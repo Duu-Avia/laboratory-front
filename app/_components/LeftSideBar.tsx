@@ -24,8 +24,8 @@ export default function LeftSidebar() {
     <aside className="w-72 bg-[#2f3533] text-white flex flex-col">
       {/* Header */}
       <div className="px-5 py-4 border-b border-white/10">
-        <div className="text-xl font-semibold">Prime Project</div>
-        <div className="text-sm text-white/70">Жин Хиангкун</div>
+        <div className="text-xl font-semibold">Лаборатори</div>
+        <div className="text-sm text-white/70">ERP</div>
       </div>
 
       {/* Menu */}
@@ -51,8 +51,8 @@ export default function LeftSidebar() {
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-white/10 text-xs text-white/60">
-        Жунмэй инженеринг групп<br />
-        ХХК-ний УБ-Дарханы замын төсөл
+        Авиагын <br />
+        Лабораторын төсөл
       </div>
     </aside>
   );

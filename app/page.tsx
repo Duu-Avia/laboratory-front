@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState }  from "react";
+import {useRouter} from "next/navigation"
 import Link from "next/link";
 import {
   Dialog,
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-type ReportStatus = "draft" | "pending" | "completed";
+type ReportStatus = "draft" | "pending_samples" | "tested" | "approved";
 
 type ReportRow = {
   id: number;
@@ -57,15 +58,15 @@ type SampleDraft = {
 
 
 
-
 function statusBadge(status: ReportStatus) {
-  const map: Record<ReportStatus, { text: string; variant: "default" | "secondary" | "outline" }> = {
-    draft: { text: "Draft", variant: "secondary" },
-    pending: { text: "Pending", variant: "outline" },
-    completed: { text: "Completed", variant: "default" },
+  const map: Record<ReportStatus, { text: string; variant: "default" | "secondary" | "outline"; className?:string }> = {
+    draft: { text: "Draft", variant: "secondary", },
+    pending_samples: { text: "Дээж хүлээгдэж байна", variant: "outline", className: "bg-color-yellow-200" },
+    tested: { text: "Шинжилгээ хийгдсэн", variant: "outline",className: "bg-blue-400 text-white" },
+    approved: {text:"Батлагдсан", variant:"default",className: "bg-color-green-200"},
   };
   const s = map[status];
-  return <Badge variant={s.variant}>{s.text}</Badge>;
+  return <Badge className={s.className} variant={s.variant}>{s.text}</Badge>;
 }
 
 function uid() {
@@ -84,7 +85,8 @@ export default function ReportsPage() {
   const [indicators, setIndicators] = useState("")
   // Modal
   const [open, setOpen] = useState(false);
-
+  const [openPdf, setOpenPdf] = useState(false);
+  const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   // Create form state
   const [reportTitle, setReportTitle] = useState("");
   const [testStart, setTestStart] = useState(from);
@@ -104,6 +106,16 @@ export default function ReportsPage() {
       availableIndicators: []
     },
   ]);
+  const statusLabel = {
+  draft: "Draft",
+  pending_samples: "Дээж хүлээгдэж байна",
+  tested: "Шинжилгээ хийгдсэн",
+  approved: "Батлагдсан",
+};
+  const router = useRouter();
+
+
+
 
   const filtered = data.filter((r) => {
     const matchSearch =
@@ -259,39 +271,40 @@ useEffect(()=>{
           </div>
 
           <div className="w-[180px]">
-            <Label className="text-xs text-muted-foreground">Status</Label>
+            <Label className="text-xs text-muted-foreground">Тайлангийн төлөв</Label>
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger>
-                <SelectValue placeholder="All" />
+                <SelectValue placeholder="Бүгдийн" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="all">Бүгдийн</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="pending_samples">Дээж хүлээгдэж байна</SelectItem>
+                <SelectItem value="tested">Шинжилгээ хийгдсэн</SelectItem>
+                <SelectItem value="approved">Батлагдсан</SelectItem>
               </SelectContent>
             </Select>
             
           </div>
 
           <div className="w-[170px]">
-            <Label className="text-xs text-muted-foreground">Start date</Label>
+            <Label className="text-xs text-muted-foreground">Эхлэх он</Label>
             <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           </div>
           <div className="w-[170px]">
-            <Label className="text-xs text-muted-foreground">End date</Label>
+            <Label className="text-xs text-muted-foreground">Дуусах он</Label>
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
 
           <div className="w-[260px]">
-            <Label className="text-xs text-muted-foreground">Search</Label>
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by code or title..." />
+            <Label className="text-xs text-muted-foreground">Хайх</Label>
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Тайлангийн нэрээр хайх" />
           </div>
 
           <div className="flex-1" />
 
           <Button variant="secondary" onClick={() => console.log("export excel (ui only)")}>
-            Export Excel
+            Экселрүү хөрвүүлэх
           </Button>
 
           <Button onClick={() => setOpen(true)}>+ Дээж шинээр оруулах</Button>
@@ -316,15 +329,30 @@ useEffect(()=>{
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((dataItem) => (
-              <TableRow key={dataItem.id}className="hover:bg-muted/50">
+            {filtered?.map((dataItem) => (
+              <TableRow
+                key={dataItem.id}
+                className="hover:bg-muted/50 cursor-pointer"
+                onClick={() => {
+                  if (dataItem.status === "tested") {
+                    setPdfReportId(dataItem.id);
+                    setOpenPdf(true);
+                  } else {
+                    router.push(`/reports/${dataItem.id}`); // results input page
+                  }
+}}>
                 <TableCell>{dataItem.created_at.slice(0,10)}</TableCell>
                 <TableCell>{dataItem.id}</TableCell>
                 <TableCell>
-                  <Link className="text-blue-600 hover:underline" href={`/reports/${dataItem.id}`}>
-                    {dataItem.report_title}
-                  </Link>
-                </TableCell>
+  <button
+    className="text-blue-600 hover:underline text-left"
+    onClick={(e) => {
+    
+    }}
+  >
+    {dataItem.report_title}
+  </button>
+</TableCell>
                 <TableCell className="max-w-[420px] truncate">{dataItem.sample_names}</TableCell>
                 <TableCell>{dataItem.workType}</TableCell>
                 <TableCell>{dataItem.location}</TableCell>
@@ -347,13 +375,13 @@ useEffect(()=>{
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-5xl">
           <DialogHeader>
-            <DialogTitle>New Report</DialogTitle>
+            <DialogTitle>Шинэ хүсэлт</DialogTitle>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Report title</Label>
-              <Input value={reportTitle} onChange={(e) => setReportTitle(e.target.value)} placeholder="e.g., Building A - Water test" />
+              <Label>Тайлан</Label>
+              <Input value={reportTitle} onChange={(e) => setReportTitle(e.target.value)} placeholder="Нэгдсэн төв ус гэх мэт..." />
             </div>
             {/* <div className="space-y-2">
               <Label>Analyst</Label>
@@ -378,9 +406,9 @@ useEffect(()=>{
           {/* <Separator className="my-4" /> */}
 
           <div className="flex items-center justify-between">
-            <div className="font-medium">Samples</div>
+            <div className="font-medium">Дээжүүд</div>
             <Button variant="secondary" onClick={addSample}>
-              + Add sample
+              + Дээж нэмэх
             </Button>
           </div>
 
@@ -390,7 +418,7 @@ useEffect(()=>{
               return (
                 <div key={s.tempId} className="rounded-xl border p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium">Sample #{idx + 1}</div>
+                    <div className="font-medium">Дээж #{idx + 1}</div>
                     {samples.length > 1 && (
                       <Button variant="ghost" onClick={() => removeSample(s.tempId)}>
                         Remove
@@ -400,13 +428,13 @@ useEffect(()=>{
 
                   <div className="grid grid-cols-3 gap-3">
                     <div className="space-y-2">
-                      <Label>Type</Label>
+                      <Label>Дээжний төрөл</Label>
                       <Select
                         value={s.sample_type_id ? String(s.sample_type_id) : undefined}
                         onValueChange={(v) => setTypeAndDefaults(s.tempId, Number(v))}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder="Төрөл" />
                         </SelectTrigger>
                         <SelectContent>
                           {sampleType.map((t) => (
@@ -419,27 +447,27 @@ useEffect(()=>{
                     </div>
 
                     <div className="space-y-2 col-span-2">
-                      <Label>Sample name</Label>
+                      <Label>Дээжний нэр</Label>
                       <Input
                         value={s.sample_name}
                         onChange={(e) => updateSample(s.tempId, { sample_name: e.target.value })}
-                        placeholder="e.g., Kitchen water / Toilet water"
+                        placeholder="Төв оффис / гал тогооны ус гэх мэт"
                       />
                     </div>
 
                     <div className="space-y-2 col-span-2">
-                      <Label>Location</Label>
-                      <Input value={s.location} onChange={(e) => updateSample(s.tempId, { location: e.target.value })} placeholder="e.g., Building A - Kitchen" />
+                      <Label>Дээж авсан байршил</Label>
+                      <Input value={s.location} onChange={(e) => updateSample(s.tempId, { location: e.target.value })} placeholder="байршил" />
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Sample date</Label>
+                      <Label>Дээж авсан огноо</Label>
                       <Input type="date" value={s.sample_date} onChange={(e) => updateSample(s.tempId, { sample_date: e.target.value })} />
                     </div>
 
                     <div className="space-y-2 col-span-2">
-                      <Label>Sampled by</Label>
-                      <Input value={s.sampled_by} onChange={(e) => updateSample(s.tempId, { sampled_by: e.target.value })} placeholder="Collector name" />
+                      <Label>Дээж авсан хүний нэр</Label>
+                      <Input value={s.sampled_by} onChange={(e) => updateSample(s.tempId, { sampled_by: e.target.value })} placeholder="нэр" />
                     </div>
                   </div>
 
@@ -486,14 +514,35 @@ useEffect(()=>{
               );
             })}
           </div>
-
           <DialogFooter className="mt-4">
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              Болих
             </Button>
-            <Button onClick={onCreateClick}>Save</Button>
+            <Button onClick={onCreateClick}>Хадгалах</Button>
           </DialogFooter>
         </DialogContent>
+        {/* PDF Modal */}
+<Dialog open={openPdf} onOpenChange={setOpenPdf}>
+  <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] p-0 overflow-hidden" style={{
+      width: '800px',
+      height: '90vh',
+      maxWidth: '1400px',
+      maxHeight: '90vh',
+    }}>
+    <DialogTitle/>
+    <div className="w-full h-full">
+      {pdfReportId ? (
+        <iframe
+          title="Report PDF"
+          className="w-full h-[85vh]"
+          src={`http://localhost:8000/reports/${pdfReportId}/pdf`}
+        />
+      ) : (
+        <div className="p-6">No report selected</div>
+      )}
+    </div>
+  </DialogContent>
+</Dialog>
       </Dialog>
     </div>
   );

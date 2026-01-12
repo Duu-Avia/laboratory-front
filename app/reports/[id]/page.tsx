@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import {useEffect, useState} from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -25,34 +25,63 @@ type SampleBlock = {
   indicators: IndicatorRow[];
 };
 
-const mockDetail: SampleBlock[] = [
-  {
-    sample_id: 1,
-    sample_name: "Kitchen water",
-    location: "Building A - Kitchen",
-    indicators: [
-      { sample_indicator_id: 10, indicator_name: "pH", unit: "", limit_value: "6.5-8.5", result_value: "" },
-      { sample_indicator_id: 11, indicator_name: "Turbidity", unit: "NTU", limit_value: "≤ 5", result_value: "" },
-      { sample_indicator_id: 12, indicator_name: "E. coli", unit: "CFU/100mL", limit_value: "0", result_value: "" },
-    ],
-  },
-  {
-    sample_id: 2,
-    sample_name: "Toilet water",
-    location: "Building A - Toilet 1",
-    indicators: [
-      { sample_indicator_id: 20, indicator_name: "pH", unit: "", limit_value: "6.5-8.5", result_value: "" },
-      { sample_indicator_id: 21, indicator_name: "Turbidity", unit: "NTU", limit_value: "≤ 5", result_value: "" },
-    ],
-  },
-];
+type FlatRow = {
+    sample_id: number;
+  sample_name: string;
+  location: string | null;
+
+  sample_indicator_id: number;
+  indicator_name: string;
+  unit: string | null;
+  limit_value: string | null;
+
+  result_value: string | null;
+  is_detected: boolean | null;
+  is_within_limit: boolean | null;
+}
 
 export default function ReportDetailPage() {
   const params = useParams<{ id: string }>();
   const reportId = params?.id;
 
   // UI-only local state for inputs
-  const [samples, setSamples] = React.useState<SampleBlock[]>(mockDetail);
+  const [samples, setSamples] = useState<SampleBlock[]>([]);
+
+  //object array ruu function
+  function groupRowsToSamples(rows: FlatRow[]): SampleBlock[] {
+  const map = new Map<number, SampleBlock>();
+
+  for (const r of rows) {
+    if (!map.has(r.sample_id)) {
+      map.set(r.sample_id, {
+        sample_id: r.sample_id,
+        sample_name: r.sample_name,
+        location: r.location ?? "",
+        indicators: [],
+      });
+    }
+
+    map.get(r.sample_id)!.indicators.push({
+      sample_indicator_id: r.sample_indicator_id,
+      indicator_name: r.indicator_name,
+      unit: r.unit ?? "",
+      limit_value: r.limit_value ?? "",
+      // result_value: r.result_value ?? null,
+      is_detected: r.is_detected ?? null,
+      is_within_limit: r.is_within_limit ?? null,
+    });
+  }
+
+  return Array.from(map.values());
+}
+
+  useEffect(()=>{
+    if(!reportId) return;
+    fetch(`http://localhost:8000/reports/${reportId}`)
+    .then((res)=> res.json())
+    .then((data)=>{const grouped = groupRowsToSamples(data.rows); setSamples(grouped)})
+    .catch((err)=>console.log(`error while fetching data`))
+  },[reportId])
 
   function updateResult(sample_indicator_id: number, patch: Partial<IndicatorRow>) {
     setSamples((prev) =>
@@ -62,20 +91,27 @@ export default function ReportDetailPage() {
       }))
     );
   }
-
-  function onSave() {
-    // UI only: you will replace this with PUT /reports/:id/results
-    const payload = samples.flatMap((s) =>
+  console.log(samples)
+  const onSave = async() => {
+      const results = samples.flatMap((s) =>
       s.indicators.map((i) => ({
         sample_indicator_id: i.sample_indicator_id,
         result_value: i.result_value ?? null,
-        // you can set these based on your business rules:
         is_detected: i.is_detected ?? null,
         is_within_limit: i.is_within_limit ?? null,
       }))
     );
-
-    console.log("SAVE RESULTS payload (UI only):", { reportId, results: payload });
+    try{
+      const response = await fetch(`http://localhost:8000/reports/results/${reportId}`,{
+      method: "PUT",
+      headers: {"Content-type": "application/json"},
+      body: JSON.stringify({results})
+    })
+     const data = response.json()
+     console.log(`saved data`, data)
+    }catch(err){
+      console.log(`failed to save`)
+    }
   }
 
   return (
@@ -88,7 +124,7 @@ export default function ReportDetailPage() {
             </Link>{" "}
             / #{reportId}
           </div>
-          <div className="text-2xl font-semibold">Report Detail</div>
+          <div className="text-2xl font-semibold">Үр дүн оруулах</div>
         </div>
 
         <div className="flex gap-2">
@@ -106,18 +142,18 @@ export default function ReportDetailPage() {
           <div key={s.sample_id} className="rounded-xl border p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <div className="text-lg font-semibold">{s.sample_name}</div>
+                <Badge variant="outline">Дээж #{s.sample_id}</Badge>
+                <div className="text-lg font-semibold pt-6">{s.sample_name}</div>
                 <div className="text-sm text-muted-foreground">{s.location || "-"}</div>
               </div>
-              <Badge variant="outline">Sample #{s.sample_id}</Badge>
             </div>
 
             <div className="mt-4 overflow-auto rounded-lg border">
               <table className="w-full text-sm">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="p-3 text-left font-medium">Indicator</th>
-                    <th className="p-3 text-left font-medium w-[120px]">Unit</th>
+                    <th className="p-3 text-left font-medium">Шинжилгээний нэр</th>
+                    <th className="p-3 text-left font-medium w-[120px]">Зөвшөөрөгдөх хэмжээ</th>
                     <th className="p-3 text-left font-medium w-[160px]">Limit</th>
                     <th className="p-3 text-left font-medium w-[220px]">Result value</th>
                     <th className="p-3 text-left font-medium w-[160px]">Detected</th>
