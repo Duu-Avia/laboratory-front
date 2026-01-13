@@ -1,8 +1,6 @@
 "use client";
-
 import { useEffect, useState }  from "react";
 import {useRouter} from "next/navigation"
-import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -23,46 +21,23 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Indicator, ReportRow, ReportStatus, SampleType, StatusFilter } from "./_components/types/types";
 
-type ReportStatus = "draft" | "pending_samples" | "tested" | "approved";
+;
 
-type ReportRow = {
-  id: number;
-  sample_names:string;
-  created_at: string;
-  time: string;
-  code: string;
-  report_title: string;
-  workType: string;
-  location: string;
-  qty?: string;
-  status: ReportStatus;
-};
-
-type SampleType = { id: number; type_name: string };
-type Indicator = { id: number; indicator_name: string; unit?: string; method?: string; limit?: string; is_default?: boolean };
-
-type SampleDraft = {
-  tempId: string;
-  sample_type_id: number | null;
-  sample_name: string;
-  location: string;
-  sample_date: string;
-  sampled_by: string;
-  indicators: number[];
-  availableIndicators: Indicator[];
-};
-
-
-
-
-
+const statusOptions: { key: StatusFilter; label: string }[] = [
+  { key: "all", label: "Бүгдийн" },
+  { key: "draft", label: "Draft" },
+  { key: "pending_samples", label: "Дээж хүлээгдэж байна" },
+  { key: "tested", label: "Шинжилгээ хийгдсэн" },
+  { key: "approved", label: "Батлагдсан" },
+];
 
 function statusBadge(status: ReportStatus) {
   const map: Record<ReportStatus, { text: string; variant: "default" | "secondary" | "outline"; className?:string }> = {
     draft: { text: "Draft", variant: "secondary", },
     pending_samples: { text: "Дээж хүлээгдэж байна", variant: "outline", className: "bg-color-yellow-200" },
-    tested: { text: "Шинжилгээ хийгдсэн", variant: "outline",className: "bg-blue-400 text-white" },
+    tested: { text: "Шинжилгээ хийгдсэн", variant: "outline",className: "bg-cyan-500 text-white" },
     approved: {text:"Батлагдсан", variant:"default",className: "bg-color-green-200"},
   };
   const s = map[status];
@@ -74,219 +49,196 @@ function uid() {
 }
 
 export default function ReportsPage() {
-  // Filters (UI only)
+  // Filters
   const [jobType, setJobType] = useState<string>("all");
-  const [status, setStatus] = useState<string>("all");
+  const [status, setStatus] = useState<StatusFilter>("all");
   const [from, setFrom] = useState<string>("2026-01-10");
   const [to, setTo] = useState<string>("2026-01-17");
   const [search, setSearch] = useState<string>("");
-  // List data (mock)
+  const [selectedSampleType, setSelectedSampleType] = useState<string>("all");
+  
+  // List data
   const [data, setData] = useState<ReportRow[]>([]);
-  const [indicators, setIndicators] = useState("")
+  
   // Modal
   const [open, setOpen] = useState(false);
   const [openPdf, setOpenPdf] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
+  
   // Create form state
   const [reportTitle, setReportTitle] = useState("");
-  const [testStart, setTestStart] = useState(from);
-  const [testEnd, setTestEnd] = useState(to);
-  const [analyst, setAnalyst] = useState("");
-  const [approvedBy, setApprovedBy] = useState("");
   const [sampleType, setSampleType] = useState<SampleType[]>([])
-  const [samples, setSamples] = useState<SampleDraft[]>([
-    {
-      tempId: uid(),
-      sample_type_id: null,
-      sample_name: "",
-      location: "",
-      sample_date: from,
-      sampled_by: "",
-      indicators: [],
-      availableIndicators: []
-    },
-  ]);
-  const statusLabel = {
-  draft: "Draft",
-  pending_samples: "Дээж хүлээгдэж байна",
-  tested: "Шинжилгээ хийгдсэн",
-  approved: "Батлагдсан",
-};
+  
+  // NEW: Single sample group with multiple names
+  const [sampleGroup, setSampleGroup] = useState<{
+    sample_type_id: number | null;
+    sample_names: string[];
+    location: string;
+    sample_date: string;
+    sampled_by: string;
+    indicators: number[];
+    availableIndicators: Indicator[];
+  }>({
+    sample_type_id: null,
+    sample_names: [""],
+    location: "",
+    sample_date: from,
+    sampled_by: "",
+    indicators: [],
+    availableIndicators: []
+  });
+  
   const router = useRouter();
 
+  // Fetch sample types
+  useEffect(()=>{
+    fetch(`http://localhost:8000/sample-types`)
+    .then((res)=> res.json())
+    .then((data)=> setSampleType(data))
+    .catch((err)=> console.log(`error while fetching sample type`))
+  },[])
 
+  // Fetch reports
+  useEffect(() => {
+    fetch("http://localhost:8000/reports")
+      .then(async (res) => {
+        const json = await res.json();
+        if (!Array.isArray(json)) {
+          console.error("Expected array from /reports but got:", json);
+          setData([]);
+          return;
+        }
+        setData(json);
+      })
+      .catch((err) => {
+        console.log("error while fetch data", err);
+        setData([]);
+      });
+  }, []);
 
-
+  // Filter data
   const filtered = data.filter((r) => {
     const matchSearch =
       !search ||
-      r.code.toLowerCase().includes(search.toLowerCase()) ||
+      r.code?.toLowerCase().includes(search.toLowerCase()) ||
       r.report_title.toLowerCase().includes(search.toLowerCase());
     const matchStatus = status === "all" ? true : r.status === status;
     const matchJob = jobType === "all" ? true : r.workType === jobType;
-    return matchSearch && matchStatus && matchJob;
+    const matchSampleType = selectedSampleType === "all" ? true : r.sample_type === selectedSampleType;
+    
+    return matchSearch && matchStatus && matchJob && matchSampleType;
   });
 
-  // sample type (Air, water) geh met data duudah func
-useEffect(()=>{
-  fetch(`http://localhost:8000/sample-types`)
-  .then((res)=> res.json())
-  .then((data)=> setSampleType(data))
-  .catch((err)=> console.log(`error while fetching sample type`))
-},[])
-
-//sample data fetch function
- useEffect(() => {
-  fetch("http://localhost:8000/reports")
-    .then(async (res) => {
-      const json = await res.json();
-
-      if (!Array.isArray(json)) {
-        console.error("Expected array from /reports but got:", json);
-        setData([]); // prevent crash
-        return;
-      }
-
-      setData(json);
-    })
-    .catch((err) => {
-      console.log("error while fetch data", err);
-      setData([]);
-    });
-}, []);
-
-
-  console.log(data)
-//sample nemeh function
-  function addSample() {
-    setSamples((prev) => [
+  function addSampleName() {
+    setSampleGroup(prev => ({
       ...prev,
-      {
-        tempId: uid(),
-        sample_type_id: null,
-        sample_name: "",
-        location: "",
-        sample_date: testStart,
-        sampled_by: "",
-        indicators: [],
-        availableIndicators:[]
-      },
-    ]);
+      sample_names: [...prev.sample_names, ""]
+    }));
   }
 
-  function removeSample(tempId: string) {
-    setSamples((prev) => prev.filter((s) => s.tempId !== tempId));
+  function removeSampleName(index: number) {
+    setSampleGroup(prev => ({
+      ...prev,
+      sample_names: prev.sample_names.filter((_, i) => i !== index)
+    }));
   }
 
-  function updateSample(tempId: string, patch: Partial<SampleDraft>) {
-    setSamples((prev) => prev.map((s) => (s.tempId === tempId ? { ...s, ...patch } : s)));
+  function updateSampleName(index: number, value: string) {
+    setSampleGroup(prev => ({
+      ...prev,
+      sample_names: prev.sample_names.map((name, i) => i === index ? value : name)
+    }));
   }
 
-  async function setTypeAndDefaults(tempId: string, typeId: number) {
-  updateSample(tempId, { sample_type_id: typeId, indicators: [], availableIndicators: [] });
+  async function setTypeAndDefaults(typeId: number) {
+    setSampleGroup(prev => ({ ...prev, sample_type_id: typeId, indicators: [], availableIndicators: [] }));
 
-  try {
-    const res = await fetch(`http://localhost:8000/sample/indicators/${typeId}`);
-    if (!res.ok) throw new Error("Failed to load indicators");
+    try {
+      const res = await fetch(`http://localhost:8000/sample/indicators/${typeId}`);
+      if (!res.ok) throw new Error("Failed to load indicators");
 
-    const indicators: Indicator[] = await res.json();
+      const indicators: Indicator[] = await res.json();
 
-    // default selections based on DB is_default
-    const defaultIds = indicators
-      .filter((i) => i.is_default)
-      .map((i) => i.id);
+      setSampleGroup(prev => ({
+        ...prev,
+        sample_type_id: typeId,
+        availableIndicators: indicators,
+        indicators:[],
+      }));
+    } catch (err) {
+      console.error(err);
+      setSampleGroup(prev => ({ ...prev, sample_type_id: typeId, availableIndicators: [], indicators: [] }));
+    }
+  }
 
-    updateSample(tempId, {
-      sample_type_id: typeId,
-      availableIndicators: indicators,
-      indicators:[],
+  function toggleIndicator(indicatorId: number) {
+    setSampleGroup(prev => {
+      const exists = prev.indicators.includes(indicatorId);
+      return {
+        ...prev,
+        indicators: exists 
+          ? prev.indicators.filter(x => x !== indicatorId)
+          : [...prev.indicators, indicatorId]
+      };
     });
-  } catch (err) {
-    console.error(err);
-    // keep type set but no indicators
-    updateSample(tempId, { sample_type_id: typeId, availableIndicators: [], indicators: [] });
-  }
-}
-
-
-  function toggleIndicator(tempId: string, indicatorId: number) {
-    setSamples((prev) =>
-      prev.map((s) => {
-        if (s.tempId !== tempId) return s;
-        const exists = s.indicators.includes(indicatorId);
-        return { ...s, indicators: exists ? s.indicators.filter((x) => x !== indicatorId) : [...s.indicators, indicatorId] };
-      })
-    );
   }
 
   const onCreateClick = async() => {
-    // UI only: you will replace with fetch to POST /reports
+    // Create a sample for each sample name
+    const samples = sampleGroup.sample_names
+      .filter(name => name.trim() !== "")
+      .map(name => ({
+        sample_type_id: sampleGroup.sample_type_id,
+        sample_name: name.trim(),
+        location: sampleGroup.location,
+        sample_date: sampleGroup.sample_date,
+        sampled_by: sampleGroup.sampled_by,
+        indicators: sampleGroup.indicators,
+      }));
+
     const payload = {
       report_title: reportTitle,
-      test_start_date: testStart,
-      test_end_date: testEnd,
-      analyst,
-      approved_by: approvedBy,
-      samples: samples.map((s) => ({
-        sample_type_id: s.sample_type_id,
-        sample_name: s.sample_name,
-        location: s.location,
-        sample_date: s.sample_date,
-        sampled_by: s.sampled_by,
-        indicators: s.indicators,
-      })),
+      test_start_date: from,
+      test_end_date: to,
+      analyst: "",
+      approved_by: "",
+      samples: samples,
     };
 
     try{
       const response = await fetch(`http://localhost:8000/reports/create`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload)
       });
       
+      if (response.ok) {
+        // Reset form
+        setReportTitle("");
+        setSampleGroup({
+          sample_type_id: null,
+          sample_names: [""],
+          location: "",
+          sample_date: from,
+          sampled_by: "",
+          indicators: [],
+          availableIndicators: []
+        });
+        setOpen(false);
+        // Refresh data
+        const json = await fetch("http://localhost:8000/reports").then(r => r.json());
+        setData(json);
+      }
     }catch(error){
       console.log("error while creating sample")
     }
-    console.log("CREATE REPORT payload (UI only):", payload);
-    setOpen(false);
   }
-  console.log(data)
+  
   return (
     <div className="p-6 space-y-5">
-      {/* Top filters row (like your screenshot) */}
+      {/* Top filters row */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-end gap-3">
-          <div className="w-[180px]">
-            <Label className="text-xs text-muted-foreground">Job type</Label>
-            <Select value={jobType} onValueChange={setJobType}>
-              <SelectTrigger>
-                <SelectValue placeholder="All" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="Earth work">Earth work</SelectItem>
-                <SelectItem value="Concrete">Concrete</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="w-[180px]">
-            <Label className="text-xs text-muted-foreground">Тайлангийн төлөв</Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Бүгдийн" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Бүгдийн</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="pending_samples">Дээж хүлээгдэж байна</SelectItem>
-                <SelectItem value="tested">Шинжилгээ хийгдсэн</SelectItem>
-                <SelectItem value="approved">Батлагдсан</SelectItem>
-              </SelectContent>
-            </Select>
-            
-          </div>
-
           <div className="w-[170px]">
             <Label className="text-xs text-muted-foreground">Эхлэх он</Label>
             <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
@@ -310,26 +262,71 @@ useEffect(()=>{
           <Button onClick={() => setOpen(true)}>+ Дээж шинээр оруулах</Button>
         </div>
 
-        <div className="text-sm text-muted-foreground">
-          Found: <span className="text-foreground">{data?.length}</span>
+        {/* Sample Type Filter Buttons */}
+        <div className="flex justify-between">
+          <div>
+            <div className="text-xs text-center text-muted-foreground">Лаб төрөлөөр хайх</div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                className="text-[13px] w-100% h-7"
+                variant={selectedSampleType === "all" ? "default" : "outline"}
+                onClick={() => setSelectedSampleType("all")}
+              >
+                Бүгд
+              </Button>
+              {sampleType.map((type) => (
+                <Button
+                  className="text-[13px] w-100% h-7"
+                  key={type.id}
+                  variant={selectedSampleType === type.type_name ? "default" : "outline"}
+                  onClick={() => setSelectedSampleType(type.type_name)}
+                >
+                  {type.type_name}
+                </Button>
+                
+              ))}
+          
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="text-xs text-center text-muted-foreground">Тайлангийн төлөвөөр хайх</div>
+            <div className="flex flex-wrap gap-2">
+              {statusOptions.map((s) => {
+                const active = status === s.key;
+                return (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => setStatus(s.key)}
+                    className={[
+                      "rounded-full border px-3 py-1 text-sm transition text-[13px] w-100% h-7",
+                      active ? "bg-black text-white border-black" : "bg-white hover:bg-muted",
+                    ].join(" ")}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border bg-background">
+      <div className="rounded-xl border bg-background text-left mt-[-15px]">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[120px]">Он сар</TableHead>
-              <TableHead className="w-[120px]">Дугаар</TableHead>
-              <TableHead>Дээжны нэр</TableHead>
-              <TableHead className="w-[160px]">Оруулсан дээжүүд</TableHead>
-              <TableHead className="w-[200px]">Байршил</TableHead>
-              <TableHead className="w-[120px] text-right">Status</TableHead>
+              <TableHead className="">Он сар</TableHead>
+              <TableHead className="">№</TableHead>
+              <TableHead className=""> Дээжны нэр </TableHead>
+              <TableHead className="">Оруулсан дээжүүд</TableHead>
+              <TableHead className="">Байршил</TableHead>
+              <TableHead className="text-right pr-15">Төлөв</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered?.map((dataItem) => (
+            {filtered?.map((dataItem, index) => (
               <TableRow
                 key={dataItem.id}
                 className="hover:bg-muted/50 cursor-pointer"
@@ -338,31 +335,38 @@ useEffect(()=>{
                     setPdfReportId(dataItem.id);
                     setOpenPdf(true);
                   } else {
-                    router.push(`/reports/${dataItem.id}`); // results input page
+                    router.push(`/reports/${dataItem.id}`);
                   }
-}}>
+                }}>
                 <TableCell>{dataItem.created_at.slice(0,10)}</TableCell>
-                <TableCell>{dataItem.id}</TableCell>
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>
-  <button
-    className="text-blue-600 hover:underline text-left"
-    onClick={(e) => {
-    
-    }}
-  >
-    {dataItem.report_title}
-  </button>
+                  <button
+                    className=" dark:text-sky-400 font-semibold hover:underline text-left"
+                    onClick={(e) => {}}
+                  >
+                    {dataItem.report_title}
+                  </button>
+                </TableCell>
+                <TableCell className="max-w-[420px]">
+  <div className="flex flex-wrap gap-1">
+    {dataItem.sample_names
+      ?.split(",")
+      .map((name, i) => (
+        <Badge key={i} variant="secondary" className="text-[12px] text-gray-850 bg-gray-200 font-normal border-gray-600">
+          <span className=" mr-1">{i + 1}.</span>
+          {name.trim()}
+        </Badge>
+      ))}
+  </div>
 </TableCell>
-                <TableCell className="max-w-[420px] truncate">{dataItem.sample_names}</TableCell>
-                <TableCell>{dataItem.workType}</TableCell>
                 <TableCell>{dataItem.location}</TableCell>
-                <TableCell>{dataItem.qty || "-"}</TableCell>
                 <TableCell className="text-right">{statusBadge(dataItem.status)}</TableCell>
               </TableRow>
             ))}
-            {data?.length === 0 && (
+            {filtered?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
                   No reports
                 </TableCell>
               </TableRow>
@@ -378,142 +382,134 @@ useEffect(()=>{
             <DialogTitle>Шинэ хүсэлт</DialogTitle>
           </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label>Тайлан</Label>
               <Input value={reportTitle} onChange={(e) => setReportTitle(e.target.value)} placeholder="Нэгдсэн төв ус гэх мэт..." />
             </div>
-            {/* <div className="space-y-2">
-              <Label>Analyst</Label>
-              <Input value={analyst} onChange={(e) => setAnalyst(e.target.value)} placeholder="Analyst name" />
-            </div>
 
-            <div className="space-y-2">
-              <Label>Start date</Label>
-              <Input type="date" value={testStart} onChange={(e) => setTestStart(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>End date</Label>
-              <Input type="date" value={testEnd} onChange={(e) => setTestEnd(e.target.value)} />
-            </div>
+            <div className="rounded-xl border p-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <Label>Дээжний төрөл</Label>
+                  <Select
+                    value={sampleGroup.sample_type_id ? String(sampleGroup.sample_type_id) : undefined}
+                    onValueChange={(v) => setTypeAndDefaults(Number(v))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Төрөл" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sampleType.map((t) => (
+                        <SelectItem key={t.id} value={String(t.id)}>
+                          {t.type_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="space-y-2 col-span-2">
-              <Label>Approved by</Label>
-              <Input value={approvedBy} onChange={(e) => setApprovedBy(e.target.value)} placeholder="Approver name (optional)" />
-            </div> */}
-          </div>
-
-          {/* <Separator className="my-4" /> */}
-
-          <div className="flex items-center justify-between">
-            <div className="font-medium">Дээжүүд</div>
-            <Button variant="secondary" onClick={addSample}>
-              + Дээж нэмэх
-            </Button>
-          </div>
-
-          <div className="space-y-4 mt-3 max-h-[52vh] overflow-auto pr-1">
-            {samples.map((s, idx) => {
-              const indicators = s.availableIndicators ?? [];;
-              return (
-                <div key={s.tempId} className="rounded-xl border p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium">Дээж #{idx + 1}</div>
-                    {samples.length > 1 && (
-                      <Button variant="ghost" onClick={() => removeSample(s.tempId)}>
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="space-y-2">
-                      <Label>Дээжний төрөл</Label>
-                      <Select
-                        value={s.sample_type_id ? String(s.sample_type_id) : undefined}
-                        onValueChange={(v) => setTypeAndDefaults(s.tempId, Number(v))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Төрөл" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {sampleType.map((t) => (
-                            <SelectItem key={t.id} value={String(t.id)}>
-                              {t.type_name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2 col-span-2">
-                      <Label>Дээжний нэр</Label>
-                      <Input
-                        value={s.sample_name}
-                        onChange={(e) => updateSample(s.tempId, { sample_name: e.target.value })}
-                        placeholder="Төв оффис / гал тогооны ус гэх мэт"
-                      />
-                    </div>
-
-                    <div className="space-y-2 col-span-2">
-                      <Label>Дээж авсан байршил</Label>
-                      <Input value={s.location} onChange={(e) => updateSample(s.tempId, { location: e.target.value })} placeholder="байршил" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Дээж авсан огноо</Label>
-                      <Input type="date" value={s.sample_date} onChange={(e) => updateSample(s.tempId, { sample_date: e.target.value })} />
-                    </div>
-
-                    <div className="space-y-2 col-span-2">
-                      <Label>Дээж авсан хүний нэр</Label>
-                      <Input value={s.sampled_by} onChange={(e) => updateSample(s.tempId, { sampled_by: e.target.value })} placeholder="нэр" />
-                    </div>
-                  </div>
-
-                  <Separator className="my-4" />
-
+                <div className="space-y-2 col-span-2">
                   <div className="flex items-center justify-between">
-                    <div className="font-medium">Шинжилгээ сонгох</div>
-                    <div className="text-xs text-muted-foreground">
-                      {s.sample_type_id ? "Defaults are pre-selected" : "Choose sample type first"}
-                    </div>
+                    <Label>Дээжний нэр</Label>
+                    <Button  variant="ghost" size="sm" onClick={addSampleName}>
+                      + Дээж нэмэх
+                    </Button>
                   </div>
-
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {s.sample_type_id ? (
-                      indicators.map((ind) => {
-                        const checked = s.indicators.includes(ind.id);
-                        return (
-                          <button
-                            type="button"
-                            key={ind.id}
-                            onClick={() => toggleIndicator(s.tempId, ind.id)}
-                            className={[
-                              "flex items-center justify-between rounded-lg border px-3 py-2 text-left",
-                              checked ? "bg-muted" : "hover:bg-muted/50",
-                            ].join(" ")}
+                  <div className="space-y-2">
+                    {sampleGroup.sample_names.map((name, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <Input
+                          value={name}
+                          onChange={(e) => updateSampleName(idx, e.target.value)}
+                          placeholder={`Дээж ${idx + 1}`}
+                        />
+                        {sampleGroup.sample_names.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeSampleName(idx)}
                           >
-                            <div>
-                              <div className="text-sm font-medium">{ind.indicator_name}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {ind.unit ? `Unit: ${ind.unit}` : "—"}
-                              </div>
-                            </div>
-                            <Badge variant={checked ? "default" : "outline"}>{checked ? "Сонгогдсон" : "Сонгох"}</Badge>
-                          </button>
-                        );
-                      })
-                    ) : (
-                      <div className="col-span-2 text-sm text-muted-foreground py-4">
-                        Select a sample type to load indicators.
+                            ×
+                          </Button>
+                        )}
                       </div>
-                    )}
+                    ))}
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="space-y-2 col-span-2">
+                  <Label>Дээж авсан байршил</Label>
+                  <Input 
+                    value={sampleGroup.location} 
+                    onChange={(e) => setSampleGroup(prev => ({ ...prev, location: e.target.value }))} 
+                    placeholder="байршил" 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Дээж авсан огноо</Label>
+                  <Input 
+                    type="date" 
+                    value={sampleGroup.sample_date} 
+                    onChange={(e) => setSampleGroup(prev => ({ ...prev, sample_date: e.target.value }))} 
+                  />
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label>Дээж авсан хүний нэр</Label>
+                  <Input 
+                    value={sampleGroup.sampled_by} 
+                    onChange={(e) => setSampleGroup(prev => ({ ...prev, sampled_by: e.target.value }))} 
+                    placeholder="нэр" 
+                  />
+                </div>
+              </div>
+
+              <Separator className="my-4" />
+
+              <div className="flex items-center justify-between">
+                <div className="font-medium">Шинжилгээ сонгох</div>
+                <div className="text-xs text-muted-foreground">
+                  {sampleGroup.sample_type_id ? "Сануулсан шинжилгээнүүд" : "Дээжний төрлөө эхлээд сонгоно уу"}
+                </div>
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {sampleGroup.sample_type_id ? (
+                  sampleGroup.availableIndicators.map((ind) => {
+                    const checked = sampleGroup.indicators.includes(ind.id);
+                    return (
+                      <button
+                        type="button"
+                        key={ind.id}
+                        onClick={() => toggleIndicator(ind.id)}
+                        className={[
+                          "flex items-center justify-between rounded-lg border px-3 py-2 text-left",
+                          checked ? "bg-muted" : "hover:bg-muted/50",
+                        ].join(" ")}
+                      >
+                        <div>
+                          <div className="text-sm font-medium">{ind.indicator_name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {ind.unit ? `Unit: ${ind.unit}` : "—"}
+                          </div>
+                        </div>
+                        <Badge variant={checked ? "default" : "outline"}>
+                          {checked ? "Сонгогдсон" : "Сонгох"}
+                        </Badge>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="col-span-2 text-sm text-muted-foreground py-4">
+                    Шинжилгээний цэс.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
+
           <DialogFooter className="mt-4">
             <Button variant="secondary" onClick={() => setOpen(false)}>
               Болих
@@ -521,29 +517,34 @@ useEffect(()=>{
             <Button onClick={onCreateClick}>Хадгалах</Button>
           </DialogFooter>
         </DialogContent>
+        
         {/* PDF Modal */}
-<Dialog open={openPdf} onOpenChange={setOpenPdf}>
-  <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] p-0 overflow-hidden" style={{
-      width: '800px',
-      height: '90vh',
-      maxWidth: '1400px',
-      maxHeight: '90vh',
-    }}>
-    <DialogTitle/>
-    <div className="w-full h-full">
-      {pdfReportId ? (
-        <iframe
-          title="Report PDF"
-          className="w-full h-[85vh]"
-          src={`http://localhost:8000/reports/${pdfReportId}/pdf`}
-        />
-      ) : (
-        <div className="p-6">No report selected</div>
-      )}
-    </div>
-  </DialogContent>
-</Dialog>
+        <Dialog open={openPdf} onOpenChange={setOpenPdf}>
+          <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] p-0 overflow-hidden" style={{
+              width: '800px',
+              height: '90vh',
+              maxWidth: '1400px',
+              maxHeight: '90vh',
+            }}>
+            <DialogTitle className="sr-only">Report PDF</DialogTitle>
+            <div className="w-full h-full">
+              {pdfReportId ? (
+                <iframe
+                  title="Report PDF"
+                  className="w-full h-[85vh]"
+                  src={`http://localhost:8000/reports/${pdfReportId}/pdf`}
+                />
+              ) : (
+                <div className="p-6">No report selected</div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </Dialog>
+         <div className="text-sm text-muted-foreground text-right">
+          Нийт илэрц : <span className="text-foreground font-medium">{filtered?.length}</span>
+        </div>
     </div>
+    
   );
 }

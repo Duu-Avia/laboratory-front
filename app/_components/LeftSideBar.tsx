@@ -21,7 +21,7 @@ export default function LeftSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-72 bg-[#2f3533] text-white flex flex-col">
+    <aside className="w-50 bg-[#2f3533] text-white flex flex-col">
       {/* Header */}
       <div className="px-5 py-4 border-b border-white/10">
         <div className="text-xl font-semibold">Лаборатори</div>
