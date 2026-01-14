@@ -5,7 +5,6 @@ export type ReportRow = {
   sample_names:string;
   created_at: string;
   time: string;
-  code: string;
   report_title: string;
   workType: string;
   location: string;
@@ -43,3 +42,24 @@ export type IndicatorRow = {
   is_detected?: boolean | null;
   is_within_limit?: boolean | null;
 };
+export interface ReportHeaderSaveProps  {
+  reportId: string,
+  onSave: () => void;
+  onExport: () => void;
+}
+
+export interface FilterBarProps {
+  from: string;
+  to: string;
+  search: string;
+  selectedSampleType: string;
+  status: StatusFilter;
+  sampleTypes: SampleType[];
+  onFromChange: (value: string) => void;
+  onToChange: (value: string) => void;
+  onSearchChange: (value: string) => void;
+  onSampleTypeChange: (value: string) => void;
+  onStatusChange: (value: StatusFilter) => void;
+  onCreateClick: () => void;
+  onExportClick: () => void;
+}

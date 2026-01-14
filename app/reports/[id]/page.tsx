@@ -1,12 +1,11 @@
 "use client";
-import {useEffect, useState} from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { FlatRow, IndicatorRow, SampleColumn } from "@/app/_components/types/types";
+import { FlatRow, IndicatorRow, SampleColumn } from "@/app/types/types";
+import { ReportHeader } from "../_components/ReportHeader";
+import { SampleBadges } from "../_components/SampleBadges";
+import { ResultsTable } from "../_components/ResultTable";
+
 
 export default function ReportDetailPage() {
   const params = useParams<{ id: string }>();
@@ -70,7 +69,7 @@ export default function ReportDetailPage() {
 
   const onSave = async () => {
     const results: any[] = [];
-    // Each indicator's result applies to ALL its sample_indicator_ids
+
     indicators.forEach((ind) => {
       ind.sample_indicator_ids.forEach((sample_indicator_id) => {
         results.push({
@@ -95,97 +94,16 @@ export default function ReportDetailPage() {
     }
   };
 
+  const handleExport = () => {
+    console.log("export pdf (ui only)");
+  };
+
   return (
     <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="text-sm text-muted-foreground">
-            <Link href="/reports" className="hover:underline">
-              Reports
-            </Link>{" "}
-            / #{reportId}
-          </div>
-          <div className="text-2xl font-semibold">Үр дүн оруулах</div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => console.log("export pdf (ui only)")}>
-            Export PDF
-          </Button>
-          <Button onClick={onSave}>Save results</Button>
-        </div>
-      </div>
-
-      <Separator />
-
+      <ReportHeader reportId={reportId || ""} onSave={onSave} onExport={handleExport} />
       <div className="rounded-xl border p-4">
-        <div className="mb-4">
-          <div className="text-[100px] font-semibold">{reportTitle}</div>
-          <div className="flex gap-2 mt-2">
-            {samples.map((s,index) => (
-              <Badge className="text-[15px]" key={s.sample_id} variant="outline">
-                Дээж-{index + 1} {s.sample_name}
-              </Badge>
-            ))}
-          </div>
-        </div>
-        
-        <div className="overflow-auto rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="p-3 text-left font-medium">Шинжилгээний нэр</th>
-                <th className="p-3 text-left font-medium w-[140px]">Зөвшөөрөгдөх хэмжээ</th>
-                <th className="p-3 text-left font-medium w-[140px]">Limit</th>
-                <th className="p-3 text-left font-medium w-[200px]">Шинжилгээний хариу</th>
-                <th className="p-3 text-center font-medium w-[140px]">Илэрсэн/илэрээгүй</th>
-              </tr>
-            </thead>
-            <tbody>
-              {indicators.map((ind) => (
-                <tr key={ind.indicator_id} className="border-t">
-                  <td className="p-3">{ind.indicator_name}</td>
-                  <td className="p-3 text-muted-foreground">{ind.unit || "-"}</td>
-                  <td className="p-3 text-muted-foreground">{ind.limit_value || "-"}</td>
-                  
-                  <td className="p-3">
-                    <Input
-                      value={ind.result_value ?? ""}
-                      onChange={(e) => updateIndicator(ind.indicator_id, { result_value: e.target.value })}
-                      placeholder="Enter result"
-                    />
-                  </td>
-
-                  <td className="p-3">
-                    <div className="flex gap-2 justify-center">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={ind.is_detected === true ? "default" : "outline"}
-                        onClick={() => updateIndicator(ind.indicator_id, { is_detected: true })}
-                      >
-                        Илэрсэн
-                      </Button>
-                    
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={ind.is_within_limit === false ? "default" : "outline"}
-                        onClick={() => updateIndicator(ind.indicator_id, { is_within_limit: false })}
-                      >
-                        Илэрээгүй
-                      </Button>
-                 
-                    </div>
-                  </td>
-                  <td className="p-3">
-                 
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <SampleBadges reportTitle={reportTitle} samples={samples} />
+        <ResultsTable indicators={indicators} onUpdateIndicator={updateIndicator} />
       </div>
     </div>
   );
