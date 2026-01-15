@@ -4,31 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
-import { Indicator, SampleType } from "../types/types";
-
-interface CreateReportModalProps {
-  open: boolean;
-  reportTitle: string;
-  sampleGroup: {
-    sample_type_id: number | null;
-    sample_names: string[];
-    location: string;
-    sample_date: string;
-    sampled_by: string;
-    indicators: number[];
-    availableIndicators: Indicator[];
-  };
-  sampleTypes: SampleType[];
-  onOpenChange: (open: boolean) => void;
-  onReportTitleChange: (value: string) => void;
-  onAddSampleName: () => void;
-  onRemoveSampleName: (index: number) => void;
-  onUpdateSampleName: (index: number, value: string) => void;
-  onTypeChange: (typeId: number) => void;
-  onFieldChange: (field: string, value: string) => void;
-  onToggleIndicator: (indicatorId: number) => void;
-  onSave: () => void;
-}
+import { CreateReportModalProps} from "../types/types";
 
 export function CreateReportModal({
   open,

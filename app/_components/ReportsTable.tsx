@@ -1,9 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ReportRow, ReportStatus } from "../types/types";
-import { Select } from "@/components/ui/select";
 
 function statusBadge(status: ReportStatus) {
   const map: Record<ReportStatus,
@@ -11,8 +9,9 @@ function statusBadge(status: ReportStatus) {
   > = {
     draft: { text: "Draft", variant: "secondary" },
     pending_samples: { text: "Дээж хүлээгдэж байна", variant: "outline", className: "bg-color-yellow-200" },
-    tested: { text: "Шинжилгээ хийгдсэн", variant: "outline", className: "bg-cyan-500 text-white" },
-    approved: { text: "Батлагдсан", variant: "default", className: "bg-color-green-200" },
+    tested: { text: "Шинжилгээ хийгдсэн", variant: "outline", className: "text-cyan-500" },
+    approved: { text: "Батлагдсан", variant: "default", className: "bg-green-200" },
+    deleted:{text:"Устгагдсан", variant:"outline", className: "text-red-500"}
   };
   const s = map[status];
   return (
@@ -26,7 +25,6 @@ interface ReportsTableProps {
   data: ReportRow[];
   onRowClick: (report: ReportRow) => void;
 }
-
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">
@@ -47,7 +45,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
             <TableRow
               key={dataItem.id}
               className="hover:bg-muted/50 cursor-pointer"
-              onClick={() => onRowClick(dataItem)}
+              onClick={() =>  onRowClick(dataItem)}
             >
               <TableCell>{dataItem.created_at.slice(0, 10)}</TableCell>
               <TableCell>{index + 1}</TableCell>
@@ -67,7 +65,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                       <span className="mr-1">{i + 1}.</span>
                       {name.trim()}
                     </Badge>
-                  ))}
+                  ))}          
                 </div>
               </TableCell>
               <TableCell>{dataItem.location}</TableCell>
@@ -83,6 +81,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
           )}
         </TableBody>
       </Table>
+
     </div>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
+import { DeleteDialog } from "../reports/_components/DeleteDialog";
 
-interface PdfViewModalProps {
+export interface PdfViewModalProps {
   open: boolean;
   reportId: number | null;
   reportTitle: string | null;
@@ -10,11 +12,14 @@ interface PdfViewModalProps {
 }
 
 export function PdfViewModal({ open, reportTitle, reportId, onOpenChange }: PdfViewModalProps) {
-  const handleEdit = () => console.log("edit");
-  const handleDelete = () => console.log("delete");
+  const [deleteDialogOpener, setDeleteDialogOpener] = useState(false)
+   const onDeleteClick = async()=>{
+    setDeleteDialogOpener(true)
+   }
+  const handleEdit = () => console.log("delete");
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+  return (<div>
+ <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-w-[95vw] w-[65vw] h-[90vh] p-0 flex flex-col overflow-hidden"
         style={{
@@ -39,11 +44,15 @@ export function PdfViewModal({ open, reportTitle, reportId, onOpenChange }: PdfV
         {/* ✅ Footer buttons (always visible) */}
         <div className="shrink-0 border-t bg-background p-4 flex justify-end gap-2">
           <Button className="text-black bg-gray-200/75 hover:bg-gray-500 hover:text-white border-1 border-cyan-200 h-[28px]" onClick={handleEdit}>Тайлан засах</Button>
-          <Button className="text-black bg-gray-200/75 hover:bg-red-200 border-1 border-red-500 h-[28px]" onClick={handleDelete}>
+          <Button className="text-black bg-gray-200/75 hover:bg-red-200 border-1 border-red-500 h-[28px]" onClick={onDeleteClick}>
             Устгах
           </Button>
         </div>
       </DialogContent>
     </Dialog>
+    <DeleteDialog reportId={reportId} deleteDialogOpener={deleteDialogOpener} setDeleteDialogOpener={setDeleteDialogOpener}/>
+  </div>
+   
   );
 }
+

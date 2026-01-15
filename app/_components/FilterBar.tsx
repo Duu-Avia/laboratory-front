@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { FilterBarProps, SampleType, StatusFilter } from "../types/types";
 
 const statusOptions: { key: StatusFilter; label: string }[] = [
-  { key: "all", label: "Бүгдийн" },
+  { key: "all", label: "Бүгд" },
   { key: "draft", label: "Draft" },
   { key: "pending_samples", label: "Дээж хүлээгдэж байна" },
   { key: "tested", label: "Шинжилгээ хийгдсэн" },

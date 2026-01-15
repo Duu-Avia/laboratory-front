@@ -3,13 +3,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReportsTable } from "./_components/ReportsTable";
 import { Indicator, ReportRow, SampleType, StatusFilter } from "./types/types";
-import { CreateReportModal } from "./_components/CreateRerortModal";
+import { CreateReportModal } from "./_components/CreateReportModal";
 import { FilterBar } from "./_components/FilterBar";
 import { PdfViewModal } from "./_components/PdfViewModal";
-
-function uid() {
-  return Math.random().toString(36).slice(2, 10);
-}
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -74,7 +70,7 @@ export default function ReportsPage() {
         setData([]);
       });
   }, []);
-  console.log(data)
+
   // Filter data
   const filtered = data.filter((r) => {
     const statusMatch = {
@@ -82,6 +78,7 @@ export default function ReportsPage() {
       tested:"шинжилгээ хийгдсэн",
       pending_samples:"дээж хүлээгдэж байна",
       approved:"батлагдсан",
+      deleted:"устгагдсан"
     }[r.status] || ""
     const matchSearch =
       !search || statusMatch.toLowerCase().includes(search) || r.report_title.toLowerCase().includes(search.toLowerCase()) || r.sample_names.toLowerCase().includes(search.toLowerCase());
@@ -211,6 +208,7 @@ export default function ReportsPage() {
     }
   };
 
+
   return (
     <div className="p-6 space-y-5">
       <FilterBar
@@ -247,9 +245,9 @@ export default function ReportsPage() {
         onSave={onCreateClick}
       />
 
-      <PdfViewModal open={openPdf} reportTitle={pdfReportTitle} reportId={pdfReportId} onOpenChange={setOpenPdf} />
+      <PdfViewModal open={openPdf} reportTitle={pdfReportTitle} reportId={pdfReportId} onOpenChange={setOpenPdf}/>
 
-      <div className="text-sm text-muted-foreground text-right">
+      <div className="text-sm text-muted-foreground text-right pr-6">
         Нийт илэрц : <span className="text-foreground font-medium">{filtered?.length}</span>
       </div>
     </div>

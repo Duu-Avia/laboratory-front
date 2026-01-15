@@ -1,4 +1,4 @@
-export type ReportStatus = "draft" | "pending_samples" | "tested" | "approved";
+export type ReportStatus = "draft" | "pending_samples" | "tested" | "approved" | "deleted";
 export type StatusFilter = ReportStatus | "all";
 export type ReportRow = {
   id: number;
@@ -47,7 +47,11 @@ export interface ReportHeaderSaveProps  {
   onSave: () => void;
   onExport: () => void;
 }
-
+export interface DeleteDialogProps  {
+ deleteDialogOpener:boolean, 
+ reportId:number | null, 
+ setDeleteDialogOpener: (setDeleteDialogOpener:boolean) => void
+}
 export interface FilterBarProps {
   from: string;
   to: string;
@@ -62,4 +66,27 @@ export interface FilterBarProps {
   onStatusChange: (value: StatusFilter) => void;
   onCreateClick: () => void;
   onExportClick: () => void;
+}
+export interface CreateReportModalProps {
+  open: boolean;
+  reportTitle: string;
+  sampleGroup: {
+    sample_type_id: number | null;
+    sample_names: string[];
+    location: string;
+    sample_date: string;
+    sampled_by: string;
+    indicators: number[];
+    availableIndicators: Indicator[];
+  };
+  sampleTypes: SampleType[];
+  onOpenChange: (open: boolean) => void;
+  onReportTitleChange: (value: string) => void;
+  onAddSampleName: () => void;
+  onRemoveSampleName: (index: number) => void;
+  onUpdateSampleName: (index: number, value: string) => void;
+  onTypeChange: (typeId: number) => void;
+  onFieldChange: (field: string, value: string) => void;
+  onToggleIndicator: (indicatorId: number) => void;
+  onSave: () => void;
 }
