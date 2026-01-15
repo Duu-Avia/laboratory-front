@@ -1,5 +1,4 @@
 
-import { PdfViewModalProps } from "@/app/_components/PdfViewModal"
 import { DeleteDialogProps } from "@/app/types/types"
 import {
   AlertDialog,

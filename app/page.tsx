@@ -245,7 +245,14 @@ export default function ReportsPage() {
         onSave={onCreateClick}
       />
 
-      <PdfViewModal open={openPdf} reportTitle={pdfReportTitle} reportId={pdfReportId} onOpenChange={setOpenPdf}/>
+      <PdfViewModal open={openPdf} reportTitle={pdfReportTitle} reportId={pdfReportId} onOpenChange={setOpenPdf} 
+      // onAddSampleName={addSampleName}
+      // onRemoveSampleName={removeSampleName}
+      // onUpdateSampleName={updateSampleName}
+      // onTypeChange={setTypeAndDefaults}
+      // onFieldChange={handleFieldChange}
+      // onToggleIndicator={toggleIndicator}
+      />
 
       <div className="text-sm text-muted-foreground text-right pr-6">
         Нийт илэрц : <span className="text-foreground font-medium">{filtered?.length}</span>

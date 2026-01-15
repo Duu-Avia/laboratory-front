@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
-import { DeleteDialog } from "../reports/_components/DeleteDialog";
+import { DeleteDialog } from "./DeleteDialog";
+// import { EditReport } from "./EditDialog";
 
 export interface PdfViewModalProps {
   open: boolean;
@@ -51,6 +52,13 @@ export function PdfViewModal({ open, reportTitle, reportId, onOpenChange }: PdfV
       </DialogContent>
     </Dialog>
     <DeleteDialog reportId={reportId} deleteDialogOpener={deleteDialogOpener} setDeleteDialogOpener={setDeleteDialogOpener}/>
+    {/* <EditReport onAddSampleName={onAddSampleName}
+     onRemoveSampleName={onRemoveSampleName} 
+     onUpdateSampleName={onUpdateSampleName}
+     onTypeChange={onTypeChange}
+     onFieldChange={onFieldChange}
+     onToggleIndicator={onToggleIndicator}
+     /> */}
   </div>
    
   );
