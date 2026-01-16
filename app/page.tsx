@@ -25,9 +25,9 @@ export default function ReportsPage() {
   const [open, setOpen] = useState(false);
   const [openPdf, setOpenPdf] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
-  const [pdfReportTitle, setPdfReportTitle] = useState("")
+  const [pdfReportTitle, setPdfReportTitle] = useState("");
 
-  // Form state
+  // Create Form state (ONLY for create)
   const [reportTitle, setReportTitle] = useState("");
   const [sampleGroup, setSampleGroup] = useState<{
     sample_type_id: number | null;
@@ -51,7 +51,7 @@ export default function ReportsPage() {
     fetch(`http://localhost:8000/sample-types`)
       .then((res) => res.json())
       .then((data) => setSampleType(data))
-      .catch((err) => console.log(`error while fetching sample type`));
+      .catch(() => console.log(`error while fetching sample type`));
   }, []);
 
   useEffect(() => {
@@ -73,27 +73,37 @@ export default function ReportsPage() {
 
   // Filter data
   const filtered = data.filter((r) => {
-    const statusMatch = {
-      draft:"draft",
-      tested:"шинжилгээ хийгдсэн",
-      pending_samples:"дээж хүлээгдэж байна",
-      approved:"батлагдсан",
-      deleted:"устгагдсан"
-    }[r.status] || ""
+    const statusMatch =
+      (
+        {
+          draft: "draft",
+          tested: "шинжилгээ хийгдсэн",
+          pending_samples: "дээж хүлээгдэж байна",
+          approved: "батлагдсан",
+          deleted: "устгагдсан",
+        } as any
+      )[r.status] || "";
+
     const matchSearch =
-      !search || statusMatch.toLowerCase().includes(search) || r.report_title.toLowerCase().includes(search.toLowerCase()) || r.sample_names.toLowerCase().includes(search.toLowerCase());
+      !search ||
+      statusMatch.toLowerCase().includes(search.toLowerCase()) ||
+      r.report_title.toLowerCase().includes(search.toLowerCase()) ||
+      r.sample_names.toLowerCase().includes(search.toLowerCase());
+
     const matchStatus = status === "all" ? true : r.status === status;
     const matchSampleType = selectedSampleType === "all" ? true : r.sample_type === selectedSampleType;
-    const reportDate = new Date(r.created_at).setHours(0,0,0,0);
-    const fromDate = from ? new Date(from).setHours(0,0,0,0) : null;
-    const toDate = to ? new Date(to).setHours(0,0,0,0) : null;
+
+    const reportDate = new Date(r.created_at).setHours(0, 0, 0, 0);
+    const fromDate = from ? new Date(from).setHours(0, 0, 0, 0) : null;
+    const toDate = to ? new Date(to).setHours(0, 0, 0, 0) : null;
 
     const matchDateFrom = !fromDate || reportDate >= fromDate;
     const matchDateTo = !toDate || reportDate <= toDate;
+
     return matchSearch && matchStatus && matchSampleType && matchDateFrom && matchDateTo;
   });
 
-  // Handlers
+  // ---- Create handlers (unchanged) ----
   function addSampleName() {
     setSampleGroup((prev) => ({
       ...prev,
@@ -128,11 +138,10 @@ export default function ReportsPage() {
         ...prev,
         sample_type_id: typeId,
         availableIndicators: indicators,
-        indicators: [],
       }));
     } catch (err) {
       console.error(err);
-      setSampleGroup((prev) => ({ ...prev, sample_type_id: typeId, availableIndicators: [], indicators: [] }));
+      setSampleGroup((prev) => ({ ...prev, sample_type_id: typeId, availableIndicators: [] }));
     }
   }
 
@@ -178,7 +187,7 @@ export default function ReportsPage() {
       test_end_date: to,
       analyst: "",
       approved_by: "",
-      samples: samples,
+      samples,
     };
 
     try {
@@ -200,6 +209,7 @@ export default function ReportsPage() {
           availableIndicators: [],
         });
         setOpen(false);
+
         const json = await fetch("http://localhost:8000/reports").then((r) => r.json());
         setData(json);
       }
@@ -207,7 +217,6 @@ export default function ReportsPage() {
       console.log("error while creating sample");
     }
   };
-
 
   return (
     <div className="p-6 space-y-5">
@@ -245,13 +254,13 @@ export default function ReportsPage() {
         onSave={onCreateClick}
       />
 
-      <PdfViewModal open={openPdf} reportTitle={pdfReportTitle} reportId={pdfReportId} onOpenChange={setOpenPdf} 
-      // onAddSampleName={addSampleName}
-      // onRemoveSampleName={removeSampleName}
-      // onUpdateSampleName={updateSampleName}
-      // onTypeChange={setTypeAndDefaults}
-      // onFieldChange={handleFieldChange}
-      // onToggleIndicator={toggleIndicator}
+      {/* ✅ Option 1: PdfViewModal only needs sampleTypes for Edit modal */}
+      <PdfViewModal
+        open={openPdf}
+        reportTitle={pdfReportTitle}
+        reportId={pdfReportId}
+        onOpenChange={setOpenPdf}
+        sampleTypes={sampleType}
       />
 
       <div className="text-sm text-muted-foreground text-right pr-6">

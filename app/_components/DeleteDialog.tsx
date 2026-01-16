@@ -27,6 +27,7 @@ export function DeleteDialog({deleteDialogOpener, reportId, setDeleteDialogOpene
      }
      
    }
+   console.log("detele daraagvi baihad ajlaad bnshvvv")
     return(
      <AlertDialog open={deleteDialogOpener} onOpenChange={setDeleteDialogOpener}>
   <AlertDialogContent>
