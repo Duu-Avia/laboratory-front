@@ -12,8 +12,6 @@ const statusOptions: { key: StatusFilter; label: string }[] = [
   { key: "approved", label: "Батлагдсан" },
 ];
 
-
-
 export function FilterBar({
   from,
   to,

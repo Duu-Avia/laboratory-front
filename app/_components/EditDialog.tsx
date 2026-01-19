@@ -6,18 +6,9 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
-import type { Indicator, SampleType } from "../types/types";
+import type { Indicator, SampleGroup, SampleGroupEdit, SampleType } from "../types/types";
 
-type SampleGroup = {
-  sample_type_id: number | null;
-  sample_ids: (number | null)[];
-  sample_names: string[];
-  location: string;
-  sample_date: string;
-  sampled_by: string;
-  indicators: number[];
-  availableIndicators: Indicator[];
-};
+
 
 const emptySampleGroup: SampleGroup = {
   sample_type_id: null,

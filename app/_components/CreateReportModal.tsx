@@ -6,54 +6,53 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
+import type { CreateReportModalProps, Indicator, SampleGroup } from "../types/types";
 
-export function CreateReportModal({
-  open,
-  onOpenChange,
-  sampleTypes,
-  from,
-  to,
-  onCreated,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  sampleTypes: any[];
-  from: string;
-  to: string;
-  onCreated?: () => void;
-}) {
+
+const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
+  sample_type_id: null,
+  sample_ids:[],
+  sample_names: [""],
+  location: "",
+  sample_date: defaultDate,
+  sampled_by: "",
+  indicators: [],
+  availableIndicators: [],
+});
+
+export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, onCreated }: CreateReportModalProps) {
+  const [saving, setSaving] = useState(false);
   const [reportTitle, setReportTitle] = useState("");
-  const [sampleGroup, setSampleGroup] = useState<any>({
-    sample_type_id: null,
-    sample_names: [""],
-    location: "",
-    sample_date: from,
-    sampled_by: "",
-    indicators: [],
-    availableIndicators: [],
-  });
+  const [sampleGroup, setSampleGroup] = useState<SampleGroup>(getEmptySampleGroup(from));
 
+  // Reset form when modal opens
   useEffect(() => {
-    if (!open) return;
-    // reset each time modal opens if you want
-  }, [open]);
+    if (open) {
+      setReportTitle("");
+      setSampleGroup(getEmptySampleGroup(from));
+    }
+  }, [open, from]);
 
+  // Load available indicators when sample type changes
   useEffect(() => {
-    if (!open) return;
-    if (!sampleGroup.sample_type_id) {
-      setSampleGroup((p: any) => ({ ...p, availableIndicators: [] }));
+    if (!open || !sampleGroup.sample_type_id) {
       return;
     }
+
     fetch(`http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`)
-      .then((r) => r.json())
-      .then((inds) => setSampleGroup((p: any) => ({ ...p, availableIndicators: inds })))
-      .catch(() => setSampleGroup((p: any) => ({ ...p, availableIndicators: [] })));
+      .then((response) => response.json())
+      .then((indicators: Indicator[]) => {
+        setSampleGroup((p) => ({ ...p, availableIndicators: indicators, indicators:indicators.map((ind)=>ind.id) }));
+      })
+      .catch(() => {
+        setSampleGroup((p) => ({ ...p, availableIndicators: [] }));
+      });
   }, [open, sampleGroup.sample_type_id]);
 
-  const onSave = async () => {
+  const handleSave = async () => {
     const samples = sampleGroup.sample_names
-      .filter((name: string) => name.trim() !== "")
-      .map((name: string) => ({
+      .filter((name) => name.trim() !== "")
+      .map((name) => ({
         sample_type_id: sampleGroup.sample_type_id,
         sample_name: name.trim(),
         location: sampleGroup.location,
@@ -61,6 +60,16 @@ export function CreateReportModal({
         sampled_by: sampleGroup.sampled_by,
         indicators: sampleGroup.indicators,
       }));
+
+    if (samples.length === 0) {
+      alert("Дор хаяж нэг дээж нэмнэ үү");
+      return;
+    }
+
+    if (!sampleGroup.sample_type_id) {
+      alert("Дээжний төрөл сонгоно уу");
+      return;
+    }
 
     const payload = {
       report_title: reportTitle,
@@ -71,15 +80,26 @@ export function CreateReportModal({
       samples,
     };
 
-    const res = await fetch(`http://localhost:8000/reports/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      setSaving(true);
 
-    if (res.ok) {
-      onCreated?.();
-      onOpenChange(false);
+      const res = await fetch(`http://localhost:8000/reports/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        onCreated?.();
+        onOpenChange(false);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.error("Create failed:", err);
+      }
+    } catch (error) {
+      console.error("Error creating report:", error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -93,17 +113,27 @@ export function CreateReportModal({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Тайлан</Label>
-            <Input value={reportTitle} onChange={(e) => setReportTitle(e.target.value)} placeholder="Нэгдсэн төв ус гэх мэт..." />
+            <Input
+              value={reportTitle}
+              onChange={(e) => setReportTitle(e.target.value)}
+              placeholder="Нэгдсэн төв ус гэх мэт..."
+            />
           </div>
 
-          <SampleFormSection sampleGroup={sampleGroup} setSampleGroup={setSampleGroup} sampleTypes={sampleTypes} />
+          <SampleFormSection
+            sampleGroup={sampleGroup}
+            setSampleGroup={setSampleGroup}
+            sampleTypes={sampleTypes}
+          />
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={saving}>
             Болих
           </Button>
-          <Button onClick={onSave}>Хадгалах</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Хадгалж байна..." : "Хадгалах"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

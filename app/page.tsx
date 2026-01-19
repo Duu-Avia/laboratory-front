@@ -1,60 +1,44 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReportsTable } from "./_components/ReportsTable";
-import { Indicator, ReportRow, SampleType, StatusFilter } from "./types/types";
+import { ReportRow, SampleType, StatusFilter } from "./types/types";
 import { CreateReportModal } from "./_components/CreateReportModal";
 import { FilterBar } from "./_components/FilterBar";
 import { PdfViewModal } from "./_components/PdfViewModal";
-
+import { RecentDay } from "./utils/GetRecentDays";
 export default function ReportsPage() {
-  const router = useRouter();
-
+const router = useRouter();
+const thirtyDaysAgo = RecentDay().thirtyDayAgo
+const today = RecentDay().today
   // Filters
   const [status, setStatus] = useState<StatusFilter>("all");
-  const [from, setFrom] = useState<string>("2026-01-10");
-  const [to, setTo] = useState<string>("2026-01-17");
+  const [from, setFrom] = useState<string>(thirtyDaysAgo);
+  const [to, setTo] = useState<string>(today);
   const [search, setSearch] = useState<string>("");
   const [selectedSampleType, setSelectedSampleType] = useState<string>("all");
 
   // Data
   const [data, setData] = useState<ReportRow[]>([]);
-  const [sampleType, setSampleType] = useState<SampleType[]>([]);
+  const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
 
   // Modals
-  const [open, setOpen] = useState(false);
-  const [openPdf, setOpenPdf] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   const [pdfReportTitle, setPdfReportTitle] = useState("");
 
-  // Create Form state (ONLY for create)
-  const [reportTitle, setReportTitle] = useState("");
-  const [sampleGroup, setSampleGroup] = useState<{
-    sample_type_id: number | null;
-    sample_names: string[];
-    location: string;
-    sample_date: string;
-    sampled_by: string;
-    indicators: number[];
-    availableIndicators: Indicator[];
-  }>({
-    sample_type_id: null,
-    sample_names: [""],
-    location: "",
-    sample_date: from,
-    sampled_by: "",
-    indicators: [],
-    availableIndicators: [],
-  });
-
+  // Fetch sample types
   useEffect(() => {
     fetch(`http://localhost:8000/sample-types`)
       .then((res) => res.json())
-      .then((data) => setSampleType(data))
-      .catch(() => console.log(`error while fetching sample type`));
+      .then((data) => setSampleTypes(data))
+      .catch(() => console.error("Error fetching sample types"));
   }, []);
 
-  useEffect(() => {
+  // Fetch reports
+  const fetchReports = () => {
     fetch("http://localhost:8000/reports")
       .then(async (res) => {
         const json = await res.json();
@@ -66,23 +50,25 @@ export default function ReportsPage() {
         setData(json);
       })
       .catch((err) => {
-        console.log("error while fetch data", err);
+        console.error("Error fetching reports:", err);
         setData([]);
       });
+  };
+
+  useEffect(() => {
+    fetchReports();
   }, []);
 
   // Filter data
   const filtered = data.filter((r) => {
-    const statusMatch =
-      (
-        {
-          draft: "draft",
-          tested: "шинжилгээ хийгдсэн",
-          pending_samples: "дээж хүлээгдэж байна",
-          approved: "батлагдсан",
-          deleted: "устгагдсан",
-        } as any
-      )[r.status] || "";
+    const statusLabels: Record<string, string> = {
+      draft: "draft",
+      tested: "шинжилгээ хийгдсэн",
+      pending_samples: "дээж хүлээгдэж байна",
+      approved: "батлагдсан",
+      deleted: "устгагдсан",
+    };
+    const statusMatch = statusLabels[r.status] || "";
 
     const matchSearch =
       !search ||
@@ -90,8 +76,8 @@ export default function ReportsPage() {
       r.report_title.toLowerCase().includes(search.toLowerCase()) ||
       r.sample_names.toLowerCase().includes(search.toLowerCase());
 
-    const matchStatus = status === "all" ? true : r.status === status;
-    const matchSampleType = selectedSampleType === "all" ? true : r.sample_type === selectedSampleType;
+    const matchStatus = status === "all" || r.status === status;
+    const matchSampleType = selectedSampleType === "all" || r.sample_type === selectedSampleType;
 
     const reportDate = new Date(r.created_at).setHours(0, 0, 0, 0);
     const fromDate = from ? new Date(from).setHours(0, 0, 0, 0) : null;
@@ -103,120 +89,26 @@ export default function ReportsPage() {
     return matchSearch && matchStatus && matchSampleType && matchDateFrom && matchDateTo;
   });
 
-  // ---- Create handlers (unchanged) ----
-  function addSampleName() {
-    setSampleGroup((prev) => ({
-      ...prev,
-      sample_names: [...prev.sample_names, ""],
-    }));
-  }
-
-  function removeSampleName(index: number) {
-    setSampleGroup((prev) => ({
-      ...prev,
-      sample_names: prev.sample_names.filter((_, i) => i !== index),
-    }));
-  }
-
-  function updateSampleName(index: number, value: string) {
-    setSampleGroup((prev) => ({
-      ...prev,
-      sample_names: prev.sample_names.map((name, i) => (i === index ? value : name)),
-    }));
-  }
-
-  async function setTypeAndDefaults(typeId: number) {
-    setSampleGroup((prev) => ({ ...prev, sample_type_id: typeId, indicators: [], availableIndicators: [] }));
-
-    try {
-      const res = await fetch(`http://localhost:8000/sample/indicators/${typeId}`);
-      if (!res.ok) throw new Error("Failed to load indicators");
-
-      const indicators: Indicator[] = await res.json();
-
-      setSampleGroup((prev) => ({
-        ...prev,
-        sample_type_id: typeId,
-        availableIndicators: indicators,
-      }));
-    } catch (err) {
-      console.error(err);
-      setSampleGroup((prev) => ({ ...prev, sample_type_id: typeId, availableIndicators: [] }));
-    }
-  }
-
-  function toggleIndicator(indicatorId: number) {
-    setSampleGroup((prev) => {
-      const exists = prev.indicators.includes(indicatorId);
-      return {
-        ...prev,
-        indicators: exists ? prev.indicators.filter((x) => x !== indicatorId) : [...prev.indicators, indicatorId],
-      };
-    });
-  }
-
-  function handleFieldChange(field: string, value: string) {
-    setSampleGroup((prev) => ({ ...prev, [field]: value }));
-  }
-
   function handleRowClick(report: ReportRow) {
     if (report.status === "tested") {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
-      setOpenPdf(true);
+      setPdfModalOpen(true);
     } else {
       router.push(`/reports/${report.id}`);
     }
   }
 
-  const onCreateClick = async () => {
-    const samples = sampleGroup.sample_names
-      .filter((name) => name.trim() !== "")
-      .map((name) => ({
-        sample_type_id: sampleGroup.sample_type_id,
-        sample_name: name.trim(),
-        location: sampleGroup.location,
-        sample_date: sampleGroup.sample_date,
-        sampled_by: sampleGroup.sampled_by,
-        indicators: sampleGroup.indicators,
-      }));
-
-    const payload = {
-      report_title: reportTitle,
-      test_start_date: from,
-      test_end_date: to,
-      analyst: "",
-      approved_by: "",
-      samples,
-    };
-
-    try {
-      const response = await fetch(`http://localhost:8000/reports/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        setReportTitle("");
-        setSampleGroup({
-          sample_type_id: null,
-          sample_names: [""],
-          location: "",
-          sample_date: from,
-          sampled_by: "",
-          indicators: [],
-          availableIndicators: [],
-        });
-        setOpen(false);
-
-        const json = await fetch("http://localhost:8000/reports").then((r) => r.json());
-        setData(json);
-      }
-    } catch (error) {
-      console.log("error while creating sample");
+  const handleExcelConvert = async()=> {
+    try{
+      const response = await fetch(`http://localhost:8000/reports/excel?status=${status}`,)
+      if(!response.ok)
+      console.log(response)
+    }catch(err){
+      console.log("error while download excel ")
     }
-  };
+    console.log("excel export daragdsan shvv")
+  }
 
   return (
     <div className="p-6 space-y-5">
@@ -226,45 +118,37 @@ export default function ReportsPage() {
         search={search}
         selectedSampleType={selectedSampleType}
         status={status}
-        sampleTypes={sampleType}
+        sampleTypes={sampleTypes}
         onFromChange={setFrom}
         onToChange={setTo}
         onSearchChange={setSearch}
         onSampleTypeChange={setSelectedSampleType}
         onStatusChange={setStatus}
-        onCreateClick={() => setOpen(true)}
-        onExportClick={() => console.log("export excel")}
+        onCreateClick={() => setCreateModalOpen(true)}
+        onExportClick={handleExcelConvert}
       />
 
       <ReportsTable data={filtered} onRowClick={handleRowClick} />
 
       <CreateReportModal
-        open={open}
-        reportTitle={reportTitle}
-        sampleGroup={sampleGroup}
-        sampleTypes={sampleType}
-        onOpenChange={setOpen}
-        onReportTitleChange={setReportTitle}
-        onAddSampleName={addSampleName}
-        onRemoveSampleName={removeSampleName}
-        onUpdateSampleName={updateSampleName}
-        onTypeChange={setTypeAndDefaults}
-        onFieldChange={handleFieldChange}
-        onToggleIndicator={toggleIndicator}
-        onSave={onCreateClick}
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        sampleTypes={sampleTypes}
+        from={from}
+        to={to}
+        onCreated={fetchReports}
       />
 
-      {/* ✅ Option 1: PdfViewModal only needs sampleTypes for Edit modal */}
       <PdfViewModal
-        open={openPdf}
+        open={pdfModalOpen}
         reportTitle={pdfReportTitle}
         reportId={pdfReportId}
-        onOpenChange={setOpenPdf}
-        sampleTypes={sampleType}
+        onOpenChange={setPdfModalOpen}
+        sampleTypes={sampleTypes}
       />
 
       <div className="text-sm text-muted-foreground text-right pr-6">
-        Нийт илэрц : <span className="text-foreground font-medium">{filtered?.length}</span>
+       <span> Нийт илэрц: {filtered.filter((item)=>(item.status !== "deleted")).length}</span>
       </div>
     </div>
   );

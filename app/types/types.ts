@@ -14,19 +14,6 @@ export type ReportRow = {
 };
 export type SampleType = { id: number; type_name: string };
 export type Indicator = { id: number; indicator_name: string; unit?: string; method?: string; limit?: string; is_default?: boolean }
-export type FlatRow = {
-  sample_id: number;
-  sample_name: string;
-  location: string | null;
-  sample_indicator_id: number;
-  indicator_id: number;
-  indicator_name: string;
-  unit: string | null;
-  limit_value: string | null;
-  result_value: string | null;
-  is_detected: boolean | null;
-  is_within_limit: boolean | null;
-}
 
 export type SampleIndicatorItem = {
   sample_indicator_id: number;
@@ -56,7 +43,7 @@ export type IndicatorRow = {
   indicator_name: string;
   unit?: string;
   limit_value?: string;
-  sample_indicator_ids: number[]; // All sample_indicator_ids for this indicator
+  sample_indicator_ids: number[]
   result_value?: string;
   is_detected?: boolean | null;
   is_within_limit?: boolean | null;
@@ -88,26 +75,11 @@ export interface FilterBarProps {
 }
 export interface CreateReportModalProps {
   open: boolean;
-  reportTitle: string;
-  sampleGroup: {
-    sample_type_id: number | null;
-    sample_names: string[];
-    location: string;
-    sample_date: string;
-    sampled_by: string;
-    indicators: number[];
-    availableIndicators: Indicator[];
-  };
-  sampleTypes: SampleType[];
   onOpenChange: (open: boolean) => void;
-  onReportTitleChange: (value: string) => void;
-  onAddSampleName: () => void;
-  onRemoveSampleName: (index: number) => void;
-  onUpdateSampleName: (index: number, value: string) => void;
-  onTypeChange: (typeId: number) => void;
-  onFieldChange: (field: string, value: string) => void;
-  onToggleIndicator: (indicatorId: number) => void;
-  onSave: () => void;
+  sampleTypes: SampleType[];
+  from: string;
+  to: string;
+  onCreated?: () => void;
 }
 export interface PdfViewModalProps {
   open: boolean;
@@ -125,3 +97,25 @@ export interface PdfViewModalProps {
   setSampleNameForEdit: (names: string[]) => void;
   setSelectedIndicatorsForEdit: (ids: number[]) => void;
 }
+
+export type SampleGroup = {
+  sample_type_id: number | null;
+  sample_ids: (number | null)[];
+  sample_names: string[];
+  location: string;
+  sample_date: string;
+  sampled_by: string;
+  indicators: number[];
+  availableIndicators: Indicator[];
+};
+
+export  type SampleGroupEdit = {
+  sample_type_id: number | null;
+  sample_ids: (number | null)[];
+  sample_names: string[];
+  location: string;
+  sample_date: string;
+  sampled_by: string;
+  indicators: number[];
+  availableIndicators: Indicator[];
+};

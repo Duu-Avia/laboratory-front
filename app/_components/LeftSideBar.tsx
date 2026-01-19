@@ -13,7 +13,7 @@ import {
 
 const menu = [
   { href: "/", label: "Ажил шалгуулах хүсэлт", icon: ClipboardCheck },
-  { href: "/pending", label: "Хүлээгдэж буй АШХ", icon: Clock },
+  { href: "/archive", label: "Архив", icon: Clock },
   { href: "/approve", label: "Баталгаажуулах хүсэлт", icon: CheckCircle2 },
 ];
 

@@ -4,18 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Indicator, SampleType } from "../types/types";
-
-type SampleGroup = {
-  sample_type_id: number | null;
-  sample_ids?: (number | null)[];
-  sample_names: string[];
-  location: string;
-  sample_date: string;
-  sampled_by: string;
-  indicators: number[];
-  availableIndicators: Indicator[];
-};
+import type { Indicator, SampleGroup, SampleType } from "../types/types";
 
 type Props = {
   sampleGroup: SampleGroup;
