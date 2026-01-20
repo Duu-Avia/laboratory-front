@@ -41,13 +41,13 @@ const today = RecentDay().today
   const fetchReports = () => {
     fetch("http://localhost:8000/reports")
       .then(async (res) => {
-        const json = await res.json();
-        if (!Array.isArray(json)) {
-          console.error("Expected array from /reports but got:", json);
+        const response = await res.json();
+        if (!Array.isArray(response)) {
+          console.error("Expected array from /reports but got:", response);
           setData([]);
           return;
         }
-        setData(json);
+        setData(response);
       })
       .catch((err) => {
         console.error("Error fetching reports:", err);
@@ -98,14 +98,26 @@ const today = RecentDay().today
       router.push(`/reports/${report.id}`);
     }
   }
-
+  console.log('main deer irj baigaa data', data)
   const handleExcelConvert = async()=> {
     try{
       const response = await fetch(`http://localhost:8000/reports/excel?status=${status}`,)
-      if(!response.ok)
-      console.log(response)
+      if(!response.ok){
+      console.log("export failed")
+      return;}
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+            console.log(blob)
+
+      const a = document.createElement("a")
+      a.href = url;
+      a.download = "report.xlsx"
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
     }catch(err){
-      console.log("error while download excel ")
+      console.log("error while download excel ",err)
     }
     console.log("excel export daragdsan shvv")
   }

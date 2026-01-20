@@ -3,6 +3,7 @@ export type StatusFilter = ReportStatus | "all";
 export type ReportRow = {
   id: number;
   sample_names:string;
+  indicator_names:string;
   created_at: string;
   time: string;
   report_title: string;

@@ -50,7 +50,7 @@ export function FilterBar({
 
         <div className="flex-1" />
 
-        <Button variant="secondary" onClick={onExportClick}>
+        <Button className="cursor-pointer hover:bg-gray-300 active:bg-gray-400" variant="secondary" onClick={onExportClick}>
           Экселрүү хөрвүүлэх
         </Button>
 

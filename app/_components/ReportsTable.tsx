@@ -27,6 +27,7 @@ interface ReportsTableProps {
 }
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
 const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
+console.log("table deer irj bui data", data)
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">
       <Table>
@@ -36,7 +37,7 @@ const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
             <TableHead>№</TableHead>
             <TableHead>Дээжны нэр</TableHead>
             <TableHead>Оруулсан дээжүүд</TableHead>
-            <TableHead>Байршил</TableHead>
+            <TableHead>Сонгогдсон/Ши</TableHead>
             <TableHead className="text-right pr-15">Төлөв</TableHead>
             <TableHead className="text-right pr-10">Төлөв</TableHead>            
           </TableRow>
@@ -69,7 +70,19 @@ const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
                   ))}          
                 </div>
               </TableCell>
-              <TableCell>{dataItem.location}</TableCell>
+               <TableCell className="max-w-[420px]">
+                <div className="flex flex-wrap gap-1">
+                  {dataItem.indicator_names?.split(",").map((name, i) => (
+                    <Badge
+                      key={i}
+                      variant="outline"
+                      className="text-[12px] text-gray-850  font-normal "
+                    >
+                      {name.trim()}
+                    </Badge>
+                  ))}          
+                </div>
+              </TableCell>
               <TableCell className="text-right">{statusBadge(dataItem.status)}</TableCell>
             </TableRow>
           ))}
