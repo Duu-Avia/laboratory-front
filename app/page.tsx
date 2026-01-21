@@ -98,7 +98,6 @@ const today = RecentDay().today
       router.push(`/reports/${report.id}`);
     }
   }
-  console.log('main deer irj baigaa data', data)
   const handleExcelConvert = async()=> {
     try{
       const response = await fetch(`http://localhost:8000/reports/excel?status=${status}`,)

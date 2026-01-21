@@ -14,13 +14,15 @@ export type ReportRow = {
   sample_type?: string;
 };
 export type SampleType = { id: number; type_name: string };
-export type Indicator = { id: number; indicator_name: string; unit?: string; method?: string; limit?: string; is_default?: boolean }
+export type Indicator = { id: number; indicator_name: string; unit?: string; method?: string; limit?: string; is_default?: boolean, input_type?:string; }
 
 export type SampleIndicatorItem = {
   sample_indicator_id: number;
   indicator_id: number;
   indicator_name: string;
   unit?: string | null;
+  avg:string | null;
+  input_type:string;
   limit_value?: string | null;
 
   // result can be null if not created yet
@@ -43,11 +45,13 @@ export type IndicatorRow = {
   indicator_id: number;
   indicator_name: string;
   unit?: string;
+  input_type:string;
   limit_value?: string;
   sample_indicator_ids: number[]
   result_value?: string;
   is_detected?: boolean | null;
   is_within_limit?: boolean | null;
+  avg:string | null
 };
 export interface ReportHeaderSaveProps  {
   reportId: string,

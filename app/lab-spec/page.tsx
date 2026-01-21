@@ -56,6 +56,7 @@ export default function LabPage(){
   // data (UI only, you will fetch)
   const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
   const [indicators, setIndicators] = useState<IndicatorRow[]>([]);
+  const [newIndicator, setNewIndicator] = useState()
 
   // filters
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -72,28 +73,22 @@ export default function LabPage(){
     is_default: false,
   });
 
-  // ---------------------------
-  // YOU will replace these 2 effects with real fetch
+  console.log(sampleTypes, "sample types")
+  console.log(indicators, )
   useEffect(() => {
-    // fetch("http://localhost:8000/sample-types").then(...)
+   
+      fetch(`http://localhost:8000/sample-types`)
+      .then((response)=>response.json())
+      .then((data)=> setSampleTypes(data))
+      .catch((error)=>console.log(`error while fetching sample types`, error.message))
 
-    // mock
-    setSampleTypes([
-      { id: 1, type_name: "Унд ахуйн ус", standard: "MNS 0900" },
-      { id: 2, type_name: "Агаар", standard: "MNS 1234" },
-      { id: 3, type_name: "Нүүрс", standard: "MNS 5678" },
-    ]);
   }, []);
 
   useEffect(() => {
-    // fetch("http://localhost:8000/indicators").then(...)
-    // mock
-    setIndicators([
-      { id: 10, sample_type_id: 1, indicator_name: "E.coli", unit: "CFU", test_method: "ISO 9308", limit_value: "0", is_default: 1 },
-      { id: 11, sample_type_id: 1, indicator_name: "Salmonella", unit: "CFU", test_method: "ISO 6579", limit_value: "0", is_default: 0 },
-      { id: 20, sample_type_id: 2, indicator_name: "Тоосжилт", unit: "mg/m3", test_method: "MNS A-01", limit_value: "10", is_default: 1 },
-      { id: 30, sample_type_id: 3, indicator_name: "Чийгшил", unit: "%", test_method: "MNS C-02", limit_value: "≤ 12", is_default: 0 },
-    ]);
+    fetch(`http://localhost:8000/indicators`)
+    .then((response)=> response.json())
+    .then((data)=> setIndicators(data))
+    .catch((error)=>console.log(`error while fetching indicators`, error.message))
   }, []);
   // ---------------------------
 
@@ -142,10 +137,14 @@ export default function LabPage(){
     setOpenCreate(true);
   }
 
-  function onSaveNewIndicator() {
+  async function onSaveNewIndicator() {
     // UI ONLY: you will POST to backend
+  const response = await fetch(`http://localhost:8000/indicators/create-indicator`,{
+    method: "POST",
+    headers:{"Content-type":"application/json"},
+    body:JSON.stringify(draft)
+  })
     console.log("CREATE INDICATOR payload:", draft);
-
     // optional UI append mock:
     if (draft.sample_type_id && draft.indicator_name.trim()) {
       setIndicators((prev) => [
@@ -172,7 +171,7 @@ export default function LabPage(){
   function typeStandard(typeId: number) {
     return sampleTypes.find((t) => t.id === typeId)?.standard ?? "";
   }
-
+  console.log(draft,"savelsen shine indicator utguud")
   return (
     <div className="p-6 space-y-4">
       {/* Header */}
@@ -185,9 +184,6 @@ export default function LabPage(){
         </div>
 
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => console.log("export (ui only)")}>
-            Export Excel
-          </Button>
           <Button onClick={openCreateModal}>+ Шинэ шинжилгээ</Button>
         </div>
       </div>
@@ -228,7 +224,7 @@ export default function LabPage(){
         </div>
 
         <div className="text-sm text-muted-foreground">
-          Нийт шинжилгээ: <span className="text-foreground">{filteredIndicators.length}</span>
+          Нийт лаборатори төрөл: <span className="text-foreground">{filteredIndicators.length}</span>
         </div>
       </div>
 
@@ -260,8 +256,8 @@ export default function LabPage(){
                       <TableHead className="w-[80px]">ID</TableHead>
                       <TableHead>Шинжилгээ</TableHead>
                       <TableHead className="w-[120px]">Нэгж</TableHead>
-                      <TableHead className="w-[220px]">Арга / Test method</TableHead>
-                      <TableHead className="w-[180px]">Хязгаар / Limit</TableHead>
+                      <TableHead className="w-[220px]">Арга стандарт</TableHead>
+                      <TableHead className="w-[180px]">Зөвш / хэмжээ</TableHead>
                       <TableHead className="w-[140px] text-right">Default</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -351,7 +347,7 @@ export default function LabPage(){
             </div>
 
             <div className="space-y-2">
-              <Label>Хязгаар</Label>
+              <Label>Зөвш/Хэмжээ</Label>
               <Input
                 value={draft.limit_value}
                 onChange={(e) => setDraft((p) => ({ ...p, limit_value: e.target.value }))}

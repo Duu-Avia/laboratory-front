@@ -27,7 +27,6 @@ interface ReportsTableProps {
 }
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
 const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
-console.log("table deer irj bui data", data)
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">
       <Table>
