@@ -1,10 +1,12 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Indicator, SampleGroup, SampleType } from "../types/types";
+import type { Indicator, LocationPackage, LocationSample, SampleGroup, SampleType } from "../types/types";
+
 
 type Props = {
   sampleGroup: SampleGroup;
@@ -13,36 +15,67 @@ type Props = {
 };
 
 export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: Props) {
-  const addSampleName = () => {
-    console.log("=== ADD SAMPLE ===");
-    setSampleGroup((prev) => {
-      const newState = {
+  // Location packages state
+  const [locationPackages, setLocationPackages] = useState<LocationPackage[]>([]);
+  const [selectedPackageId, setSelectedPackageId] = useState<number | null>(null);
+
+  // Fetch location packages when sample_type changes
+  useEffect(() => {
+    if (!sampleGroup.sample_type_id) {
+      setLocationPackages([]);
+      setSelectedPackageId(null);
+      return;
+    }
+
+    fetch(`http://localhost:8000/locations?sample_type_id=${sampleGroup.sample_type_id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setLocationPackages(data);
+        setSelectedPackageId(null); // Reset selection
+      })
+      .catch((err) => {
+        console.error("Error fetching location packages:", err);
+        setLocationPackages([]);
+      });
+  }, [sampleGroup.sample_type_id]);
+
+  // When package is selected, fetch samples and populate sample_names
+  const handlePackageSelect = async (packageId: number) => {
+    setSelectedPackageId(packageId);
+
+    try {
+      const res = await fetch(`http://localhost:8000/locations/samples/${packageId}`);
+      const samples: LocationSample[] = await res.json();
+
+      // Get package name for location field
+      const selectedPackage = locationPackages.find((p) => p.id === packageId);
+
+      setSampleGroup((prev) => ({
         ...prev,
-        sample_names: [...prev.sample_names, ""],
-        sample_ids: [...(prev.sample_ids ?? []), null],
-      };
-      console.log("After add:", { names: newState.sample_names, ids: newState.sample_ids });
-      return newState;
-    });
+        location: selectedPackage?.package_name ?? "",
+        sample_names: samples.map((s) => s.location_name),
+        sample_ids: samples.map(() => null), // All new samples
+      }));
+    } catch (err) {
+      console.error("Error fetching location samples:", err);
+    }
+  };
+  console.log(locationPackages,selectedPackageId)
+  const addSampleName = () => {
+    setSampleGroup((prev) => ({
+      ...prev,
+      sample_names: [...prev.sample_names, ""],
+      sample_ids: [...(prev.sample_ids ?? []), null],
+    }));
   };
 
   const removeSampleName = (index: number) => {
-    console.log("=== REMOVE SAMPLE at index", index, "===");
-    console.log("Before remove - ids:", sampleGroup.sample_ids);
-    console.log("Before remove - names:", sampleGroup.sample_names);
-    
     setSampleGroup((prev) => {
       const currentIds = prev.sample_ids ?? [];
-      const newNames = prev.sample_names.filter((_, i) => i !== index);
-      const newIds = currentIds.filter((_, i) => i !== index);
-      
-      console.log("After remove - ids:", newIds);
-      console.log("After remove - names:", newNames);
-      
       return {
         ...prev,
-        sample_names: newNames,
-        sample_ids: newIds,
+        sample_names: prev.sample_names.filter((_, i) => i !== index),
+        sample_ids: currentIds.filter((_, i) => i !== index),
       };
     });
   };
@@ -59,7 +92,14 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
   };
 
   const onTypeChange = (typeId: number) => {
-    setSampleGroup((prev) => ({ ...prev, sample_type_id: typeId }));
+    setSampleGroup((prev) => ({
+      ...prev,
+      sample_type_id: typeId,
+      // Reset when type changes
+      sample_names: [""],
+      sample_ids: [],
+      location: "",
+    }));
   };
 
   const toggleIndicator = (indicatorId: number) => {
@@ -71,7 +111,6 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
     }));
   };
 
-  // Get current IDs safely
   const currentIds = sampleGroup.sample_ids ?? [];
 
   return (
@@ -85,7 +124,7 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
             onValueChange={(v) => onTypeChange(Number(v))}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Төрөл" />
+              <SelectValue placeholder="Сонгох" />
             </SelectTrigger>
             <SelectContent>
               {sampleTypes.map((t) => (
@@ -97,8 +136,35 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
           </Select>
         </div>
 
-        {/* Sample Names */}
+        {/* Location Package Selection */}
         <div className="space-y-2 col-span-2">
+          <Label>Байршил сонгох</Label>
+          <Select
+            value={selectedPackageId ? String(selectedPackageId) : undefined}
+            onValueChange={(v) => handlePackageSelect(Number(v))}
+            disabled={!sampleGroup.sample_type_id || locationPackages.length === 0}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={
+                !sampleGroup.sample_type_id 
+                  ? "Эхлээд дээжний төрөл сонгоно уу" 
+                  : locationPackages.length === 0 
+                    ? "Байршил байхгүй" 
+                    : "Байршил сонгох"
+              } />
+            </SelectTrigger>
+            <SelectContent>
+              {locationPackages.map((pkg) => (
+                <SelectItem key={pkg.id} value={String(pkg.id)}>
+                  {pkg.package_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Sample Names */}
+        <div className="space-y-2 col-span-3">
           <div className="flex items-center justify-between">
             <Label>Дээжний нэр</Label>
             <Button variant="ghost" size="sm" onClick={addSampleName} type="button">
@@ -114,10 +180,6 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
                   onChange={(e) => updateSampleName(idx, e.target.value)}
                   placeholder={`Дээж ${idx + 1}`}
                 />
-                {/* Debug: show sample_id */}
-                <span className="text-xs text-gray-400 min-w-[50px]">
-                  #{currentIds[idx] ?? "new"}
-                </span>
                 {sampleGroup.sample_names.length > 1 && (
                   <Button variant="ghost" size="sm" onClick={() => removeSampleName(idx)} type="button">
                     ×
@@ -128,13 +190,23 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
           </div>
         </div>
 
-        {/* Location */}
+        {/* Location (auto-filled from package, but editable) */}
         <div className="space-y-2 col-span-2">
           <Label>Дээж авсан байршил</Label>
           <Input
             value={sampleGroup.location}
             onChange={(e) => onFieldChange("location", e.target.value)}
-            placeholder="байршил"
+            placeholder="Байршил"
+          />
+        </div>
+
+        {/* Sample Amount */}
+        <div className="space-y-2">
+          <Label>Сорьцын хэмжээ</Label>
+          <Input
+            value={sampleGroup.sample_amount ?? ""}
+            onChange={(e) => onFieldChange("sample_amount", e.target.value)}
+            placeholder="0.5л гэх мэт"
           />
         </div>
 
@@ -150,11 +222,11 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
 
         {/* Sampled By */}
         <div className="space-y-2 col-span-2">
-          <Label>Дээж авсан хүний нэр</Label>
+          <Label>Дээж өгсөн хүний нэр</Label>
           <Input
             value={sampleGroup.sampled_by}
             onChange={(e) => onFieldChange("sampled_by", e.target.value)}
-            placeholder="нэр"
+            placeholder="Нэр"
           />
         </div>
       </div>

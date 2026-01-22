@@ -15,6 +15,7 @@ const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
   sample_names: [""],
   location: "",
   sample_date: defaultDate,
+  sample_amount:"",
   sampled_by: "",
   indicators: [],
   availableIndicators: [],
@@ -23,22 +24,37 @@ const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
 export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, onCreated }: CreateReportModalProps) {
   const [saving, setSaving] = useState(false);
   const [reportTitle, setReportTitle] = useState("");
+  const [reportTitleTouched, setReportTitleTouched] = useState(false);
   const [sampleGroup, setSampleGroup] = useState<SampleGroup>(getEmptySampleGroup(from));
+
+  const calculateTestEndDate = (startDate:string) =>{
+  const endTestDate = new Date(startDate);
+  endTestDate.setDate(endTestDate.getDate() + 3)
+  return endTestDate.toISOString().slice(0, 10);
+  }
 
   // Reset form when modal opens
   useEffect(() => {
     if (open) {
       setReportTitle("");
-      setSampleGroup(getEmptySampleGroup(from));
+      setReportTitleTouched(false)
+      setSampleGroup(getEmptySampleGroup(to));
     }
-  }, [open, from]);
+  }, [open, to]);
+
+//location ororchlogdoh burt report title supdate hiih
+  useEffect(() => {
+  if (!open) return;
+  if (reportTitleTouched) return;
+
+  setReportTitle(sampleGroup.location || "");
+}, [open, sampleGroup.location, reportTitleTouched]);
+
 
   // Load available indicators when sample type changes
   useEffect(() => {
-    if (!open || !sampleGroup.sample_type_id) {
-      return;
-    }
-
+    if (!open || !sampleGroup.sample_type_id) return;
+    
     fetch(`http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`)
       .then((response) => response.json())
       .then((indicators: Indicator[]) => {
@@ -55,6 +71,7 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
       .map((name) => ({
         sample_type_id: sampleGroup.sample_type_id,
         sample_name: name.trim(),
+        sample_amount:sampleGroup.sample_amount,
         location: sampleGroup.location,
         sample_date: sampleGroup.sample_date,
         sampled_by: sampleGroup.sampled_by,
@@ -72,9 +89,9 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
     }
 
     const payload = {
-      report_title: reportTitle,
-      test_start_date: from,
-      test_end_date: to,
+      report_title: reportTitle || sampleGroup.location || "",
+      test_start_date: sampleGroup.sample_date,
+      test_end_date: calculateTestEndDate(sampleGroup.sample_date),
       analyst: "",
       approved_by: "",
       samples,
@@ -102,7 +119,7 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
       setSaving(false);
     }
   };
-
+  console.log(sampleGroup.location,"location")
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl">
@@ -115,7 +132,9 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
             <Label>Тайлан</Label>
             <Input
               value={reportTitle}
-              onChange={(e) => setReportTitle(e.target.value)}
+              onChange={(e) => {setReportTitleTouched(true);
+                setReportTitle(e.target.value)
+              }}
               placeholder="Нэгдсэн төв ус гэх мэт..."
             />
           </div>

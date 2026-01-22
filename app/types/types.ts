@@ -37,6 +37,7 @@ export type SampleIndicatorItem = {
 export type SampleColumn = {
   sample_id: number;
   sample_name: string;
+  sample_amopunt:string;
   location?: string;
   indicators:SampleIndicatorItem[]
   
@@ -107,6 +108,7 @@ export type SampleGroup = {
   sample_type_id: number | null;
   sample_ids: (number | null)[];
   sample_names: string[];
+  sample_amount:string;
   location: string;
   sample_date: string;
   sampled_by: string;
@@ -123,4 +125,16 @@ export  type SampleGroupEdit = {
   sampled_by: string;
   indicators: number[];
   availableIndicators: Indicator[];
+};
+
+ export type LocationPackage = {
+  id: number;
+  package_name: string;
+  sample_type_id: number;
+};
+
+export type LocationSample = {
+  id: number;
+  location_name: string;
+  sort_order: number;
 };

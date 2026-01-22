@@ -153,7 +153,7 @@ export function ResultsTable({ indicators, onUpdateIndicator }: ResultsTableProp
                           })
                         }
                       >
-                        Илэрээгүй
+                        Илрээгүй
                       </Button>
                     </div>
                   )}

@@ -158,7 +158,7 @@ const today = RecentDay().today
         sampleTypes={sampleTypes}
       />
 
-      <div className="text-sm text-muted-foreground text-right pr-6">
+      <div className="text-sm font-bold text-muted-foreground text-right pr-6">
        <span> Нийт илэрц: {filtered.filter((item)=>(item.status !== "deleted")).length}</span>
       </div>
     </div>

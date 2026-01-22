@@ -56,7 +56,7 @@ const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
                 </button>
               </TableCell>
               <TableCell className="max-w-[420px]">
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1 gap-y-2">
                   {dataItem.sample_names?.split(",").map((name, i) => (
                     <Badge
                       key={i}
