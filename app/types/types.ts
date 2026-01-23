@@ -13,7 +13,7 @@ export type ReportRow = {
   status: ReportStatus;
   sample_type?: string;
 };
-export type SampleType = { id: number; type_name: string };
+export type SampleType = { id: number; type_name: string; standard:string };
 export type Indicator = { id: number; indicator_name: string; unit?: string; method?: string; limit?: string; is_default?: boolean, input_type?:string; }
 
 export type SampleIndicatorItem = {
@@ -37,7 +37,7 @@ export type SampleIndicatorItem = {
 export type SampleColumn = {
   sample_id: number;
   sample_name: string;
-  sample_amopunt:string;
+  sample_amount:string;
   location?: string;
   indicators:SampleIndicatorItem[]
   
@@ -52,6 +52,7 @@ export type IndicatorRow = {
   result_value?: string;
   is_detected?: boolean | null;
   is_within_limit?: boolean | null;
+  is_default?: boolean | number | null;
   avg:string | null
 };
 export interface ReportHeaderSaveProps  {
@@ -137,4 +138,24 @@ export type LocationSample = {
   id: number;
   location_name: string;
   sort_order: number;
+};
+
+export type IndicatorRowForLabSpec = {
+  id: number;
+  sample_type_id: number;
+  indicator_name: string;
+  unit?: string | null;
+  test_method?: string | null;
+  limit_value?: string | null;
+  is_default?: boolean | number | null; 
+};
+
+
+export type NewIndicatorDraft = {
+  sample_type_id: number | null;
+  indicator_name: string;
+  unit: string;
+  test_method: string;
+  limit_value: string;
+  is_default: boolean;
 };

@@ -27,35 +27,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {  IndicatorRowForLabSpec, NewIndicatorDraft, SampleType } from "../types/types";
 
-type SampleType = {
-  id: number;
-  type_name: string;
-  standard?: string | null;
-};
 
-type IndicatorRow = {
-  id: number;
-  sample_type_id: number;
-  indicator_name: string;
-  unit?: string | null;
-  test_method?: string | null;
-  limit_value?: string | null;
-  is_default?: boolean | number | null;
-};
 
-type NewIndicatorDraft = {
-  sample_type_id: number | null;
-  indicator_name: string;
-  unit: string;
-  test_method: string;
-  limit_value: string;
-  is_default: boolean;
-};
+
 export default function LabPage(){
   // data (UI only, you will fetch)
   const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
-  const [indicators, setIndicators] = useState<IndicatorRow[]>([]);
+  const [indicators, setIndicators] = useState<IndicatorRowForLabSpec[]>([]);
   const [newIndicator, setNewIndicator] = useState()
 
   // filters
@@ -117,7 +97,7 @@ export default function LabPage(){
 
   // group indicators under each type (for “related between each other” view)
   const grouped = useMemo(() => {
-    const map = new Map<number, IndicatorRow[]>();
+    const map = new Map<number, IndicatorRowForLabSpec[]>();
     for (const i of filteredIndicators) {
       if (!map.has(i.sample_type_id)) map.set(i.sample_type_id, []);
       map.get(i.sample_type_id)!.push(i);
@@ -224,7 +204,7 @@ export default function LabPage(){
         </div>
 
         <div className="text-sm text-muted-foreground">
-          Нийт лаборатори төрөл: <span className="text-foreground">{filteredIndicators.length}</span>
+          Нийт шинжилгээ: <span className="text-foreground font-semibold">{filteredIndicators.length}</span>
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import type { Indicator, SampleGroup, SampleGroupEdit, SampleType } from "../typ
 const emptySampleGroup: SampleGroup = {
   sample_type_id: null,
   sample_ids: [],
+  sample_amount:"",
   sample_names: [""],
   location: "",
   sample_date: "",
@@ -74,6 +75,7 @@ export function EditReport({ open, onOpenChange, reportId, sampleTypes, onSaved 
         setSampleGroup({
           sample_type_id: first?.sample_type_id ?? null,
           sample_ids: loadedIds,
+          sample_amount:first?.sample_amount ?? "",
           sample_names: loadedNames.length ? loadedNames : [""],
           location: first?.location ?? "",
           sample_date: (first?.sample_date ?? "").slice(0, 10),
