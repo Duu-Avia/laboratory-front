@@ -39,7 +39,7 @@ const today = RecentDay().today
 
   // Fetch reports
   const fetchReports = () => {
-    fetch("http://localhost:8000/reports")
+    fetch(`http://localhost:8000/reports`)
       .then(async (res) => {
         const response = await res.json();
         if (!Array.isArray(response)) {
@@ -60,34 +60,33 @@ const today = RecentDay().today
   }, []);
 
   // Filter data
-  const filtered = data.filter((r) => {
-    const statusLabels: Record<string, string> = {
-      draft: "draft",
-      tested: "шинжилгээ хийгдсэн",
-      pending_samples: "дээж хүлээгдэж байна",
-      approved: "батлагдсан",
-      deleted: "устгагдсан",
-    };
-    const statusMatch = statusLabels[r.status] || "";
+const filtered = data.filter((r) => {
+  const statusLabels: Record<string, string> = {
+    draft: "draft",
+    tested: "шинжилгээ хийгдсэн",
+    pending_samples: "дээж хүлээгдэж байна",
+    approved: "батлагдсан",
+    deleted: "устгагдсан",
+  };
+  const statusMatch = statusLabels[r.status] || "";
 
-    const matchSearch =
-      !search ||
-      statusMatch.toLowerCase().includes(search.toLowerCase()) ||
-      r.report_title.toLowerCase().includes(search.toLowerCase()) ||
-      r.sample_names.toLowerCase().includes(search.toLowerCase());
+  const matchSearch =
+    !search ||
+    statusMatch.toLowerCase().includes(search.toLowerCase()) ||
+    r.report_title.toLowerCase().includes(search.toLowerCase()) ||
+    r.sample_names.toLowerCase().includes(search.toLowerCase());
 
-    const matchStatus = status === "all" || r.status === status;
-    const matchSampleType = selectedSampleType === "all" || r.sample_type === selectedSampleType;
+  const matchStatus = status === "all" || r.status === status;
+  const matchSampleType = selectedSampleType === "all" || r.sample_type === selectedSampleType;
 
-    const reportDate = new Date(r.created_at).setHours(0, 0, 0, 0);
-    const fromDate = from ? new Date(from).setHours(0, 0, 0, 0) : null;
-    const toDate = to ? new Date(to).setHours(0, 0, 0, 0) : null;
+  const reportDateStr = r.created_at.slice(0, 10);  
+  const matchDateFrom = !from || reportDateStr >= from;
+  const matchDateTo = !to || reportDateStr <= to;
 
-    const matchDateFrom = !fromDate || reportDate >= fromDate;
-    const matchDateTo = !toDate || reportDate <= toDate;
+  return matchSearch && matchStatus && matchSampleType && matchDateFrom && matchDateTo;
+});
 
-    return matchSearch && matchStatus && matchSampleType && matchDateFrom && matchDateTo;
-  });
+console.log("Filtered result:", filtered.length);
 
   function handleRowClick(report: ReportRow) {
     if (report.status === "tested") {
@@ -107,7 +106,6 @@ const today = RecentDay().today
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
             console.log(blob)
-
       const a = document.createElement("a")
       a.href = url;
       a.download = "report.xlsx"
@@ -120,7 +118,6 @@ const today = RecentDay().today
     }
     console.log("excel export daragdsan shvv")
   }
-
   return (
     <div className="p-6 space-y-5">
       <FilterBar

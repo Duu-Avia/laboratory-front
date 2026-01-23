@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
@@ -19,24 +19,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {  IndicatorRowForLabSpec, NewIndicatorDraft, SampleType } from "../types/types";
 
 
+import { Plus, Search, FlaskConical, Beaker, Sparkles } from "lucide-react";
+import { IndicatorRowForLabSpec, NewIndicatorDraft, SampleType } from "../types/types";
+import { FilterPill } from "./_components/FilterPill";
+import { IndicatorCard } from "./_components/IndicatorCard";
 
-
-export default function LabPage(){
+export default function LabPage() {
   // data (UI only, you will fetch)
   const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
   const [indicators, setIndicators] = useState<IndicatorRowForLabSpec[]>([]);
-  const [newIndicator, setNewIndicator] = useState()
 
   // filters
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -53,24 +46,23 @@ export default function LabPage(){
     is_default: false,
   });
 
-  console.log(sampleTypes, "sample types")
-  console.log(indicators, )
   useEffect(() => {
-   
-      fetch(`http://localhost:8000/sample-types`)
-      .then((response)=>response.json())
-      .then((data)=> setSampleTypes(data))
-      .catch((error)=>console.log(`error while fetching sample types`, error.message))
-
+    fetch(`http://localhost:8000/sample-types`)
+      .then((response) => response.json())
+      .then((data) => setSampleTypes(data))
+      .catch((error) =>
+        console.log(`error while fetching sample types`, error.message)
+      );
   }, []);
 
   useEffect(() => {
     fetch(`http://localhost:8000/indicators`)
-    .then((response)=> response.json())
-    .then((data)=> setIndicators(data))
-    .catch((error)=>console.log(`error while fetching indicators`, error.message))
+      .then((response) => response.json())
+      .then((data) => setIndicators(data))
+      .catch((error) =>
+        console.log(`error while fetching indicators`, error.message)
+      );
   }, []);
-  // ---------------------------
 
   const typeButtons = useMemo(() => {
     return [
@@ -83,7 +75,8 @@ export default function LabPage(){
     const q = search.trim().toLowerCase();
 
     return indicators.filter((i) => {
-      const matchType = selectedType === "all" ? true : i.sample_type_id === Number(selectedType);
+      const matchType =
+        selectedType === "all" ? true : i.sample_type_id === Number(selectedType);
       const matchSearch =
         !q ||
         i.indicator_name?.toLowerCase().includes(q) ||
@@ -95,7 +88,6 @@ export default function LabPage(){
     });
   }, [indicators, selectedType, search]);
 
-  // group indicators under each type (for “related between each other” view)
   const grouped = useMemo(() => {
     const map = new Map<number, IndicatorRowForLabSpec[]>();
     for (const i of filteredIndicators) {
@@ -118,14 +110,15 @@ export default function LabPage(){
   }
 
   async function onSaveNewIndicator() {
-    // UI ONLY: you will POST to backend
-  const response = await fetch(`http://localhost:8000/indicators/create-indicator`,{
-    method: "POST",
-    headers:{"Content-type":"application/json"},
-    body:JSON.stringify(draft)
-  })
+    const response = await fetch(
+      `http://localhost:8000/indicators/create-indicator`,
+      {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify(draft),
+      }
+    );
     console.log("CREATE INDICATOR payload:", draft);
-    // optional UI append mock:
     if (draft.sample_type_id && draft.indicator_name.trim()) {
       setIndicators((prev) => [
         ...prev,
@@ -151,154 +144,144 @@ export default function LabPage(){
   function typeStandard(typeId: number) {
     return sampleTypes.find((t) => t.id === typeId)?.standard ?? "";
   }
-  console.log(draft,"savelsen shine indicator utguud")
+
   return (
-    <div className="p-6 space-y-4">
-      {/* Header */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="space-y-1">
-          <div className="text-2xl font-semibold">Шинжилгээний бүртгэл</div>
-          <div className="text-sm text-muted-foreground">
-            Дээжний төрөл → стандарт → холбогдох шинжилгээний жагсаалт
-          </div>
-        </div>
+    <div className="min-h-screen bg-background">
+      {/* Hero Header */}
+      <div className="border-b border-border bg-card">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                  <Beaker className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground tracking-tight">
+                    Шинжилгээний бүртгэл
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    Дээжний төрөл → стандарт → холбогдох шинжилгээний жагсаалт
+                  </p>
+                </div>
+              </div>
+            </div>
 
-        <div className="flex gap-2">
-          <Button onClick={openCreateModal}>+ Шинэ шинжилгээ</Button>
+            <Button
+              onClick={openCreateModal}
+              className="gap-2 shadow-soft"
+              size="lg"
+            >
+              <Plus className="h-4 w-4" />
+              Шинэ шинжилгээ
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="rounded-xl border bg-background p-4 space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="text-xs text-muted-foreground">Лаб төрөлөөр хайх</div>
-            <div className="flex flex-wrap gap-2">
-              {typeButtons.map((b) => {
-                const active = selectedType === b.key;
-                return (
-                  <button
+      {/* Main Content */}
+      <div className="mx-auto max-w-7xl px-6 py-6 space-y-6">
+        {/* Filters Card */}
+        <div className="rounded-xl border border-border bg-card shadow-card p-5 space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            {/* Type Filter Pills */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Лаб төрлөөр шүүх
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {typeButtons.map((b) => (
+                  <FilterPill
                     key={b.key}
-                    type="button"
+                    label={b.label}
+                    active={selectedType === b.key}
                     onClick={() => setSelectedType(b.key)}
-                    className={[
-                      "rounded-full border px-3 py-1 text-sm transition",
-                      active ? "bg-black text-white border-black" : "bg-white hover:bg-muted",
-                    ].join(" ")}
-                  >
-                    {b.label}
-                  </button>
-                );
-              })}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="w-full lg:w-80 space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Хайлт
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="E.coli, ISO, mg/m3..."
+                  className="pl-10 bg-background"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="w-[320px]">
-            <Label className="text-xs text-muted-foreground">Хайх (шинжилгээ / арга / нэгж)</Label>
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="жишээ: E.coli, ISO, mg/m3..."
-            />
+          {/* Stats Bar */}
+          <div className="flex items-center gap-2 pt-2 border-t border-border">
+            <FlaskConical className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              Нийт шинжилгээ:{" "}
+              <span className="font-semibold text-foreground">
+                {filteredIndicators.length}
+              </span>
+            </span>
           </div>
         </div>
 
-        <div className="text-sm text-muted-foreground">
-          Нийт шинжилгээ: <span className="text-foreground font-semibold">{filteredIndicators.length}</span>
+        {/* Grouped Indicator Cards */}
+        <div className="space-y-5">
+          {Array.from(grouped.entries())
+            .sort((a, b) => a[0] - b[0])
+            .map(([typeId, items]) => (
+              <IndicatorCard
+                key={typeId}
+                typeName={typeName(typeId)}
+                standard={typeStandard(typeId)}
+                items={items}
+              />
+            ))}
+
+          {filteredIndicators.length === 0 && (
+            <div className="rounded-xl border border-border bg-card shadow-card py-16 text-center">
+              <FlaskConical className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-1">
+                Шинжилгээ олдсонгүй
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Өөр хайлтын утга оруулж үзнэ үү
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Related view: grouped by sample type */}
-      <div className="space-y-4">
-        {Array.from(grouped.entries())
-          .sort((a, b) => a[0] - b[0])
-          .map(([typeId, items]) => (
-            <div key={typeId} className="rounded-xl border bg-background">
-              <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b">
-                <div className="flex items-center gap-2">
-                  <div className="font-semibold">{typeName(typeId)}</div>
-                  {typeStandard(typeId) ? (
-                    <Badge variant="secondary" className="font-normal">
-                      Стандарт: {typeStandard(typeId)}
-                    </Badge>
-                  ) : null}
-                </div>
-
-                <div className="text-sm text-muted-foreground">
-                  Шинжилгээ: <span className="text-foreground">{items.length}</span>
-                </div>
-              </div>
-
-              <div className="overflow-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[80px]">ID</TableHead>
-                      <TableHead>Шинжилгээ</TableHead>
-                      <TableHead className="w-[120px]">Нэгж</TableHead>
-                      <TableHead className="w-[220px]">Арга стандарт</TableHead>
-                      <TableHead className="w-[180px]">Зөвш / хэмжээ</TableHead>
-                      <TableHead className="w-[140px] text-right">Default</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {items.map((i) => (
-                      <TableRow key={i.id} className="hover:bg-muted/50">
-                        <TableCell className="text-muted-foreground">{i.id}</TableCell>
-                        <TableCell className="font-medium">{i.indicator_name}</TableCell>
-                        <TableCell>{i.unit || "-"}</TableCell>
-                        <TableCell className="text-muted-foreground">{i.test_method || "-"}</TableCell>
-                        <TableCell className="text-muted-foreground">{i.limit_value || "-"}</TableCell>
-                        <TableCell className="text-right">
-                          {i.is_default ? (
-                            <Badge className="bg-blue-500 text-white" variant="default">
-                              Default
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline">—</Badge>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-
-                    {items.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
-                          No indicators
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-          ))}
-
-        {filteredIndicators.length === 0 && (
-          <div className="rounded-xl border bg-background py-12 text-center text-muted-foreground">
-            No indicators found
-          </div>
-        )}
-      </div>
-
-      {/* Create Indicator Modal (UI only) */}
+      {/* Create Indicator Modal */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Шинэ шинжилгээ нэмэх</DialogTitle>
+        <DialogContent className="max-w-2xl bg-card">
+          <DialogHeader className="pb-4 border-b border-border">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <DialogTitle className="text-xl">Шинэ шинжилгээ нэмэх</DialogTitle>
+            </div>
           </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-5 py-4">
             <div className="space-y-2 col-span-2">
-              <Label>Дээжний төрөл</Label>
+              <Label className="text-sm font-medium">Дээжний төрөл</Label>
               <Select
                 value={draft.sample_type_id ? String(draft.sample_type_id) : ""}
-                onValueChange={(v) => setDraft((p) => ({ ...p, sample_type_id: Number(v) }))}
+                onValueChange={(v) =>
+                  setDraft((p) => ({ ...p, sample_type_id: Number(v) }))
+                }
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Төрөл сонгох" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover">
                   {sampleTypes.map((t) => (
                     <SelectItem key={t.id} value={String(t.id)}>
                       {t.type_name}
@@ -309,59 +292,82 @@ export default function LabPage(){
             </div>
 
             <div className="space-y-2 col-span-2">
-              <Label>Шинжилгээний нэр</Label>
+              <Label className="text-sm font-medium">Шинжилгээний нэр</Label>
               <Input
                 value={draft.indicator_name}
-                onChange={(e) => setDraft((p) => ({ ...p, indicator_name: e.target.value }))}
+                onChange={(e) =>
+                  setDraft((p) => ({ ...p, indicator_name: e.target.value }))
+                }
                 placeholder="жишээ: E.coli"
+                className="bg-background"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Нэгж</Label>
+              <Label className="text-sm font-medium">Нэгж</Label>
               <Input
                 value={draft.unit}
-                onChange={(e) => setDraft((p) => ({ ...p, unit: e.target.value }))}
+                onChange={(e) =>
+                  setDraft((p) => ({ ...p, unit: e.target.value }))
+                }
                 placeholder="жишээ: CFU, mg/m3"
+                className="bg-background"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Зөвш/Хэмжээ</Label>
+              <Label className="text-sm font-medium">Зөвш/Хэмжээ</Label>
               <Input
                 value={draft.limit_value}
-                onChange={(e) => setDraft((p) => ({ ...p, limit_value: e.target.value }))}
+                onChange={(e) =>
+                  setDraft((p) => ({ ...p, limit_value: e.target.value }))
+                }
                 placeholder="жишээ: 0, ≤ 12"
+                className="bg-background"
               />
             </div>
 
             <div className="space-y-2 col-span-2">
-              <Label>Арга / Test method</Label>
+              <Label className="text-sm font-medium">Арга / Test method</Label>
               <Input
                 value={draft.test_method}
-                onChange={(e) => setDraft((p) => ({ ...p, test_method: e.target.value }))}
+                onChange={(e) =>
+                  setDraft((p) => ({ ...p, test_method: e.target.value }))
+                }
                 placeholder="жишээ: ISO 9308"
+                className="bg-background"
               />
             </div>
 
             <div className="col-span-2">
-              <Separator className="my-2" />
+              <Separator className="my-3" />
               <button
                 type="button"
                 onClick={() => setDraft((p) => ({ ...p, is_default: !p.is_default }))}
-                className={[
-                  "w-full rounded-lg border px-3 py-2 text-left transition",
-                  draft.is_default ? "bg-muted" : "hover:bg-muted/50",
-                ].join(" ")}
+                className={`w-full rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                  draft.is_default
+                    ? "bg-primary/5 border-primary/30"
+                    : "bg-background border-border hover:bg-secondary/50"
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-sm font-medium">Default болгох</div>
+                    <div className="text-sm font-medium text-foreground">
+                      Default болгох
+                    </div>
                     <div className="text-xs text-muted-foreground">
-                      Энэ төрөл дээр шинэ sample үүсгэхэд санал болгох default indicator
+                      Энэ төрөл дээр шинэ sample үүсгэхэд санал болгох default
+                      indicator
                     </div>
                   </div>
-                  <Badge variant={draft.is_default ? "default" : "outline"}>
+                  <Badge
+                    variant={draft.is_default ? "default" : "outline"}
+                    className={
+                      draft.is_default
+                        ? "bg-primary text-primary-foreground"
+                        : ""
+                    }
+                  >
                     {draft.is_default ? "ON" : "OFF"}
                   </Badge>
                 </div>
@@ -369,11 +375,16 @@ export default function LabPage(){
             </div>
           </div>
 
-          <DialogFooter className="mt-4">
-            <Button variant="secondary" onClick={() => setOpenCreate(false)}>
+          <DialogFooter className="pt-4 border-t border-border gap-2">
+            <Button variant="outline" onClick={() => setOpenCreate(false)}>
               Болих
             </Button>
-            <Button onClick={onSaveNewIndicator} disabled={!draft.sample_type_id || !draft.indicator_name.trim()}>
+            <Button
+              onClick={onSaveNewIndicator}
+              disabled={!draft.sample_type_id || !draft.indicator_name.trim()}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
               Хадгалах
             </Button>
           </DialogFooter>

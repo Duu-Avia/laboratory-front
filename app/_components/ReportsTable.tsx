@@ -26,7 +26,6 @@ interface ReportsTableProps {
   onRowClick: (report: ReportRow) => void;
 }
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
-const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">
       <Table>
@@ -42,7 +41,7 @@ const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
           </TableRow>
         </TableHeader>
         <TableBody>
-          {exceptDeletedDatas.map((dataItem, index) => (
+          {data.map((dataItem, index) => (
             <TableRow
               key={dataItem.id}
               className="hover:bg-muted/50 cursor-pointer"
@@ -85,7 +84,7 @@ const exceptDeletedDatas = data.filter((item)=>item.status !== "deleted")
               <TableCell className="text-right">{statusBadge(dataItem.status)}</TableCell>
             </TableRow>
           ))}
-          {exceptDeletedDatas.length === 0 && (
+          {data.length === 0 && (
             <TableRow>
               <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
                 No reports
