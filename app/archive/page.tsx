@@ -2,13 +2,10 @@
 import { useRouter } from "next/navigation";
 import { RecentDay } from "../utils/GetRecentDays";
 import { useEffect, useState } from "react";
-import { ReportRow, SampleType, StatusFilter } from "../types/types";
 import { PdfViewModal } from "../_components/PdfViewModal";
-import { CreateReportModal } from "../_components/CreateReportModal";
-import { ReportsTable } from "../_components/ReportsTable";
-import { FilterBar } from "../_components/FilterBar";
+import { ArchiveReportsTable } from "./components/ArchiveReportsTable";
 import { ArchiveHeader } from "./components/Header";
-import { stat } from "fs";
+import { ReportRow, SampleType, StatusFilter } from "../types/types";
 
 export default function ArchivePage(){
     const router = useRouter();
@@ -84,7 +81,7 @@ export default function ArchivePage(){
         return matchSearch && matchStatus && matchSampleType && matchDateFrom && matchDateTo;
       });console.log(selectedSampleType)
       function handleRowClick(report: ReportRow) {
-        if (report.status === "tested") {
+        if (report.status === "tested" || report.status === "approved") {
           setPdfReportId(report.id);
           setPdfReportTitle(report.report_title);
           setPdfModalOpen(true);
@@ -132,7 +129,7 @@ export default function ArchivePage(){
             onExportClick={handleExcelConvert}
            />
     
-          <ReportsTable data={archiveFiltered} onRowClick={handleRowClick} />
+          <ArchiveReportsTable data={archiveFiltered} onRowClick={handleRowClick} />
     
     
           <PdfViewModal

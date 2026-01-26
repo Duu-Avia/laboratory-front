@@ -159,3 +159,23 @@ export type NewIndicatorDraft = {
   limit_value: string;
   is_default: boolean;
 };
+
+export interface ReportsTableProps {
+  data: ReportRow[];
+  onRowClick: (report: ReportRow) => void;
+}
+
+export interface ArchiveFilterBarProps {
+  from: string;
+  to: string;
+  search: string;
+  selectedSampleType: string;
+  status: StatusFilter;
+  sampleTypes: SampleType[];
+  onFromChange: (value: string) => void;
+  onToChange: (value: string) => void;
+  onSearchChange: (value: string) => void;
+  onSampleTypeChange: (value: string) => void;
+  onStatusChange: (value: StatusFilter) => void;
+  onExportClick: () => void;
+}

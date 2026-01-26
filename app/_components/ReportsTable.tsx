@@ -1,7 +1,7 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ReportRow, ReportStatus } from "../types/types";
+import { ReportRow, ReportsTableProps, ReportStatus } from "../types/types";
 
 function statusBadge(status: ReportStatus) {
   const map: Record<ReportStatus,
@@ -21,10 +21,7 @@ function statusBadge(status: ReportStatus) {
   );
 }
 
-interface ReportsTableProps {
-  data: ReportRow[];
-  onRowClick: (report: ReportRow) => void;
-}
+
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">

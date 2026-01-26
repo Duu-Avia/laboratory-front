@@ -89,7 +89,7 @@ const filtered = data.filter((r) => {
 console.log("Filtered result:", filtered.length);
 
   function handleRowClick(report: ReportRow) {
-    if (report.status === "tested") {
+    if (report.status === "tested" || report.status === "approved") {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
       setPdfModalOpen(true);
