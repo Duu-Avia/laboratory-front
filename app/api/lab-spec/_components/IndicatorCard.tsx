@@ -22,7 +22,7 @@ export function IndicatorCard({
   items,
 }: IndicatorCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 overflow-hidden animate-fade-in hover:shadow-2xl hover:shadow-slate-300/50 dark:hover:shadow-slate-900/50 transition-shadow duration-300">
+    <div className="rounded-2xl border border-emerald-300/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 overflow-hidden animate-fade-in hover:shadow-2xl hover:shadow-slate-300/50 dark:hover:shadow-slate-900/50 transition-shadow duration-300">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5 bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200/60 dark:border-slate-800/60">
         <div className="flex items-center gap-4">
@@ -54,7 +54,7 @@ export function IndicatorCard({
           <TableHeader>
             <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-b border-slate-200/60 dark:border-slate-800/60">
               <TableHead className="w-[70px] text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                ID
+                №
               </TableHead>
               <TableHead className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                 Шинжилгээ
@@ -97,7 +97,7 @@ export function IndicatorCard({
                 </TableCell>
                 <TableCell className="text-right">
                   {item.is_default ? (
-                    <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 dark:bg-blue-950/50 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 dark:bg-blue-950/50 px-3 py-1 text-xs font-medium text-blue-400 dark:text-emerald-300 border border-blue-200 dark:border-blue-800">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       Default
                     </div>

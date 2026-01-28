@@ -21,13 +21,14 @@ import {
 } from "@/components/ui/select";
 
 import { Plus, Search, FlaskConical, Beaker, Sparkles } from "lucide-react";
+
+import { FilterPill } from "./_components/FilterPill";
+import { IndicatorCard } from "./_components/IndicatorCard";
 import {
   IndicatorRowForLabSpec,
   NewIndicatorDraft,
   SampleType,
-} from "../types/types";
-import { FilterPill } from "./_components/FilterPill";
-import { IndicatorCard } from "./_components/IndicatorCard";
+} from "@/app/types/types";
 
 export default function LabPage() {
   // data (UI only, you will fetch)

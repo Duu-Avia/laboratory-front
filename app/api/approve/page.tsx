@@ -1,13 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { RecentDay } from "../utils/GetRecentDays";
 import { useEffect, useState } from "react";
-import { PdfViewModal } from "../_components/PdfViewModal";
-import { ArchiveReportsTable } from "./components/ArchiveReportsTable";
-import { ArchiveHeader } from "./components/Header";
-import { ReportRow, SampleType, StatusFilter } from "../types/types";
 
-export default function ArchivePage() {
+import { ArchiveReportsTable } from "../archive/components/ArchiveReportsTable";
+import { ArchiveHeader } from "../archive/components/Header";
+import { RecentDay } from "@/app/utils/GetRecentDays";
+import { ReportRow, SampleType, StatusFilter } from "@/app/types/types";
+import { PdfViewModal } from "@/app/_components/PdfViewModal";
+
+export default function ApprovePage() {
   const router = useRouter();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
   const today = RecentDay().today;

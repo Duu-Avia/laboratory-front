@@ -6,9 +6,9 @@ import { ClipboardCheck, CheckCircle2, Clock, Pencil } from "lucide-react";
 
 const menu = [
   { href: "/", label: "Ажил шалгуулах хүсэлт", icon: ClipboardCheck },
-  { href: "/archive", label: "Архив", icon: Clock },
-  { href: "/approve", label: "Баталгаажуулах хүсэлт", icon: CheckCircle2 },
-  { href: "/lab-spec", label: "Шинжилгээний бүртгэл", icon: Pencil },
+  { href: "/api/archive", label: "Архив", icon: Clock },
+  { href: "/api/approve", label: "Баталгаажуулах хүсэлт", icon: CheckCircle2 },
+  { href: "/api/lab-spec", label: "Шинжилгээний бүртгэл", icon: Pencil },
 ];
 
 export default function LeftSidebar() {
