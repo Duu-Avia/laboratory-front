@@ -12,11 +12,11 @@ export function FilterPill({ label, active, onClick }: FilterPillProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 border",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         active
-          ? "bg-primary text-primary-foreground shadow-soft"
-          : "bg-card text-muted-foreground hover:bg-secondary hover:text-foreground border border-border"
+          ? "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100 ring-blue-500/20 dark:text-blue-300 dark:bg-blue-950/50 dark:border-blue-800 dark:hover:bg-blue-900/50"
+          : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-300"
       )}
     >
       {label}
