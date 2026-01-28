@@ -1,17 +1,45 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ReportRow, ReportsTableProps, ReportStatus } from "../types/types";
 
 function statusBadge(status: ReportStatus) {
-  const map: Record<ReportStatus,
-    { text: string; variant: "default" | "secondary" | "outline"; className?: string }
+  const map: Record<
+    ReportStatus,
+    {
+      text: string;
+      variant: "default" | "secondary" | "outline";
+      className?: string;
+    }
   > = {
     draft: { text: "Draft", variant: "secondary" },
-    pending_samples: { text: "Дээж хүлээгдэж байна", variant: "outline", className: "bg-color-yellow-200" },
-    tested: { text: "Шинжилгээ хийгдсэн", variant: "outline", className: "text-cyan-500" },
-    approved: { text: "Батлагдсан", variant: "default", className: "bg-green-200" },
-    deleted:{text:"Устгагдсан", variant:"outline", className: "text-red-500"}
+    pending_samples: {
+      text: "Дээж хүлээгдэж байна",
+      variant: "outline",
+      className: "bg-color-yellow-200",
+    },
+    tested: {
+      text: "Шинжилгээ хийгдсэн",
+      variant: "outline",
+      className: "text-cyan-500",
+    },
+    approved: {
+      text: "Батлагдсан",
+      variant: "default",
+      className: "bg-green-200",
+    },
+    deleted: {
+      text: "Устгагдсан",
+      variant: "outline",
+      className: "text-red-500",
+    },
   };
   const s = map[status];
   return (
@@ -20,7 +48,6 @@ function statusBadge(status: ReportStatus) {
     </Badge>
   );
 }
-
 
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
   return (
@@ -34,7 +61,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
             <TableHead>Оруулсан дээжүүд</TableHead>
             <TableHead>Сонгогдсон/Ши</TableHead>
             <TableHead className="text-right pr-15">Төлөв</TableHead>
-            <TableHead className="text-right pr-10">Төлөв</TableHead>            
+            <TableHead className="text-right pr-10">Төлөв</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -42,7 +69,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
             <TableRow
               key={dataItem.id}
               className="hover:bg-muted/50 cursor-pointer"
-              onClick={() =>  onRowClick(dataItem)}
+              onClick={() => onRowClick(dataItem)}
             >
               <TableCell>{dataItem.created_at.slice(0, 10)}</TableCell>
               <TableCell>{index + 1}</TableCell>
@@ -62,10 +89,10 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                       <span className="mr-1">{i + 1}.</span>
                       {name.trim()}
                     </Badge>
-                  ))}          
+                  ))}
                 </div>
               </TableCell>
-               <TableCell className="max-w-[420px]">
+              <TableCell className="max-w-[420px]">
                 <div className="flex flex-wrap gap-1">
                   {dataItem.indicator_names?.split(",").map((name, i) => (
                     <Badge
@@ -75,22 +102,26 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                     >
                       {name.trim()}
                     </Badge>
-                  ))}          
+                  ))}
                 </div>
               </TableCell>
-              <TableCell className="text-right">{statusBadge(dataItem.status)}</TableCell>
+              <TableCell className="text-right">
+                {statusBadge(dataItem.status)}
+              </TableCell>
             </TableRow>
           ))}
           {data.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+              <TableCell
+                colSpan={6}
+                className="py-10 text-center text-muted-foreground"
+              >
                 No reports
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-
     </div>
   );
 }

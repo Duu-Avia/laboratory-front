@@ -4,9 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Indicator, LocationPackage, LocationSample, SampleGroup, SampleType } from "../types/types";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type {
+  Indicator,
+  LocationPackage,
+  LocationSample,
+  SampleGroup,
+  SampleType,
+} from "../types/types";
 
 type Props = {
   sampleGroup: SampleGroup;
@@ -14,10 +25,18 @@ type Props = {
   sampleTypes: SampleType[];
 };
 
-export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: Props) {
+export function SampleFormSection({
+  sampleGroup,
+  setSampleGroup,
+  sampleTypes,
+}: Props) {
   // Location packages state
-  const [locationPackages, setLocationPackages] = useState<LocationPackage[]>([]);
-  const [selectedPackageId, setSelectedPackageId] = useState<number | null>(null);
+  const [locationPackages, setLocationPackages] = useState<LocationPackage[]>(
+    []
+  );
+  const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
+    null
+  );
 
   // Fetch location packages when sample_type changes
   useEffect(() => {
@@ -27,7 +46,9 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
       return;
     }
 
-    fetch(`http://localhost:8000/locations?sample_type_id=${sampleGroup.sample_type_id}`)
+    fetch(
+      `http://localhost:8000/locations?sample_type_id=${sampleGroup.sample_type_id}`
+    )
       .then((r) => r.json())
       .then((data) => {
         setLocationPackages(data);
@@ -44,7 +65,9 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
     setSelectedPackageId(packageId);
 
     try {
-      const res = await fetch(`http://localhost:8000/locations/samples/${packageId}`);
+      const res = await fetch(
+        `http://localhost:8000/locations/samples/${packageId}`
+      );
       const samples: LocationSample[] = await res.json();
 
       // Get package name for location field
@@ -60,7 +83,7 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
       console.error("Error fetching location samples:", err);
     }
   };
-  console.log(locationPackages,selectedPackageId)
+  console.log(locationPackages, selectedPackageId);
   const addSampleName = () => {
     setSampleGroup((prev) => ({
       ...prev,
@@ -120,7 +143,11 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
         <div className="space-y-2">
           <Label>Дээжний төрөл</Label>
           <Select
-            value={sampleGroup.sample_type_id ? String(sampleGroup.sample_type_id) : undefined}
+            value={
+              sampleGroup.sample_type_id
+                ? String(sampleGroup.sample_type_id)
+                : undefined
+            }
             onValueChange={(v) => onTypeChange(Number(v))}
           >
             <SelectTrigger>
@@ -142,16 +169,20 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
           <Select
             value={selectedPackageId ? String(selectedPackageId) : undefined}
             onValueChange={(v) => handlePackageSelect(Number(v))}
-            disabled={!sampleGroup.sample_type_id || locationPackages.length === 0}
+            disabled={
+              !sampleGroup.sample_type_id || locationPackages.length === 0
+            }
           >
             <SelectTrigger>
-              <SelectValue placeholder={
-                !sampleGroup.sample_type_id 
-                  ? "Эхлээд дээжний төрөл сонгоно уу" 
-                  : locationPackages.length === 0 
-                    ? "Байршил байхгүй" 
-                    : "Байршил сонгох"
-              } />
+              <SelectValue
+                placeholder={
+                  !sampleGroup.sample_type_id
+                    ? "Эхлээд дээжний төрөл сонгоно уу"
+                    : locationPackages.length === 0
+                      ? "Байршил байхгүй"
+                      : "Байршил сонгох"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
               {locationPackages.map((pkg) => (
@@ -167,7 +198,12 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
         <div className="space-y-2 col-span-3">
           <div className="flex items-center justify-between">
             <Label>Дээжний нэр</Label>
-            <Button variant="ghost" size="sm" onClick={addSampleName} type="button">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={addSampleName}
+              type="button"
+            >
               + Дээж нэмэх
             </Button>
           </div>
@@ -181,7 +217,12 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
                   placeholder={`Дээж ${idx + 1}`}
                 />
                 {sampleGroup.sample_names.length > 1 && (
-                  <Button variant="ghost" size="sm" onClick={() => removeSampleName(idx)} type="button">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeSampleName(idx)}
+                    type="button"
+                  >
                     ×
                   </Button>
                 )}
@@ -237,7 +278,9 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
       <div className="flex items-center justify-between">
         <div className="font-medium">Шинжилгээ сонгох</div>
         <div className="text-xs text-muted-foreground">
-          {sampleGroup.sample_type_id ? "Санал болгох шинжилгээнүүд" : "Дээжний төрлөө эхлээд сонгоно уу"}
+          {sampleGroup.sample_type_id
+            ? "Санал болгох шинжилгээнүүд"
+            : "Дээжний төрлөө эхлээд сонгоно уу"}
         </div>
       </div>
 
@@ -255,7 +298,9 @@ export function SampleFormSection({ sampleGroup, setSampleGroup, sampleTypes }: 
                 }`}
               >
                 <div>
-                  <div className="text-sm font-medium">{ind.indicator_name}</div>
+                  <div className="text-sm font-medium">
+                    {ind.indicator_name}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {ind.unit ? `Unit: ${ind.unit}` : "—"}
                   </div>

@@ -2,18 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
-import type { Indicator, SampleGroup, SampleGroupEdit, SampleType } from "../types/types";
-
-
+import type {
+  Indicator,
+  SampleGroup,
+  SampleGroupEdit,
+  SampleType,
+} from "../types/types";
 
 const emptySampleGroup: SampleGroup = {
   sample_type_id: null,
   sample_ids: [],
-  sample_amount:"",
+  sample_amount: "",
   sample_names: [""],
   location: "",
   sample_date: "",
@@ -30,7 +39,13 @@ type Props = {
   onSaved?: () => void;
 };
 
-export function EditReport({ open, onOpenChange, reportId, sampleTypes, onSaved }: Props) {
+export function EditReport({
+  open,
+  onOpenChange,
+  reportId,
+  sampleTypes,
+  onSaved,
+}: Props) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [reportTitle, setReportTitle] = useState("");
@@ -75,7 +90,7 @@ export function EditReport({ open, onOpenChange, reportId, sampleTypes, onSaved 
         setSampleGroup({
           sample_type_id: first?.sample_type_id ?? null,
           sample_ids: loadedIds,
-          sample_amount:first?.sample_amount ?? "",
+          sample_amount: first?.sample_amount ?? "",
           sample_names: loadedNames.length ? loadedNames : [""],
           location: first?.location ?? "",
           sample_date: (first?.sample_date ?? "").slice(0, 10),
@@ -94,7 +109,9 @@ export function EditReport({ open, onOpenChange, reportId, sampleTypes, onSaved 
       return;
     }
 
-    fetch(`http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`)
+    fetch(
+      `http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`
+    )
       .then((r) => r.json())
       .then((indicators: Indicator[]) => {
         setSampleGroup((p) => ({ ...p, availableIndicators: indicators }));
@@ -123,16 +140,25 @@ export function EditReport({ open, onOpenChange, reportId, sampleTypes, onSaved 
       }))
       .filter((s) => s.sample_name !== "");
 
-    console.log("Payload samples:", samples.map(s => ({ sample_id: s.sample_id, sample_name: s.sample_name })));
+    console.log(
+      "Payload samples:",
+      samples.map((s) => ({
+        sample_id: s.sample_id,
+        sample_name: s.sample_name,
+      }))
+    );
 
     try {
       setSaving(true);
 
-      const res = await fetch(`http://localhost:8000/reports/edit/${reportId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ report_title: reportTitle, samples }),
-      });
+      const res = await fetch(
+        `http://localhost:8000/reports/edit/${reportId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ report_title: reportTitle, samples }),
+        }
+      );
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -155,7 +181,9 @@ export function EditReport({ open, onOpenChange, reportId, sampleTypes, onSaved 
         </DialogHeader>
 
         {loading ? (
-          <div className="py-6 text-sm text-muted-foreground">Ачаалж байна...</div>
+          <div className="py-6 text-sm text-muted-foreground">
+            Ачаалж байна...
+          </div>
         ) : (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -176,7 +204,11 @@ export function EditReport({ open, onOpenChange, reportId, sampleTypes, onSaved 
         )}
 
         <DialogFooter className="mt-4">
-          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={saving}>
+          <Button
+            variant="secondary"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
             Болих
           </Button>
           <Button onClick={handleSave} disabled={saving || loading}>

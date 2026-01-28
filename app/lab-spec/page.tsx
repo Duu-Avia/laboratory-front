@@ -20,9 +20,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-
 import { Plus, Search, FlaskConical, Beaker, Sparkles } from "lucide-react";
-import { IndicatorRowForLabSpec, NewIndicatorDraft, SampleType } from "../types/types";
+import {
+  IndicatorRowForLabSpec,
+  NewIndicatorDraft,
+  SampleType,
+} from "../types/types";
 import { FilterPill } from "./_components/FilterPill";
 import { IndicatorCard } from "./_components/IndicatorCard";
 
@@ -76,7 +79,9 @@ export default function LabPage() {
 
     return indicators.filter((i) => {
       const matchType =
-        selectedType === "all" ? true : i.sample_type_id === Number(selectedType);
+        selectedType === "all"
+          ? true
+          : i.sample_type_id === Number(selectedType);
       const matchSearch =
         !q ||
         i.indicator_name?.toLowerCase().includes(q) ||
@@ -138,7 +143,9 @@ export default function LabPage() {
   }
 
   function typeName(typeId: number) {
-    return sampleTypes.find((t) => t.id === typeId)?.type_name ?? `Type #${typeId}`;
+    return (
+      sampleTypes.find((t) => t.id === typeId)?.type_name ?? `Type #${typeId}`
+    );
   }
 
   function typeStandard(typeId: number) {
@@ -265,7 +272,9 @@ export default function LabPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                 <Sparkles className="h-5 w-5 text-primary" />
               </div>
-              <DialogTitle className="text-xl">Шинэ шинжилгээ нэмэх</DialogTitle>
+              <DialogTitle className="text-xl">
+                Шинэ шинжилгээ нэмэх
+              </DialogTitle>
             </div>
           </DialogHeader>
 
@@ -343,7 +352,9 @@ export default function LabPage() {
               <Separator className="my-3" />
               <button
                 type="button"
-                onClick={() => setDraft((p) => ({ ...p, is_default: !p.is_default }))}
+                onClick={() =>
+                  setDraft((p) => ({ ...p, is_default: !p.is_default }))
+                }
                 className={`w-full rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
                   draft.is_default
                     ? "bg-primary/5 border-primary/30"

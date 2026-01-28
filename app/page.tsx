@@ -9,9 +9,9 @@ import { FilterBar } from "./_components/FilterBar";
 import { PdfViewModal } from "./_components/PdfViewModal";
 import { RecentDay } from "./utils/GetRecentDays";
 export default function ReportsPage() {
-const router = useRouter();
-const thirtyDaysAgo = RecentDay().thirtyDayAgo
-const today = RecentDay().today
+  const router = useRouter();
+  const thirtyDaysAgo = RecentDay().thirtyDayAgo;
+  const today = RecentDay().today;
   // Filters
   const [status, setStatus] = useState<StatusFilter>("all");
   const [from, setFrom] = useState<string>(thirtyDaysAgo);
@@ -60,33 +60,40 @@ const today = RecentDay().today
   }, []);
 
   // Filter data
-const filtered = data.filter((r) => {
-  const statusLabels: Record<string, string> = {
-    draft: "draft",
-    tested: "шинжилгээ хийгдсэн",
-    pending_samples: "дээж хүлээгдэж байна",
-    approved: "батлагдсан",
-    deleted: "устгагдсан",
-  };
-  const statusMatch = statusLabels[r.status] || "";
+  const filtered = data.filter((r) => {
+    const statusLabels: Record<string, string> = {
+      draft: "draft",
+      tested: "шинжилгээ хийгдсэн",
+      pending_samples: "дээж хүлээгдэж байна",
+      approved: "батлагдсан",
+      deleted: "устгагдсан",
+    };
+    const statusMatch = statusLabels[r.status] || "";
 
-  const matchSearch =
-    !search ||
-    statusMatch.toLowerCase().includes(search.toLowerCase()) ||
-    r.report_title.toLowerCase().includes(search.toLowerCase()) ||
-    r.sample_names.toLowerCase().includes(search.toLowerCase());
+    const matchSearch =
+      !search ||
+      statusMatch.toLowerCase().includes(search.toLowerCase()) ||
+      r.report_title.toLowerCase().includes(search.toLowerCase()) ||
+      r.sample_names.toLowerCase().includes(search.toLowerCase());
 
-  const matchStatus = status === "all" || r.status === status;
-  const matchSampleType = selectedSampleType === "all" || r.sample_type === selectedSampleType;
+    const matchStatus = status === "all" || r.status === status;
+    const matchSampleType =
+      selectedSampleType === "all" || r.sample_type === selectedSampleType;
 
-  const reportDateStr = r.created_at.slice(0, 10);  
-  const matchDateFrom = !from || reportDateStr >= from;
-  const matchDateTo = !to || reportDateStr <= to;
+    const reportDateStr = r.created_at.slice(0, 10);
+    const matchDateFrom = !from || reportDateStr >= from;
+    const matchDateTo = !to || reportDateStr <= to;
 
-  return matchSearch && matchStatus && matchSampleType && matchDateFrom && matchDateTo;
-});
+    return (
+      matchSearch &&
+      matchStatus &&
+      matchSampleType &&
+      matchDateFrom &&
+      matchDateTo
+    );
+  });
 
-console.log("Filtered result:", filtered.length);
+  console.log("Filtered result:", filtered.length);
 
   function handleRowClick(report: ReportRow) {
     if (report.status === "tested" || report.status === "approved") {
@@ -97,27 +104,30 @@ console.log("Filtered result:", filtered.length);
       router.push(`/reports/${report.id}`);
     }
   }
-  const handleExcelConvert = async()=> {
-    try{
-      const response = await fetch(`http://localhost:8000/reports/excel?status=${status}`,)
-      if(!response.ok){
-      console.log("export failed")
-      return;}
+  const handleExcelConvert = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/reports/excel?status=${status}`
+      );
+      if (!response.ok) {
+        console.log("export failed");
+        return;
+      }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-            console.log(blob)
-      const a = document.createElement("a")
+      console.log(blob);
+      const a = document.createElement("a");
       a.href = url;
-      a.download = "report.xlsx"
+      a.download = "report.xlsx";
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-    }catch(err){
-      console.log("error while download excel ",err)
+    } catch (err) {
+      console.log("error while download excel ", err);
     }
-    console.log("excel export daragdsan shvv")
-  }
+    console.log("excel export daragdsan shvv");
+  };
   return (
     <div className="p-6 space-y-5">
       <FilterBar
@@ -156,7 +166,11 @@ console.log("Filtered result:", filtered.length);
       />
 
       <div className="text-sm font-bold text-muted-foreground text-right pr-6">
-       <span> Нийт илэрц: {filtered.filter((item)=>(item.status !== "deleted")).length}</span>
+        <span>
+          {" "}
+          Нийт илэрц:{" "}
+          {filtered.filter((item) => item.status !== "deleted").length}
+        </span>
       </div>
     </div>
   );

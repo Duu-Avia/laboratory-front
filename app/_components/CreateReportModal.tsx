@@ -1,64 +1,87 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
-import type { CreateReportModalProps, Indicator, SampleGroup } from "../types/types";
-
+import type {
+  CreateReportModalProps,
+  Indicator,
+  SampleGroup,
+} from "../types/types";
 
 const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
   sample_type_id: null,
-  sample_ids:[],
+  sample_ids: [],
   sample_names: [""],
   location: "",
   sample_date: defaultDate,
-  sample_amount:"",
+  sample_amount: "",
   sampled_by: "",
   indicators: [],
   availableIndicators: [],
 });
 
-export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, onCreated }: CreateReportModalProps) {
+export function CreateReportModal({
+  open,
+  onOpenChange,
+  sampleTypes,
+  from,
+  to,
+  onCreated,
+}: CreateReportModalProps) {
   const [saving, setSaving] = useState(false);
   const [reportTitle, setReportTitle] = useState("");
   const [reportTitleTouched, setReportTitleTouched] = useState(false);
-  const [sampleGroup, setSampleGroup] = useState<SampleGroup>(getEmptySampleGroup(from));
+  const [sampleGroup, setSampleGroup] = useState<SampleGroup>(
+    getEmptySampleGroup(from)
+  );
 
-  const calculateTestEndDate = (startDate:string) =>{
-  const endTestDate = new Date(startDate);
-  endTestDate.setDate(endTestDate.getDate() + 3)
-  return endTestDate.toISOString().slice(0, 10);
-  }
+  const calculateTestEndDate = (startDate: string) => {
+    const endTestDate = new Date(startDate);
+    endTestDate.setDate(endTestDate.getDate() + 3);
+    return endTestDate.toISOString().slice(0, 10);
+  };
 
   // Reset form when modal opens
   useEffect(() => {
     if (open) {
       setReportTitle("");
-      setReportTitleTouched(false)
+      setReportTitleTouched(false);
       setSampleGroup(getEmptySampleGroup(to));
     }
   }, [open, to]);
 
-//location ororchlogdoh burt report title supdate hiih
+  //location ororchlogdoh burt report title supdate hiih
   useEffect(() => {
-  if (!open) return;
-  if (reportTitleTouched) return;
+    if (!open) return;
+    if (reportTitleTouched) return;
 
-  setReportTitle(sampleGroup.location || "");
-}, [open, sampleGroup.location, reportTitleTouched]);
-
+    setReportTitle(sampleGroup.location || "");
+  }, [open, sampleGroup.location, reportTitleTouched]);
 
   // Load available indicators when sample type changes
   useEffect(() => {
     if (!open || !sampleGroup.sample_type_id) return;
-    
-    fetch(`http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`)
+
+    fetch(
+      `http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`
+    )
       .then((response) => response.json())
       .then((indicators: Indicator[]) => {
-        setSampleGroup((p) => ({ ...p, availableIndicators: indicators, indicators:indicators.map((ind)=>ind.id) }));
+        setSampleGroup((p) => ({
+          ...p,
+          availableIndicators: indicators,
+          indicators: indicators.map((ind) => ind.id),
+        }));
       })
       .catch(() => {
         setSampleGroup((p) => ({ ...p, availableIndicators: [] }));
@@ -71,7 +94,7 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
       .map((name) => ({
         sample_type_id: sampleGroup.sample_type_id,
         sample_name: name.trim(),
-        sample_amount:sampleGroup.sample_amount,
+        sample_amount: sampleGroup.sample_amount,
         location: sampleGroup.location,
         sample_date: sampleGroup.sample_date,
         sampled_by: sampleGroup.sampled_by,
@@ -119,7 +142,7 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
       setSaving(false);
     }
   };
-  console.log(sampleGroup.location,"location")
+  console.log(sampleGroup.location, "location");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl">
@@ -132,8 +155,9 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
             <Label>Тайлан</Label>
             <Input
               value={reportTitle}
-              onChange={(e) => {setReportTitleTouched(true);
-                setReportTitle(e.target.value)
+              onChange={(e) => {
+                setReportTitleTouched(true);
+                setReportTitle(e.target.value);
               }}
               placeholder="Нэгдсэн төв ус гэх мэт..."
             />
@@ -147,7 +171,11 @@ export function CreateReportModal({ open, onOpenChange, sampleTypes, from, to, o
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={saving}>
+          <Button
+            variant="secondary"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
             Болих
           </Button>
           <Button onClick={handleSave} disabled={saving}>

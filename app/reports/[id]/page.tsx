@@ -22,7 +22,8 @@ export default function ReportDetailPage() {
         ...it,
         result_value: it.result?.result_value ?? it.result_value ?? null,
         is_detected: it.result?.is_detected ?? it.is_detected ?? null,
-        is_within_limit: it.result?.is_within_limit ?? it.is_within_limit ?? null,
+        is_within_limit:
+          it.result?.is_within_limit ?? it.is_within_limit ?? null,
         avg: it.avg ?? it.result?.avg ?? null,
       })),
     }));
@@ -46,7 +47,9 @@ export default function ReportDetailPage() {
       prev.map((s) => ({
         ...s,
         indicators: (s.indicators ?? []).map((ind: any) =>
-          ind.sample_indicator_id === sampleIndicatorId ? { ...ind, ...patch } : ind
+          ind.sample_indicator_id === sampleIndicatorId
+            ? { ...ind, ...patch }
+            : ind
         ),
       }))
     );
@@ -68,11 +71,14 @@ export default function ReportDetailPage() {
     });
 
     try {
-      const response = await fetch(`http://localhost:8000/reports/results/${reportId}`, {
-        method: "PUT",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify({ results }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/reports/results/${reportId}`,
+        {
+          method: "PUT",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify({ results }),
+        }
+      );
 
       const data = await response.json();
       console.log("saved data", data);
@@ -87,7 +93,11 @@ export default function ReportDetailPage() {
 
   return (
     <div className="p-6 space-y-5">
-      <ReportHeader reportId={reportId || ""} onSave={onSave} onExport={handleExport} />
+      <ReportHeader
+        reportId={reportId || ""}
+        onSave={onSave}
+        onExport={handleExport}
+      />
 
       <div className="rounded-xl border p-4">
         <SampleBadges reportTitle={reportTitle} samples={samples} />
@@ -103,7 +113,9 @@ export default function ReportDetailPage() {
                   {s.sample_amount || "-"} Дээж авсан • {s.sampled_by || "-"}
                 </div>
               </div>
-              <div className="text-sm text-muted-foreground">Дээж: {s.sample_id}</div>
+              <div className="text-sm text-muted-foreground">
+                Дээж: {s.sample_id}
+              </div>
             </div>
 
             <ResultsTable
@@ -118,4 +130,3 @@ export default function ReportDetailPage() {
     </div>
   );
 }
-

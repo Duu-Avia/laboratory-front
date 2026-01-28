@@ -27,10 +27,16 @@ type TableIndicator = {
 
 type ResultsTableProps = {
   indicators: TableIndicator[];
-  onUpdateIndicator: (sampleIndicatorId: number, patch: Partial<TableIndicator>) => void;
+  onUpdateIndicator: (
+    sampleIndicatorId: number,
+    patch: Partial<TableIndicator>
+  ) => void;
 };
 
-export function ResultsTable({ indicators, onUpdateIndicator }: ResultsTableProps) {
+export function ResultsTable({
+  indicators,
+  onUpdateIndicator,
+}: ResultsTableProps) {
   const handleCfuChange = (
     sampleIndicatorId: number,
     currentValue: string | null | undefined,
@@ -74,13 +80,17 @@ export function ResultsTable({ indicators, onUpdateIndicator }: ResultsTableProp
               <tr key={ind.sample_indicator_id} className="border-t">
                 <td className="p-3">{ind.indicator_name}</td>
                 <td className="p-3 text-muted-foreground">{ind.unit || "-"}</td>
-                <td className="p-3 text-muted-foreground">{ind.limit_value || "-"}</td>
+                <td className="p-3 text-muted-foreground">
+                  {ind.limit_value || "-"}
+                </td>
 
                 <td className="p-3">
                   {isCfu ? (
                     <div className="flex gap-2 items-center">
                       <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted-foreground">22°C</label>
+                        <label className="text-xs text-muted-foreground">
+                          22°C
+                        </label>
                         <Input
                           className="w-[80px]"
                           type="number"
@@ -98,7 +108,9 @@ export function ResultsTable({ indicators, onUpdateIndicator }: ResultsTableProp
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted-foreground">37°C</label>
+                        <label className="text-xs text-muted-foreground">
+                          37°C
+                        </label>
                         <Input
                           className="w-[80px]"
                           type="number"
@@ -116,7 +128,9 @@ export function ResultsTable({ indicators, onUpdateIndicator }: ResultsTableProp
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted-foreground">Дундаж</label>
+                        <label className="text-xs text-muted-foreground">
+                          Дундаж
+                        </label>
                         <Input
                           className="w-[80px] bg-muted"
                           type="number"
@@ -131,7 +145,9 @@ export function ResultsTable({ indicators, onUpdateIndicator }: ResultsTableProp
                       <Button
                         type="button"
                         size="sm"
-                        variant={ind.is_detected === true ? "default" : "outline"}
+                        variant={
+                          ind.is_detected === true ? "default" : "outline"
+                        }
                         onClick={() =>
                           onUpdateIndicator(ind.sample_indicator_id, {
                             is_detected: true,
@@ -145,7 +161,9 @@ export function ResultsTable({ indicators, onUpdateIndicator }: ResultsTableProp
                       <Button
                         type="button"
                         size="sm"
-                        variant={ind.is_detected === false ? "default" : "outline"}
+                        variant={
+                          ind.is_detected === false ? "default" : "outline"
+                        }
                         onClick={() =>
                           onUpdateIndicator(ind.sample_indicator_id, {
                             is_detected: false,

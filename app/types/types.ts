@@ -1,9 +1,14 @@
-export type ReportStatus = "draft" | "pending_samples" | "tested" | "approved" | "deleted";
+export type ReportStatus =
+  | "draft"
+  | "pending_samples"
+  | "tested"
+  | "approved"
+  | "deleted";
 export type StatusFilter = ReportStatus | "all";
 export type ReportRow = {
   id: number;
-  sample_names:string;
-  indicator_names:string;
+  sample_names: string;
+  indicator_names: string;
   created_at: string;
   time: string;
   report_title: string;
@@ -13,16 +18,24 @@ export type ReportRow = {
   status: ReportStatus;
   sample_type?: string;
 };
-export type SampleType = { id: number; type_name: string; standard:string };
-export type Indicator = { id: number; indicator_name: string; unit?: string; method?: string; limit?: string; is_default?: boolean, input_type?:string; }
+export type SampleType = { id: number; type_name: string; standard: string };
+export type Indicator = {
+  id: number;
+  indicator_name: string;
+  unit?: string;
+  method?: string;
+  limit?: string;
+  is_default?: boolean;
+  input_type?: string;
+};
 
 export type SampleIndicatorItem = {
   sample_indicator_id: number;
   indicator_id: number;
   indicator_name: string;
   unit?: string | null;
-  avg:string | null;
-  input_type:string;
+  avg: string | null;
+  input_type: string;
   limit_value?: string | null;
 
   // result can be null if not created yet
@@ -37,33 +50,32 @@ export type SampleIndicatorItem = {
 export type SampleColumn = {
   sample_id: number;
   sample_name: string;
-  sample_amount:string;
+  sample_amount: string;
   location?: string;
-  indicators:SampleIndicatorItem[]
-  
+  indicators: SampleIndicatorItem[];
 };
 export type IndicatorRow = {
   indicator_id: number;
   indicator_name: string;
   unit?: string;
-  input_type:string;
+  input_type: string;
   limit_value?: string;
-  sample_indicator_ids: number[]
+  sample_indicator_ids: number[];
   result_value?: string;
   is_detected?: boolean | null;
   is_within_limit?: boolean | null;
   is_default?: boolean | number | null;
-  avg:string | null
+  avg: string | null;
 };
-export interface ReportHeaderSaveProps  {
-  reportId: string,
+export interface ReportHeaderSaveProps {
+  reportId: string;
   onSave: () => void;
   onExport: () => void;
 }
-export interface DeleteDialogProps  {
- deleteDialogOpener:boolean, 
- reportId:number | null, 
- setDeleteDialogOpener: (setDeleteDialogOpener:boolean) => void
+export interface DeleteDialogProps {
+  deleteDialogOpener: boolean;
+  reportId: number | null;
+  setDeleteDialogOpener: (setDeleteDialogOpener: boolean) => void;
 }
 export interface FilterBarProps {
   from: string;
@@ -109,7 +121,7 @@ export type SampleGroup = {
   sample_type_id: number | null;
   sample_ids: (number | null)[];
   sample_names: string[];
-  sample_amount:string;
+  sample_amount: string;
   location: string;
   sample_date: string;
   sampled_by: string;
@@ -117,7 +129,7 @@ export type SampleGroup = {
   availableIndicators: Indicator[];
 };
 
-export  type SampleGroupEdit = {
+export type SampleGroupEdit = {
   sample_type_id: number | null;
   sample_ids: (number | null)[];
   sample_names: string[];
@@ -128,7 +140,7 @@ export  type SampleGroupEdit = {
   availableIndicators: Indicator[];
 };
 
- export type LocationPackage = {
+export type LocationPackage = {
   id: number;
   package_name: string;
   sample_type_id: number;
@@ -147,9 +159,8 @@ export type IndicatorRowForLabSpec = {
   unit?: string | null;
   test_method?: string | null;
   limit_value?: string | null;
-  is_default?: boolean | number | null; 
+  is_default?: boolean | number | null;
 };
-
 
 export type NewIndicatorDraft = {
   sample_type_id: number | null;

@@ -2,13 +2,39 @@ import { ArchiveFilterBarProps } from "@/app/types/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar, Download, Plus, Search, Filter } from "lucide-react";
+import {
+  Calendar,
+  Download,
+  Plus,
+  Search,
+  Filter,
+  XCircle,
+  CheckCircle2,
+  Icon,
+} from "lucide-react";
 
 type ArchiveStatus = "all" | "deleted" | "approved";
 
-const statusOptions: { key: ArchiveStatus; label: string; color: string }[] = [
-  { key: "approved", label: "Батлагдсан", color: "bg-emerald-600" },
-  { key: "deleted", label: "Устгагдсан", color: "bg-rose-600" },
+const statusOptions: {
+  key: ArchiveStatus;
+  label: string;
+  icon: React.ElementType;
+  color: string;
+}[] = [
+  {
+    key: "approved",
+    label: "Батлагдсан",
+    icon: CheckCircle2,
+    color:
+      "text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100 ring-emerald-500/20",
+  },
+  {
+    key: "deleted",
+    label: "Устгагдсан",
+    icon: XCircle,
+    color:
+      "text-rose-700 bg-rose-50 border-rose-200 hover:bg-rose-100 ring-rose-500/20",
+  },
 ];
 
 export function ArchiveHeader({
@@ -46,7 +72,6 @@ export function ArchiveHeader({
             <Download className="w-4 h-4 mr-2" />
             Экселрүү хөрвүүлэх
           </Button>
-
         </div>
       </div>
 
@@ -113,9 +138,10 @@ export function ArchiveHeader({
                 onClick={() => onSampleTypeChange("all")}
                 className={`
                   px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                  ${selectedSampleType === "all"
-                    ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
+                  ${
+                    selectedSampleType === "all"
+                      ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
                   }
                 `}
               >
@@ -127,9 +153,10 @@ export function ArchiveHeader({
                   onClick={() => onSampleTypeChange(type.type_name)}
                   className={`
                     px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                    ${selectedSampleType === type.type_name
-                      ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
+                    ${
+                      selectedSampleType === type.type_name
+                        ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
                     }
                   `}
                 >
@@ -147,23 +174,22 @@ export function ArchiveHeader({
             <div className="flex flex-wrap gap-2 justify-end">
               {statusOptions.map((s) => {
                 const active = status === s.key;
+                const Icon = s.icon;
                 return (
                   <button
                     key={s.key}
                     type="button"
                     onClick={() => onStatusChange(s.key)}
                     className={`
-                      px-4 py-2 rounded-full text-sm font-medium border-2 transition-all duration-200
-                      ${active
-                        ? `${s.color} text-white border-transparent shadow-lg`
-                        : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                      flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold border transition-all
+                      ${
+                        active
+                          ? s.color + " ring-2 shadow-sm"
+                          : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                       }
                     `}
-                    style={{
-                      boxShadow: active ? `0 8px 16px -4px ${s.key === 'approved' ? 'rgb(16 185 129 / 0.3)' : s.key === 'deleted' ? 'rgb(225 29 72 / 0.3)' : 'rgb(71 85 105 / 0.3)'}` : undefined
-                    }}
                   >
-                    <span className={`inline-block w-2 h-2 rounded-full mr-2 ${active ? 'bg-white/80' : s.key === 'approved' ? 'bg-emerald-500' : s.key === 'deleted' ? 'bg-rose-500' : 'bg-slate-400'}`} />
+                    <Icon className="w-3.5 h-3.5" />
                     {s.label}
                   </button>
                 );

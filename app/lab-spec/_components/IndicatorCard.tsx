@@ -16,7 +16,11 @@ interface IndicatorCardProps {
   items: IndicatorRowForLabSpec[];
 }
 
-export function IndicatorCard({ typeName, standard, items }: IndicatorCardProps) {
+export function IndicatorCard({
+  typeName,
+  standard,
+  items,
+}: IndicatorCardProps) {
   return (
     <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden animate-fade-in">
       {/* Header */}
@@ -28,7 +32,9 @@ export function IndicatorCard({ typeName, standard, items }: IndicatorCardProps)
           <div>
             <h3 className="font-semibold text-foreground">{typeName}</h3>
             {standard && (
-              <p className="text-xs text-muted-foreground">Стандарт: {standard}</p>
+              <p className="text-xs text-muted-foreground">
+                Стандарт: {standard}
+              </p>
             )}
           </div>
         </div>
@@ -42,26 +48,48 @@ export function IndicatorCard({ typeName, standard, items }: IndicatorCardProps)
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-[70px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">ID</TableHead>
-              <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Шинжилгээ</TableHead>
-              <TableHead className="w-[100px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">Нэгж</TableHead>
-              <TableHead className="w-[200px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">Арга стандарт</TableHead>
-              <TableHead className="w-[150px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">Зөвш / хэмжээ</TableHead>
-              <TableHead className="w-[100px] text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">Default</TableHead>
+              <TableHead className="w-[70px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                ID
+              </TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Шинжилгээ
+              </TableHead>
+              <TableHead className="w-[100px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Нэгж
+              </TableHead>
+              <TableHead className="w-[200px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Арга стандарт
+              </TableHead>
+              <TableHead className="w-[150px] text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Зөвш / хэмжээ
+              </TableHead>
+              <TableHead className="w-[100px] text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Default
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((item, index) => (
-              <TableRow 
-                key={item.id} 
+              <TableRow
+                key={item.id}
                 className="group transition-colors hover:bg-accent/50"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <TableCell className="text-sm text-muted-foreground font-mono">{item.id}</TableCell>
-                <TableCell className="font-medium text-foreground">{item.indicator_name}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{item.unit || "—"}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{item.test_method || "—"}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{item.limit_value || "—"}</TableCell>
+                <TableCell className="text-sm text-muted-foreground font-mono">
+                  {item.id}
+                </TableCell>
+                <TableCell className="font-medium text-foreground">
+                  {item.indicator_name}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {item.unit || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {item.test_method || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {item.limit_value || "—"}
+                </TableCell>
                 <TableCell className="text-right">
                   {item.is_default ? (
                     <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
@@ -79,7 +107,10 @@ export function IndicatorCard({ typeName, standard, items }: IndicatorCardProps)
 
             {items.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="py-12 text-center text-muted-foreground"
+                >
                   <FlaskConical className="mx-auto h-8 w-8 mb-2 opacity-30" />
                   Шинжилгээ олдсонгүй
                 </TableCell>

@@ -1,7 +1,11 @@
 import "./globals.css";
 import LeftSidebar from "./_components/LeftSideBar";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="mn">
       <body className="h-screen overflow-hidden">
