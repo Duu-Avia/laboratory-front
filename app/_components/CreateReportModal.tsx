@@ -12,11 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
-import type {
-  CreateReportModalProps,
-  Indicator,
-  SampleGroup,
-} from "../types/types";
+
+// Types - use @/types instead of relative path
+import type { CreateReportModalProps, Indicator, SampleGroup } from "@/types";
+
+// Lib - use new API client and error handling
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/api/endpoints";
+import { getErrorMessage, logError } from "@/lib/errors";
 
 const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
   sample_type_id: null,
@@ -39,6 +42,7 @@ export function CreateReportModal({
   onCreated,
 }: CreateReportModalProps) {
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Error state for UI
   const [reportTitle, setReportTitle] = useState("");
   const [reportTitleTouched, setReportTitleTouched] = useState(false);
   const [sampleGroup, setSampleGroup] = useState<SampleGroup>(
@@ -56,15 +60,15 @@ export function CreateReportModal({
     if (open) {
       setReportTitle("");
       setReportTitleTouched(false);
+      setError(null); // Clear error when modal opens
       setSampleGroup(getEmptySampleGroup(to));
     }
   }, [open, to]);
 
-  //location ororchlogdoh burt report title supdate hiih
+  // Update report title when location changes
   useEffect(() => {
     if (!open) return;
     if (reportTitleTouched) return;
-
     setReportTitle(sampleGroup.location || "");
   }, [open, sampleGroup.location, reportTitleTouched]);
 
@@ -72,23 +76,24 @@ export function CreateReportModal({
   useEffect(() => {
     if (!open || !sampleGroup.sample_type_id) return;
 
-    fetch(
-      `http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`
-    )
-      .then((response) => response.json())
-      .then((indicators: Indicator[]) => {
+    // Using api client - auto adds auth headers
+    api
+      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_SAMPLE_TYPE(sampleGroup.sample_type_id))
+      .then((indicators) => {
         setSampleGroup((p) => ({
           ...p,
           availableIndicators: indicators,
           indicators: indicators.map((ind) => ind.id),
         }));
       })
-      .catch(() => {
+      .catch((err) => {
+        logError(err, "Fetch indicators");
         setSampleGroup((p) => ({ ...p, availableIndicators: [] }));
       });
   }, [open, sampleGroup.sample_type_id]);
 
   const handleSave = async () => {
+    // Validation - set error state instead of alert()
     const samples = sampleGroup.sample_names
       .filter((name) => name.trim() !== "")
       .map((name) => ({
@@ -102,12 +107,12 @@ export function CreateReportModal({
       }));
 
     if (samples.length === 0) {
-      alert("Дор хаяж нэг дээж нэмнэ үү");
+      setError("Дор хаяж нэг дээж нэмнэ үү");
       return;
     }
 
     if (!sampleGroup.sample_type_id) {
-      alert("Дээжний төрөл сонгоно уу");
+      setError("Дээжний төрөл сонгоно уу");
       return;
     }
 
@@ -121,28 +126,22 @@ export function CreateReportModal({
     };
 
     try {
+      setError(null); // Clear previous errors
       setSaving(true);
 
-      const res = await fetch(`http://localhost:8000/reports/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Using api client - auto adds auth headers
+      await api.post(ENDPOINTS.REPORTS.CREATE, payload);
 
-      if (res.ok) {
-        onCreated?.();
-        onOpenChange(false);
-      } else {
-        const err = await res.json().catch(() => ({}));
-        console.error("Create failed:", err);
-      }
-    } catch (error) {
-      console.error("Error creating report:", error);
+      onCreated?.();
+      onOpenChange(false);
+    } catch (err) {
+      logError(err, "Create report");
+      setError(getErrorMessage(err)); // Show user-friendly error
     } finally {
       setSaving(false);
     }
   };
-  console.log(sampleGroup.location, "location");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl">
@@ -151,6 +150,13 @@ export function CreateReportModal({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Error message display */}
+          {error && (
+            <div className="rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 p-3 text-sm text-red-600 dark:text-red-400">
+              {error}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label>Тайлан</Label>
             <Input

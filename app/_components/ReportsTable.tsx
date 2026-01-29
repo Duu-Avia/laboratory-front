@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ReportRow, ReportsTableProps, ReportStatus } from "../types/types";
+import type { ReportsTableProps, ReportStatus } from "@/types";
 
 function statusBadge(status: ReportStatus) {
   const map: Record<

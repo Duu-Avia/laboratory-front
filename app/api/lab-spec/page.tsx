@@ -28,7 +28,7 @@ import {
   IndicatorRowForLabSpec,
   NewIndicatorDraft,
   SampleType,
-} from "@/app/types/types";
+} from "@/types";
 
 export default function LabPage() {
   // data (UI only, you will fetch)

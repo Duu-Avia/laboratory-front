@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ArchiveReportsTable } from "./components/ArchiveReportsTable";
 import { ArchiveHeader } from "./components/Header";
 import { RecentDay } from "@/app/utils/GetRecentDays";
-import { ReportRow, SampleType, StatusFilter } from "@/app/types/types";
+import { ReportRow, SampleType, StatusFilter } from "@/types";
 import { PdfViewModal } from "@/app/_components/PdfViewModal";
 
 export default function ArchivePage() {

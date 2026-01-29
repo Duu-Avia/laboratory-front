@@ -2,16 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+// Components
 import { ReportsTable } from "./_components/ReportsTable";
-import { ReportRow, SampleType, StatusFilter } from "./types/types";
 import { CreateReportModal } from "./_components/CreateReportModal";
 import { FilterBar } from "./_components/FilterBar";
 import { PdfViewModal } from "./_components/PdfViewModal";
+
+// Types
+import type { ReportRow, SampleType, StatusFilter } from "@/types";
+
+// Lib
+import { api, fetchBlob } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/api/endpoints";
+import { STATUS_LABELS } from "@/lib/constants";
+import { useAuth } from "@/lib/hooks";
+import { logError } from "@/lib/errors";
+
+// Utils
 import { RecentDay } from "./utils/GetRecentDays";
+
 export default function ReportsPage() {
   const router = useRouter();
+  const { logout } = useAuth();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
   const today = RecentDay().today;
+
   // Filters
   const [status, setStatus] = useState<StatusFilter>("all");
   const [from, setFrom] = useState<string>(thirtyDaysAgo);
@@ -31,26 +47,26 @@ export default function ReportsPage() {
 
   // Fetch sample types
   useEffect(() => {
-    fetch(`http://localhost:8000/sample-types`)
-      .then((res) => res.json())
+    api
+      .get<SampleType[]>(ENDPOINTS.SAMPLE_TYPES.LIST)
       .then((data) => setSampleTypes(data))
-      .catch(() => console.error("Error fetching sample types"));
+      .catch((err) => logError(err, "Fetch sample types"));
   }, []);
 
   // Fetch reports
   const fetchReports = () => {
-    fetch(`http://localhost:8000/reports`)
-      .then(async (res) => {
-        const response = await res.json();
+    api
+      .get<ReportRow[]>(ENDPOINTS.REPORTS.LIST)
+      .then((response) => {
         if (!Array.isArray(response)) {
-          console.error("Expected array from /reports but got:", response);
+          logError("Expected array from /reports", "Fetch reports");
           setData([]);
           return;
         }
         setData(response);
       })
       .catch((err) => {
-        console.error("Error fetching reports:", err);
+        logError(err, "Fetch reports");
         setData([]);
       });
   };
@@ -61,14 +77,7 @@ export default function ReportsPage() {
 
   // Filter data
   const filtered = data.filter((r) => {
-    const statusLabels: Record<string, string> = {
-      draft: "draft",
-      tested: "шинжилгээ хийгдсэн",
-      pending_samples: "дээж хүлээгдэж байна",
-      approved: "батлагдсан",
-      deleted: "устгагдсан",
-    };
-    const statusMatch = statusLabels[r.status] || "";
+    const statusMatch = STATUS_LABELS[r.status] || "";
 
     const matchSearch =
       !search ||
@@ -93,8 +102,6 @@ export default function ReportsPage() {
     );
   });
 
-  console.log("Filtered result:", filtered.length);
-
   function handleRowClick(report: ReportRow) {
     if (report.status === "tested" || report.status === "approved") {
       setPdfReportId(report.id);
@@ -104,18 +111,11 @@ export default function ReportsPage() {
       router.push(`/reports/${report.id}`);
     }
   }
+
   const handleExcelConvert = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/reports/excel?status=${status}`
-      );
-      if (!response.ok) {
-        console.log("export failed");
-        return;
-      }
-      const blob = await response.blob();
+      const blob = await fetchBlob(ENDPOINTS.REPORTS.EXCEL(status));
       const url = window.URL.createObjectURL(blob);
-      console.log(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = "report.xlsx";
@@ -124,10 +124,10 @@ export default function ReportsPage() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.log("error while download excel ", err);
+      logError(err, "Excel export");
     }
-    console.log("excel export daragdsan shvv");
   };
+
   return (
     <div className="p-6 space-y-5">
       <FilterBar
@@ -144,6 +144,7 @@ export default function ReportsPage() {
         onStatusChange={setStatus}
         onCreateClick={() => setCreateModalOpen(true)}
         onExportClick={handleExcelConvert}
+        onLogout={logout}
       />
 
       <ReportsTable data={filtered} onRowClick={handleRowClick} />
@@ -167,7 +168,6 @@ export default function ReportsPage() {
 
       <div className="text-sm font-bold text-muted-foreground text-right pr-6">
         <span>
-          {" "}
           Нийт илэрц:{" "}
           {filtered.filter((item) => item.status !== "deleted").length}
         </span>

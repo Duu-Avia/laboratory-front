@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FilterBarProps, SampleType, StatusFilter } from "../types/types";
+import type { FilterBarProps, StatusFilter } from "@/types";
+import { LogOut } from "lucide-react";
 
 const statusOptions: { key: StatusFilter; label: string }[] = [
   { key: "all", label: "Бүгд" },
@@ -26,6 +27,7 @@ export function FilterBar({
   onStatusChange,
   onCreateClick,
   onExportClick,
+  onLogout,
 }: FilterBarProps) {
   return (
     <div className="flex flex-col gap-3">
@@ -69,6 +71,15 @@ export function FilterBar({
         </Button>
 
         <Button onClick={onCreateClick}>+ Дээж шинээр оруулах</Button>
+
+        <Button
+          variant="outline"
+          onClick={onLogout}
+          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+        >
+          <LogOut className="h-4 w-4 mr-1" />
+          Гарах
+        </Button>
       </div>
 
       <div className="flex justify-between">
