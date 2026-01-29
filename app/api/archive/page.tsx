@@ -41,7 +41,7 @@ export default function ArchivePage() {
       .then(async (res) => {
         const response = await res.json();
         if (!Array.isArray(response)) {
-          console.error("Expected array from /reports but got:", response);
+          console.error("Expected array from /reports but got it:", response);
           setData([]);
           return;
         }
