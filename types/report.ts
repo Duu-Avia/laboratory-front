@@ -5,6 +5,7 @@
 export type ReportStatus =
   | "draft"
   | "pending_samples"
+  | "signed"
   | "tested"
   | "approved"
   | "deleted";

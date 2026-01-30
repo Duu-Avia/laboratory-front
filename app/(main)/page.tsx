@@ -4,10 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Components
-import { ReportsTable } from "./_components/ReportsTable";
-import { CreateReportModal } from "./_components/CreateReportModal";
-import { FilterBar } from "./_components/FilterBar";
-import { PdfViewModal } from "./_components/PdfViewModal";
 
 // Types
 import type { ReportRow, SampleType, StatusFilter } from "@/types";
@@ -18,9 +14,13 @@ import { ENDPOINTS } from "@/lib/api/endpoints";
 import { STATUS_LABELS } from "@/lib/constants";
 import { useAuth } from "@/lib/hooks";
 import { logError } from "@/lib/errors";
+import { RecentDay } from "../utils/GetRecentDays";
+import { FilterBar } from "../_components/FilterBar";
+import { ReportsTable } from "../_components/ReportsTable";
+import { CreateReportModal } from "../_components/CreateReportModal";
+import { PdfViewModal } from "../_components/PdfViewModal";
 
 // Utils
-import { RecentDay } from "./utils/GetRecentDays";
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -44,6 +44,7 @@ export default function ReportsPage() {
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   const [pdfReportTitle, setPdfReportTitle] = useState("");
+  const [pdfReportStatus, setPdfReportStatus] = useState<ReportRow["status"] | undefined>();
 
   // Fetch sample types
   useEffect(() => {
@@ -103,12 +104,13 @@ export default function ReportsPage() {
   });
 
   function handleRowClick(report: ReportRow) {
-    if (report.status === "tested" || report.status === "approved") {
+    if (report.status === "tested" || report.status === "approved" || report.status === "signed") {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
+      setPdfReportStatus(report.status);
       setPdfModalOpen(true);
     } else {
-      router.push(`/reports/${report.id}`);
+      router.push(`/api/reports/${report.id}`);
     }
   }
 
@@ -162,7 +164,9 @@ export default function ReportsPage() {
         open={pdfModalOpen}
         reportTitle={pdfReportTitle}
         reportId={pdfReportId}
+        reportStatus={pdfReportStatus}
         onOpenChange={setPdfModalOpen}
+        onApproved={fetchReports}
         sampleTypes={sampleTypes}
       />
 

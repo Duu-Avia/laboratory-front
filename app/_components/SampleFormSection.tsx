@@ -17,7 +17,10 @@ import type {
   LocationSample,
   SampleGroup,
   SampleType,
-} from "../types/types";
+} from "@/types";
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/api/endpoints";
+import { logError } from "@/lib/errors";
 
 type Props = {
   sampleGroup: SampleGroup;
@@ -46,16 +49,14 @@ export function SampleFormSection({
       return;
     }
 
-    fetch(
-      `http://localhost:8000/locations?sample_type_id=${sampleGroup.sample_type_id}`
-    )
-      .then((r) => r.json())
+    api
+      .get<LocationPackage[]>(ENDPOINTS.LOCATIONS.BY_SAMPLE_TYPE(sampleGroup.sample_type_id))
       .then((data) => {
         setLocationPackages(data);
-        setSelectedPackageId(null); // Reset selection
+        setSelectedPackageId(null);
       })
       .catch((err) => {
-        console.error("Error fetching location packages:", err);
+        logError(err, "Fetch location packages");
         setLocationPackages([]);
       });
   }, [sampleGroup.sample_type_id]);
@@ -65,25 +66,20 @@ export function SampleFormSection({
     setSelectedPackageId(packageId);
 
     try {
-      const res = await fetch(
-        `http://localhost:8000/locations/samples/${packageId}`
-      );
-      const samples: LocationSample[] = await res.json();
+      const samples = await api.get<LocationSample[]>(ENDPOINTS.LOCATIONS.SAMPLES(packageId));
 
-      // Get package name for location field
       const selectedPackage = locationPackages.find((p) => p.id === packageId);
 
       setSampleGroup((prev) => ({
         ...prev,
         location: selectedPackage?.package_name ?? "",
         sample_names: samples.map((s) => s.location_name),
-        sample_ids: samples.map(() => null), // All new samples
+        sample_ids: samples.map(() => null),
       }));
     } catch (err) {
-      console.error("Error fetching location samples:", err);
+      logError(err, "Fetch location samples");
     }
   };
-  console.log(locationPackages, selectedPackageId);
   const addSampleName = () => {
     setSampleGroup((prev) => ({
       ...prev,

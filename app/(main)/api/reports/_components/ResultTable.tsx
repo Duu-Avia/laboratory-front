@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { IndicatorRow } from "@/app/types/types";
+import { IndicatorRow } from "@/types";
 
 function parseCfuValue(resultValue: string | null | undefined) {
   if (!resultValue) return { temp22: "", temp37: "", average: "" };

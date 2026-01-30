@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import {
   FileText,
   Calendar,
@@ -15,42 +14,10 @@ import {
   TestTube,
   CheckCircle2,
 } from "lucide-react";
-import { ReportsTableProps } from "@/app/types/types";
+import { ReportsTableProps } from "@/types";
+import { StatusBadge } from "@/app/_components/StatusBadge";
 
-function statusBadge(status: string) {
-  const map: Record<
-    string,
-    { text: string; className: string; dotColor: string }
-  > = {
-    approved: {
-      text: "Батлагдсан",
-      className:
-        "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100",
-      dotColor: "bg-emerald-500",
-    },
-    deleted: {
-      text: "Устгагдсан",
-      className: "bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100",
-      dotColor: "bg-rose-500",
-    },
-  };
-  const s = map[status] || {
-    text: status,
-    className: "bg-slate-100 text-slate-600 border-slate-200",
-    dotColor: "bg-slate-400",
-  };
-  return (
-    <Badge
-      variant="outline"
-      className={`font-medium px-3 py-1.5 rounded-full text-xs flex items-center gap-2 transition-colors ${s.className}`}
-    >
-      <span className={`w-2 h-2 rounded-full ${s.dotColor}`} />
-      {s.text}
-    </Badge>
-  );
-}
-
-export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
+export function ApproveReportsTable({ data, onRowClick }: ReportsTableProps) {
   if (data.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-16 text-center">
@@ -166,7 +133,7 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
                 </div>
               </TableCell>
               <TableCell className="py-5 pr-6">
-                {statusBadge(dataItem.status)}
+                <StatusBadge status={dataItem.status} label={dataItem.status === "signed" ? "Хүлээгдэж байна" : undefined} />
               </TableCell>
             </TableRow>
           ))}

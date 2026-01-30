@@ -1,5 +1,5 @@
 "use client";
-import { SampleColumn } from "@/app/types/types";
+import { SampleColumn } from "@/types";
 import { Badge } from "@/components/ui/badge";
 
 interface SampleBadgesProps {

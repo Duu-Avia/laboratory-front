@@ -20,6 +20,10 @@ export const ENDPOINTS = {
     EXCEL: (status?: string) =>
       status ? `/reports/excel?status=${status}` : "/reports/excel",
     PDF: (id: number | string) => `/reports/${id}/pdf`,
+    RESULTS: (id: number | string) => `/results/create-result/${id}`,
+    ARCHIVE: (mode: string) => `/reports/archive?mode=${mode}`,
+    APPROVE: (id: number | string) => `/reports/approve/${id}`,
+    SIGN: (id: number | string) => `/reports/sign/${id}`,
   },
 
   // Sample Types
@@ -30,9 +34,9 @@ export const ENDPOINTS = {
   // Indicators
   INDICATORS: {
     BY_SAMPLE_TYPE: (sampleTypeId: number) =>
-      `/sample/indicators/${sampleTypeId}`,
+      `/indicators/indicators/${sampleTypeId}`,
     LIST: "/indicators",
-    CREATE: "/indicators/create",
+    CREATE: "/indicators/create-indicator",
   },
 
   // Locations

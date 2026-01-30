@@ -29,6 +29,9 @@ import {
   NewIndicatorDraft,
   SampleType,
 } from "@/types";
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/api/endpoints";
+import { logError } from "@/lib/errors";
 
 export default function LabPage() {
   // data (UI only, you will fetch)
@@ -51,21 +54,17 @@ export default function LabPage() {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:8000/sample-types`)
-      .then((response) => response.json())
+    api
+      .get<SampleType[]>(ENDPOINTS.SAMPLE_TYPES.LIST)
       .then((data) => setSampleTypes(data))
-      .catch((error) =>
-        console.log(`error while fetching sample types`, error.message)
-      );
+      .catch((err) => logError(err, "Fetch sample types"));
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/indicators`)
-      .then((response) => response.json())
+    api
+      .get<IndicatorRowForLabSpec[]>(ENDPOINTS.INDICATORS.LIST)
       .then((data) => setIndicators(data))
-      .catch((error) =>
-        console.log(`error while fetching indicators`, error.message)
-      );
+      .catch((err) => logError(err, "Fetch indicators"));
   }, []);
 
   const typeButtons = useMemo(() => {
@@ -116,15 +115,7 @@ export default function LabPage() {
   }
 
   async function onSaveNewIndicator() {
-    const response = await fetch(
-      `http://localhost:8000/indicators/create-indicator`,
-      {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(draft),
-      }
-    );
-    console.log("CREATE INDICATOR payload:", draft);
+    await api.post(ENDPOINTS.INDICATORS.CREATE, draft);
     if (draft.sample_type_id && draft.indicator_name.trim()) {
       setIndicators((prev) => [
         ...prev,

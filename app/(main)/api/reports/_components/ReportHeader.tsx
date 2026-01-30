@@ -1,4 +1,4 @@
-import { ReportHeaderSaveProps } from "@/app/types/types";
+import { ReportHeaderSaveProps } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@radix-ui/react-separator";
 import Link from "next/link";

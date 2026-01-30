@@ -15,9 +15,11 @@ import { SampleFormSection } from "./SampleFormSection";
 import type {
   Indicator,
   SampleGroup,
-  SampleGroupEdit,
   SampleType,
-} from "../types/types";
+} from "@/types";
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/api/endpoints";
+import { logError } from "@/lib/errors";
 
 const emptySampleGroup: SampleGroup = {
   sample_type_id: null,
@@ -51,22 +53,16 @@ export function EditReport({
   const [reportTitle, setReportTitle] = useState("");
   const [sampleGroup, setSampleGroup] = useState<SampleGroup>(emptySampleGroup);
 
-  // Debug: log sampleGroup changes
-  useEffect(() => {
-    console.log("sampleGroup changed:", {
-      sample_names: sampleGroup.sample_names,
-      sample_ids: sampleGroup.sample_ids,
-    });
-  }, [sampleGroup.sample_names, sampleGroup.sample_ids]);
-
   // Fetch report data when modal opens
   useEffect(() => {
     if (!open || !reportId) return;
 
     setLoading(true);
 
-    fetch(`http://localhost:8000/reports/${reportId}`)
-      .then((r) => r.json())
+    api
+      .get<{ report?: { report_title: string }; samples: any[] }>(
+        ENDPOINTS.REPORTS.DETAIL(reportId)
+      )
       .then((data) => {
         const samples = data.samples ?? [];
         const first = samples[0];
@@ -83,10 +79,6 @@ export function EditReport({
         const loadedNames = samples.map((s: any) => s.sample_name);
         const loadedIds = samples.map((s: any) => s.sample_id);
 
-        console.log("=== LOADED FROM API ===");
-        console.log("names:", loadedNames);
-        console.log("ids:", loadedIds);
-
         setSampleGroup({
           sample_type_id: first?.sample_type_id ?? null,
           sample_ids: loadedIds,
@@ -99,7 +91,7 @@ export function EditReport({
           availableIndicators: [],
         });
       })
-      .catch((e) => console.error("Error fetching report:", e))
+      .catch((err) => logError(err, "Fetch report for edit"))
       .finally(() => setLoading(false));
   }, [open, reportId]);
 
@@ -109,11 +101,9 @@ export function EditReport({
       return;
     }
 
-    fetch(
-      `http://localhost:8000/sample/indicators/${sampleGroup.sample_type_id}`
-    )
-      .then((r) => r.json())
-      .then((indicators: Indicator[]) => {
+    api
+      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_SAMPLE_TYPE(sampleGroup.sample_type_id))
+      .then((indicators) => {
         setSampleGroup((p) => ({ ...p, availableIndicators: indicators }));
       })
       .catch(() => {
@@ -123,10 +113,6 @@ export function EditReport({
 
   const handleSave = async () => {
     if (!reportId) return;
-
-    console.log("=== SAVE CLICKED ===");
-    console.log("sample_names:", sampleGroup.sample_names);
-    console.log("sample_ids:", sampleGroup.sample_ids);
 
     const samples = sampleGroup.sample_names
       .map((name, idx) => ({
@@ -140,34 +126,16 @@ export function EditReport({
       }))
       .filter((s) => s.sample_name !== "");
 
-    console.log(
-      "Payload samples:",
-      samples.map((s) => ({
-        sample_id: s.sample_id,
-        sample_name: s.sample_name,
-      }))
-    );
-
     try {
       setSaving(true);
-
-      const res = await fetch(
-        `http://localhost:8000/reports/edit/${reportId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ report_title: reportTitle, samples }),
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("Update failed:", err);
-        return;
-      }
-
+      await api.put(ENDPOINTS.REPORTS.EDIT(reportId!), {
+        report_title: reportTitle,
+        samples,
+      });
       onSaved?.();
       onOpenChange(false);
+    } catch (err) {
+      logError(err, "Update report");
     } finally {
       setSaving(false);
     }

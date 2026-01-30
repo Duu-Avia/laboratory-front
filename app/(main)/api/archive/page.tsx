@@ -6,6 +6,9 @@ import { ArchiveHeader } from "./components/Header";
 import { RecentDay } from "@/app/utils/GetRecentDays";
 import { ReportRow, SampleType, StatusFilter } from "@/types";
 import { PdfViewModal } from "@/app/_components/PdfViewModal";
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/api/endpoints";
+import { logError } from "@/lib/errors";
 
 export default function ArchivePage() {
   const router = useRouter();
@@ -26,31 +29,20 @@ export default function ArchivePage() {
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   const [pdfReportTitle, setPdfReportTitle] = useState("");
+  const [pdfReportStatus, setPdfReportStatus] = useState<ReportRow["status"] | undefined>();
 
   // Fetch sample types
   useEffect(() => {
-    fetch(`http://localhost:8000/sample-types`)
-      .then((res) => res.json())
-      .then((data) => setSampleTypes(data))
-      .catch(() => console.error("Error fetching sample types"));
+    api.get<SampleType[]>(ENDPOINTS.SAMPLE_TYPES.LIST)
+    .then(data => setSampleTypes(data))
+    .catch(err => logError(err, "Fetch sample types on archive page"));
   }, []);
 
   // Fetch reports
   const fetchReports = () => {
-    fetch(`http://localhost:8000/reports/archive?mode=${status}`)
-      .then(async (res) => {
-        const response = await res.json();
-        if (!Array.isArray(response)) {
-          console.error("Expected array from /reports but got it:", response);
-          setData([]);
-          return;
-        }
-        setData(response);
-      })
-      .catch((err) => {
-        console.error("Error fetching reports:", err);
-        setData([]);
-      });
+    api.get<ReportRow[]>(`${ENDPOINTS.REPORTS.LIST}/archive?mode=${status}`)
+    .then(data => setData(data))
+    .catch(err=> logError(err, "Fetch archive reports") );
   };
 
   useEffect(() => {
@@ -92,6 +84,7 @@ export default function ArchivePage() {
     if (report.status === "tested" || report.status === "approved") {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
+      setPdfReportStatus(report.status);
       setPdfModalOpen(true);
     } else {
       router.push(`/reports/${report.id}`);
@@ -146,7 +139,9 @@ export default function ArchivePage() {
         open={pdfModalOpen}
         reportTitle={pdfReportTitle}
         reportId={pdfReportId}
+        reportStatus={pdfReportStatus}
         onOpenChange={setPdfModalOpen}
+        onApproved={fetchReports}
         sampleTypes={sampleTypes}
       />
 

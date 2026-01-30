@@ -2,17 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ClipboardCheck, CheckCircle2, Clock, Pencil } from "lucide-react";
+import { useAuth } from "@/lib/hooks/useAuth";
+
+const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
 
 const menu = [
   { href: "/", label: "Ажил шалгуулах хүсэлт", icon: ClipboardCheck },
   { href: "/api/archive", label: "Архив", icon: Clock },
   { href: "/api/approve", label: "Баталгаажуулах хүсэлт", icon: CheckCircle2 },
-  { href: "/api/lab-spec", label: "Шинжилгээний бүртгэл", icon: Pencil },
+  {
+    href: "/api/lab-spec",
+    label: "Шинжилгээний бүртгэл",
+    icon: Pencil,
+    roles: ELEVATED_ROLES,
+  },
 ];
 
 export default function LeftSidebar() {
   const pathname = usePathname();
+  const { getUser } = useAuth();
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const user = getUser();
+    setUserRole(user?.roleName ?? "");
+  }, [getUser]);
+
+  const visibleMenu = menu.filter(
+    (item) => !item.roles || item.roles.includes(userRole)
+  );
 
   return (
     <aside className="w-50 bg-[#2f3533] text-white flex flex-col">
@@ -24,7 +44,7 @@ export default function LeftSidebar() {
 
       {/* Menu */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {menu.map((item) => {
+        {visibleMenu.map((item) => {
           const active = pathname.startsWith(item.href);
           const Icon = item.icon;
 

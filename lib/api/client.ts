@@ -96,7 +96,7 @@ export const api = {
     }),
 
   delete: <T>(endpoint: string, options?: RequestInit) =>
-    baseFetch<T>(endpoint, { ...options, method: "DELETE" }),
+    baseFetch<T>(endpoint, { ...options, method: "PUT" }),
 };
 
 /**

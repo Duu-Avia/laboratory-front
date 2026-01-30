@@ -8,46 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ReportsTableProps, ReportStatus } from "@/types";
-
-function statusBadge(status: ReportStatus) {
-  const map: Record<
-    ReportStatus,
-    {
-      text: string;
-      variant: "default" | "secondary" | "outline";
-      className?: string;
-    }
-  > = {
-    draft: { text: "Draft", variant: "secondary" },
-    pending_samples: {
-      text: "Дээж хүлээгдэж байна",
-      variant: "outline",
-      className: "bg-color-yellow-200",
-    },
-    tested: {
-      text: "Шинжилгээ хийгдсэн",
-      variant: "outline",
-      className: "text-cyan-500",
-    },
-    approved: {
-      text: "Батлагдсан",
-      variant: "default",
-      className: "bg-green-200",
-    },
-    deleted: {
-      text: "Устгагдсан",
-      variant: "outline",
-      className: "text-red-500",
-    },
-  };
-  const s = map[status];
-  return (
-    <Badge className={s.className} variant={s.variant}>
-      {s.text}
-    </Badge>
-  );
-}
+import type { ReportsTableProps } from "@/types";
+import { StatusBadge } from "@/app/_components/StatusBadge";
 
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
   return (
@@ -60,8 +22,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
             <TableHead>Дээжны нэр</TableHead>
             <TableHead>Оруулсан дээжүүд</TableHead>
             <TableHead>Сонгогдсон/Ши</TableHead>
-            <TableHead className="text-right pr-15">Төлөв</TableHead>
-            <TableHead className="text-right pr-10">Төлөв</TableHead>
+            <TableHead >Төлөв</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -84,7 +45,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                     <Badge
                       key={i}
                       variant="secondary"
-                      className="text-[12px] text-gray-850 bg-gray-200 font-normal border-gray-600"
+                      className="text-[12px] text-gray-850 bg-gray-200 font-normal border-gray-300"
                     >
                       <span className="mr-1">{i + 1}.</span>
                       {name.trim()}
@@ -106,7 +67,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                 </div>
               </TableCell>
               <TableCell className="text-right">
-                {statusBadge(dataItem.status)}
+                <StatusBadge status={dataItem.status} />
               </TableCell>
             </TableRow>
           ))}

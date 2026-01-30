@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { IndicatorRow, SampleColumn } from "@/app/types/types";
+import { IndicatorRow, SampleColumn } from "@/types";
 import { ReportHeader } from "../_components/ReportHeader";
 import { SampleBadges } from "../_components/SampleBadges";
 import { ResultsTable } from "../_components/ResultTable";
+import { api } from "@/lib/api";
+import { ENDPOINTS } from "@/lib/api/endpoints";
+import { logError } from "@/lib/errors";
 
 export default function ReportDetailPage() {
   const params = useParams<{ id: string }>();
@@ -30,15 +33,12 @@ export default function ReportDetailPage() {
   }
 
   useEffect(() => {
-    if (!reportId) return;
-
-    fetch(`http://localhost:8000/reports/${reportId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setReportTitle(data.report?.report_title ?? "");
-        setSamples(normalizeSamples(data.samples ?? []));
-      })
-      .catch(() => console.log("error while fetching report detail"));
+    api.get<{ samples: SampleColumn[]; report_title: string }>(ENDPOINTS.REPORTS.DETAIL(reportId))
+    .then((data)=>{
+      setSamples(normalizeSamples(data.samples));
+      setReportTitle(data.report_title);
+    })
+    .catch((err)=> logError(err, "Fetch report details") );
   }, [reportId]);
 
   // Update one indicator by sample_indicator_id (unique)
@@ -71,19 +71,9 @@ export default function ReportDetailPage() {
     });
 
     try {
-      const response = await fetch(
-        `http://localhost:8000/reports/results/${reportId}`,
-        {
-          method: "PUT",
-          headers: { "Content-type": "application/json" },
-          body: JSON.stringify({ results }),
-        }
-      );
-
-      const data = await response.json();
-      console.log("saved data", data);
+      await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results });
     } catch (err) {
-      console.log("failed to save", err);
+      logError(err, "Save report results");
     }
   };
 

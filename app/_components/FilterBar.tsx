@@ -7,10 +7,9 @@ import { LogOut } from "lucide-react";
 
 const statusOptions: { key: StatusFilter; label: string }[] = [
   { key: "all", label: "Бүгд" },
-  { key: "draft", label: "Draft" },
+  { key: "signed", label: "Шалгагдаж байна" },
   { key: "pending_samples", label: "Дээж хүлээгдэж байна" },
   { key: "tested", label: "Шинжилгээ хийгдсэн" },
-  { key: "approved", label: "Батлагдсан" },
 ];
 
 export function FilterBar({
