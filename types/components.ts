@@ -3,36 +3,35 @@
  */
 
 import { ReportRow, StatusFilter } from "./report";
-import { SampleType } from "./sample";
+import { LabType } from "./sample";
 
 export interface FilterBarProps {
   from: string;
   to: string;
   search: string;
-  selectedSampleType: string;
+  selectedLabType: string;
   status: StatusFilter;
-  sampleTypes: SampleType[];
+  labTypes: LabType[];
   onFromChange: (value: string) => void;
   onToChange: (value: string) => void;
   onSearchChange: (value: string) => void;
-  onSampleTypeChange: (value: string) => void;
+  onLabTypeChange: (value: string) => void;
   onStatusChange: (value: StatusFilter) => void;
   onCreateClick: () => void;
   onExportClick: () => void;
-  onLogout: () => void;
 }
 
 export interface ArchiveFilterBarProps {
   from: string;
   to: string;
   search: string;
-  selectedSampleType: string;
+  selectedLabType: string;
   status: StatusFilter;
-  sampleTypes: SampleType[];
+  labTypes: LabType[];
   onFromChange: (value: string) => void;
   onToChange: (value: string) => void;
   onSearchChange: (value: string) => void;
-  onSampleTypeChange: (value: string) => void;
+  onLabTypeChange: (value: string) => void;
   onStatusChange: (value: StatusFilter) => void;
   onExportClick: () => void;
 }
@@ -57,7 +56,7 @@ export interface DeleteDialogProps {
 export interface CreateReportModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  sampleTypes: SampleType[];
+  labTypes: LabType[];
   from: string;
   to: string;
   onCreated?: () => void;
@@ -74,7 +73,7 @@ export interface PdfViewModalProps {
   onTypeChange: (typeId: number) => Promise<void> | void;
   onFieldChange: (field: string, value: string) => void;
   onToggleIndicator: (indicatorId: number) => void;
-  sampleType: SampleType[];
+  labType: LabType[];
   sampleGroup: unknown;
   setSampleNameForEdit: (names: string[]) => void;
   setSelectedIndicatorsForEdit: (ids: number[]) => void;

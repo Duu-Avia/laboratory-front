@@ -10,9 +10,9 @@ export type {
   ReportRow,
 } from "./report";
 
-// Sample types
+// Lab types
 export type {
-  SampleType,
+  LabType,
   SampleIndicatorItem,
   SampleColumn,
   SampleGroup,
@@ -32,6 +32,9 @@ export type {
   LocationPackage,
   LocationSample,
 } from "./location";
+
+// User types
+export type { SeniorEngineer } from "./user";
 
 // Component props types
 export type {

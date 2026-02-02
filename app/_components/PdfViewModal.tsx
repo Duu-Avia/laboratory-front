@@ -13,16 +13,15 @@ import { logError } from "@/lib/errors";
 import { useAuth } from "@/lib/hooks/useAuth";
 import type { ReportStatus, SampleType } from "@/types";
 
-const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
-
 export interface PdfViewModalProps {
   open: boolean;
   reportId: number | null;
   reportTitle: string | null;
   reportStatus?: ReportStatus;
+  assignedTo?: number | null;
   onOpenChange: (open: boolean) => void;
   onApproved?: () => void;
-  sampleTypes: SampleType[];
+  labTypes: SampleType[];
 }
 
 export function PdfViewModal({
@@ -30,15 +29,17 @@ export function PdfViewModal({
   reportTitle,
   reportId,
   reportStatus,
+  assignedTo,
   onOpenChange,
   onApproved,
-  sampleTypes,
+  labTypes,
 }: PdfViewModalProps) {
   const { getUser } = useAuth();
   const user = getUser();
   const canSign = reportStatus === "tested";
   const canApprove =
-    reportStatus === "signed" && ELEVATED_ROLES.includes(user?.roleName ?? "");
+    reportStatus === "signed" &&
+    (user?.roleName === "superadmin" || user?.userId === assignedTo);
 
   const [deleteDialogOpener, setDeleteDialogOpener] = useState(false);
   const [editDialogOpener, setEditDialogOpener] = useState(false);
@@ -155,7 +156,7 @@ export function PdfViewModal({
         open={editDialogOpener}
         onOpenChange={setEditDialogOpener}
         reportId={reportId}
-        sampleTypes={sampleTypes}
+        labTypes={labTypes}
         onSaved={() => {
           setEditDialogOpener(false);
         }}

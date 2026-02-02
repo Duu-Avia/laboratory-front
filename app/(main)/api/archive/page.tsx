@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ArchiveReportsTable } from "./components/ArchiveReportsTable";
 import { ArchiveHeader } from "./components/Header";
 import { RecentDay } from "@/app/utils/GetRecentDays";
-import { ReportRow, SampleType, StatusFilter } from "@/types";
+import { ReportRow, LabType, StatusFilter } from "@/types";
 import { PdfViewModal } from "@/app/_components/PdfViewModal";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
@@ -19,11 +19,11 @@ export default function ArchivePage() {
   const [from, setFrom] = useState<string>(thirtyDaysAgo);
   const [to, setTo] = useState<string>(today);
   const [search, setSearch] = useState<string>("");
-  const [selectedSampleType, setSelectedSampleType] = useState<string>("all");
+  const [selectedLabType, setSelectedLabType] = useState<string>("all");
 
   // Data
   const [data, setData] = useState<ReportRow[]>([]);
-  const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
+  const [labTypes, setLabTypes] = useState<LabType[]>([]);
 
   // Modals
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
@@ -31,11 +31,11 @@ export default function ArchivePage() {
   const [pdfReportTitle, setPdfReportTitle] = useState("");
   const [pdfReportStatus, setPdfReportStatus] = useState<ReportRow["status"] | undefined>();
 
-  // Fetch sample types
+  // Fetch lab types
   useEffect(() => {
-    api.get<SampleType[]>(ENDPOINTS.SAMPLE_TYPES.LIST)
-    .then(data => setSampleTypes(data))
-    .catch(err => logError(err, "Fetch sample types on archive page"));
+    api.get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
+    .then(data => setLabTypes(data))
+    .catch(err => logError(err, "Fetch lab types on archive page"));
   }, []);
 
   // Fetch reports
@@ -65,8 +65,8 @@ export default function ArchivePage() {
       r.sample_names.toLowerCase().includes(search.toLowerCase());
 
     const matchStatus = status === "all" || r.status === status;
-    const matchSampleType =
-      selectedSampleType === "all" || r.sample_type === selectedSampleType;
+    const matchLabType =
+      selectedLabType === "all" || r.lab_type === selectedLabType;
     const reportDateStr = r.created_at.slice(0, 10);
     const matchDateFrom = !from || reportDateStr >= from;
     const matchDateTo = !to || reportDateStr <= to;
@@ -74,12 +74,12 @@ export default function ArchivePage() {
     return (
       matchSearch &&
       matchStatus &&
-      matchSampleType &&
+      matchLabType &&
       matchDateFrom &&
       matchDateTo
     );
   });
-  console.log(selectedSampleType);
+  console.log(selectedLabType);
   function handleRowClick(report: ReportRow) {
     if (report.status === "tested" || report.status === "approved") {
       setPdfReportId(report.id);
@@ -122,13 +122,13 @@ export default function ArchivePage() {
         from={from}
         to={to}
         search={search}
-        selectedSampleType={selectedSampleType}
+        selectedLabType={selectedLabType}
         status={status}
-        sampleTypes={sampleTypes}
+        labTypes={labTypes}
         onFromChange={setFrom}
         onToChange={setTo}
         onSearchChange={setSearch}
-        onSampleTypeChange={setSelectedSampleType}
+        onLabTypeChange={setSelectedLabType}
         onStatusChange={setStatus}
         onExportClick={handleExcelConvert}
       />
@@ -142,7 +142,7 @@ export default function ArchivePage() {
         reportStatus={pdfReportStatus}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
-        sampleTypes={sampleTypes}
+        labTypes={labTypes}
       />
 
       <div className="text-sm font-bold text-muted-foreground text-right pr-6">

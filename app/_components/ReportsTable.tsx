@@ -11,6 +11,8 @@ import {
 import type { ReportsTableProps } from "@/types";
 import { StatusBadge } from "@/app/_components/StatusBadge";
 
+
+
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">

@@ -23,5 +23,7 @@ export type ReportRow = {
   location: string;
   qty?: string;
   status: ReportStatus;
-  sample_type?: string;
+  lab_type?: string;
+  assigned_to?: number;
+  assigned_to_name?: string;
 };

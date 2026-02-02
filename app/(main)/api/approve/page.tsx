@@ -25,7 +25,7 @@ export default function ApprovePage() {
 
   // Data
   const [data, setData] = useState<ReportRow[]>([]);
-  const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
+  const [labTypes, setSampleTypes] = useState<SampleType[]>([]);
 
   // Modals
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
@@ -35,12 +35,12 @@ export default function ApprovePage() {
     ReportRow["status"] | undefined
   >();
 
-  // Fetch sample types
+  // Fetch lab types
   useEffect(() => {
     api
-      .get<SampleType[]>(ENDPOINTS.SAMPLE_TYPES.LIST)
+      .get<SampleType[]>(ENDPOINTS.LAB_TYPES.LIST)
       .then((data) => setSampleTypes(data))
-      .catch((err) => logError(err, "Fetch sample types"));
+      .catch((err) => logError(err, "Fetch lab types"));
   }, []);
 
   // Fetch only tested reports
@@ -76,7 +76,7 @@ export default function ApprovePage() {
       r.sample_names.toLowerCase().includes(search.toLowerCase());
 
     const matchSampleType =
-      selectedSampleType === "all" || r.sample_type === selectedSampleType;
+      selectedSampleType === "all" || r.lab_type === selectedSampleType;
     const reportDateStr = r.created_at.slice(0, 10);
     const matchDateFrom = !from || reportDateStr >= from;
     const matchDateTo = !to || reportDateStr <= to;
@@ -171,7 +171,7 @@ export default function ApprovePage() {
             >
               Бүгд
             </button>
-            {sampleTypes.map((type) => (
+            {labTypes.map((type) => (
               <button
                 key={type.id}
                 onClick={() => setSelectedSampleType(type.type_name)}
@@ -200,7 +200,7 @@ export default function ApprovePage() {
         reportStatus={pdfReportStatus}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
-        sampleTypes={sampleTypes}
+        labTypes={labTypes}
       />
 
       <div className="text-sm font-bold text-muted-foreground text-right pr-6">

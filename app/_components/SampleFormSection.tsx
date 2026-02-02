@@ -16,7 +16,8 @@ import type {
   LocationPackage,
   LocationSample,
   SampleGroup,
-  SampleType,
+  SeniorEngineer,
+  LabType,
 } from "@/types";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
@@ -25,13 +26,19 @@ import { logError } from "@/lib/errors";
 type Props = {
   sampleGroup: SampleGroup;
   setSampleGroup: (updater: (prev: SampleGroup) => SampleGroup) => void;
-  sampleTypes: SampleType[];
+  labTypes: LabType[];
+  seniors: SeniorEngineer[];
+  assignedTo: number | null;
+  onAssignedToChange: (value: number | null) => void;
 };
 
 export function SampleFormSection({
   sampleGroup,
   setSampleGroup,
-  sampleTypes,
+  labTypes,
+  seniors,
+  assignedTo,
+  onAssignedToChange,
 }: Props) {
   // Location packages state
   const [locationPackages, setLocationPackages] = useState<LocationPackage[]>(
@@ -41,16 +48,16 @@ export function SampleFormSection({
     null
   );
 
-  // Fetch location packages when sample_type changes
+  // Fetch location packages when lab_type changes
   useEffect(() => {
-    if (!sampleGroup.sample_type_id) {
+    if (!sampleGroup.lab_type_id) {
       setLocationPackages([]);
       setSelectedPackageId(null);
       return;
     }
 
     api
-      .get<LocationPackage[]>(ENDPOINTS.LOCATIONS.BY_SAMPLE_TYPE(sampleGroup.sample_type_id))
+      .get<LocationPackage[]>(ENDPOINTS.LOCATIONS.BY_LAB_TYPE(sampleGroup.lab_type_id))
       .then((data) => {
         setLocationPackages(data);
         setSelectedPackageId(null);
@@ -59,7 +66,7 @@ export function SampleFormSection({
         logError(err, "Fetch location packages");
         setLocationPackages([]);
       });
-  }, [sampleGroup.sample_type_id]);
+  }, [sampleGroup.lab_type_id]);
 
   // When package is selected, fetch samples and populate sample_names
   const handlePackageSelect = async (packageId: number) => {
@@ -113,7 +120,7 @@ export function SampleFormSection({
   const onTypeChange = (typeId: number) => {
     setSampleGroup((prev) => ({
       ...prev,
-      sample_type_id: typeId,
+      lab_type_id: typeId,
       // Reset when type changes
       sample_names: [""],
       sample_ids: [],
@@ -140,8 +147,8 @@ export function SampleFormSection({
           <Label>Дээжний төрөл</Label>
           <Select
             value={
-              sampleGroup.sample_type_id
-                ? String(sampleGroup.sample_type_id)
+              sampleGroup.lab_type_id
+                ? String(sampleGroup.lab_type_id)
                 : undefined
             }
             onValueChange={(v) => onTypeChange(Number(v))}
@@ -150,7 +157,7 @@ export function SampleFormSection({
               <SelectValue placeholder="Сонгох" />
             </SelectTrigger>
             <SelectContent>
-              {sampleTypes.map((t) => (
+              {labTypes.map((t) => (
                 <SelectItem key={t.id} value={String(t.id)}>
                   {t.type_name}
                 </SelectItem>
@@ -158,21 +165,24 @@ export function SampleFormSection({
             </SelectContent>
           </Select>
         </div>
+        
+
+
 
         {/* Location Package Selection */}
-        <div className="space-y-2 col-span-2">
+        <div className="space-y-2 col-span-3">
           <Label>Байршил сонгох</Label>
           <Select
             value={selectedPackageId ? String(selectedPackageId) : undefined}
             onValueChange={(v) => handlePackageSelect(Number(v))}
             disabled={
-              !sampleGroup.sample_type_id || locationPackages.length === 0
+              !sampleGroup.lab_type_id || locationPackages.length === 0
             }
           >
             <SelectTrigger>
               <SelectValue
                 placeholder={
-                  !sampleGroup.sample_type_id
+                  !sampleGroup.lab_type_id
                     ? "Эхлээд дээжний төрөл сонгоно уу"
                     : locationPackages.length === 0
                       ? "Байршил байхгүй"
@@ -268,20 +278,49 @@ export function SampleFormSection({
         </div>
       </div>
 
+       {/* Senior Engineer */}
+        <div className="space-y-2 col-span-2 pt-4">
+          <Label>Хянах инженер</Label>
+          <Select
+            value={assignedTo ? String(assignedTo) : undefined}
+            onValueChange={(v) => onAssignedToChange(Number(v))}
+            disabled={!sampleGroup.lab_type_id || seniors.length === 0}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  !sampleGroup.lab_type_id
+                    ? "Эхлээд төрөл сонгоно уу"
+                    : seniors.length === 0
+                      ? "Инженер олдсонгүй"
+                      : "Инженер сонгох"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {seniors.map((s) => (
+                <SelectItem key={s.id} value={String(s.id)}>
+                  {s.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
       <Separator className="my-4" />
 
       {/* Indicators */}
       <div className="flex items-center justify-between">
         <div className="font-medium">Шинжилгээ сонгох</div>
         <div className="text-xs text-muted-foreground">
-          {sampleGroup.sample_type_id
+          {sampleGroup.lab_type_id
             ? "Санал болгох шинжилгээнүүд"
             : "Дээжний төрлөө эхлээд сонгоно уу"}
         </div>
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
-        {sampleGroup.sample_type_id ? (
+        {sampleGroup.lab_type_id ? (
           sampleGroup.availableIndicators.map((ind) => {
             const checked = sampleGroup.indicators.includes(ind.id);
             return (

@@ -28,7 +28,7 @@ export type IndicatorRow = {
 
 export type IndicatorRowForLabSpec = {
   id: number;
-  sample_type_id: number;
+  lab_type_id: number;
   indicator_name: string;
   unit?: string | null;
   test_method?: string | null;
@@ -37,7 +37,7 @@ export type IndicatorRowForLabSpec = {
 };
 
 export type NewIndicatorDraft = {
-  sample_type_id: number | null;
+  lab_type_id: number | null;
   indicator_name: string;
   unit: string;
   test_method: string;

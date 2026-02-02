@@ -2,8 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { FilterBarProps, StatusFilter } from "@/types";
-import { LogOut } from "lucide-react";
+import TopHeader from "./TopHeader";
+import { FilterBarProps, StatusFilter } from "@/types";
 
 const statusOptions: { key: StatusFilter; label: string }[] = [
   { key: "all", label: "Бүгд" },
@@ -16,17 +16,16 @@ export function FilterBar({
   from,
   to,
   search,
-  selectedSampleType,
+  selectedLabType,
   status,
-  sampleTypes,
+  labTypes,
   onFromChange,
   onToChange,
   onSearchChange,
-  onSampleTypeChange,
+  onLabTypeChange,
   onStatusChange,
   onCreateClick,
   onExportClick,
-  onLogout,
 }: FilterBarProps) {
   return (
     <div className="flex flex-col gap-3">
@@ -70,15 +69,6 @@ export function FilterBar({
         </Button>
 
         <Button onClick={onCreateClick}>+ Дээж шинээр оруулах</Button>
-
-        <Button
-          variant="outline"
-          onClick={onLogout}
-          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-        >
-          <LogOut className="h-4 w-4 mr-1" />
-          Гарах
-        </Button>
       </div>
 
       <div className="flex justify-between">
@@ -89,19 +79,19 @@ export function FilterBar({
           <div className="flex flex-wrap items-center gap-2">
             <Button
               className="text-[13px] w-100% h-7"
-              variant={selectedSampleType === "all" ? "default" : "outline"}
-              onClick={() => onSampleTypeChange("all")}
+              variant={selectedLabType === "all" ? "default" : "outline"}
+              onClick={() => onLabTypeChange("all")}
             >
               Бүгд
             </Button>
-            {sampleTypes.map((type) => (
+            {labTypes.map((type) => (
               <Button
                 className="text-[13px] w-100% h-7"
                 key={type.id}
                 variant={
-                  selectedSampleType === type.type_name ? "default" : "outline"
+                  selectedLabType === type.type_name ? "default" : "outline"
                 }
-                onClick={() => onSampleTypeChange(type.type_name)}
+                onClick={() => onLabTypeChange(type.type_name)}
               >
                 {type.type_name}
               </Button>

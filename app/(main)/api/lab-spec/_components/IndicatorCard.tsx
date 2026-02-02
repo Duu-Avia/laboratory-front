@@ -1,4 +1,4 @@
-import { IndicatorRowForLabSpec } from "@/app/types/types";
+import { IndicatorRowForLabSpec } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,

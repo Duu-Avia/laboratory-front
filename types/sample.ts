@@ -4,7 +4,7 @@
 
 import { Indicator } from "./indicator";
 
-export type SampleType = {
+export type LabType = {
   id: number;
   type_name: string;
   standard: string;
@@ -35,7 +35,7 @@ export type SampleColumn = {
 };
 
 export type SampleGroup = {
-  sample_type_id: number | null;
+  lab_type_id: number | null;
   sample_ids: (number | null)[];
   sample_names: string[];
   sample_amount: string;
@@ -47,7 +47,7 @@ export type SampleGroup = {
 };
 
 export type SampleGroupEdit = {
-  sample_type_id: number | null;
+  lab_type_id: number | null;
   sample_ids: (number | null)[];
   sample_names: string[];
   location: string;

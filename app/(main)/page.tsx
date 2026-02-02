@@ -6,25 +6,24 @@ import { useRouter } from "next/navigation";
 // Components
 
 // Types
-import type { ReportRow, SampleType, StatusFilter } from "@/types";
+import type { ReportRow, LabType, StatusFilter } from "@/types";
 
 // Lib
 import { api, fetchBlob } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { STATUS_LABELS } from "@/lib/constants";
-import { useAuth } from "@/lib/hooks";
 import { logError } from "@/lib/errors";
 import { RecentDay } from "../utils/GetRecentDays";
 import { FilterBar } from "../_components/FilterBar";
 import { ReportsTable } from "../_components/ReportsTable";
 import { CreateReportModal } from "../_components/CreateReportModal";
 import { PdfViewModal } from "../_components/PdfViewModal";
+import * as motion from "motion/react-client"
 
 // Utils
 
 export default function ReportsPage() {
   const router = useRouter();
-  const { logout } = useAuth();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
   const today = RecentDay().today;
 
@@ -33,11 +32,11 @@ export default function ReportsPage() {
   const [from, setFrom] = useState<string>(thirtyDaysAgo);
   const [to, setTo] = useState<string>(today);
   const [search, setSearch] = useState<string>("");
-  const [selectedSampleType, setSelectedSampleType] = useState<string>("all");
+  const [selectedLabType, setSelectedLabType] = useState<string>("all");
 
   // Data
   const [data, setData] = useState<ReportRow[]>([]);
-  const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
+  const [labTypes, setLabTypes] = useState<LabType[]>([]);
 
   // Modals
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -45,13 +44,14 @@ export default function ReportsPage() {
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   const [pdfReportTitle, setPdfReportTitle] = useState("");
   const [pdfReportStatus, setPdfReportStatus] = useState<ReportRow["status"] | undefined>();
+  const [pdfReportAssignedTo, setPdfReportAssignedTo] = useState<number | null>(null);
 
-  // Fetch sample types
+  // Fetch lab types
   useEffect(() => {
     api
-      .get<SampleType[]>(ENDPOINTS.SAMPLE_TYPES.LIST)
-      .then((data) => setSampleTypes(data))
-      .catch((err) => logError(err, "Fetch sample types"));
+      .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
+      .then((data) => setLabTypes(data))
+      .catch((err) => logError(err, "Fetch lab types"));
   }, []);
 
   // Fetch reports
@@ -87,8 +87,8 @@ export default function ReportsPage() {
       r.sample_names.toLowerCase().includes(search.toLowerCase());
 
     const matchStatus = status === "all" || r.status === status;
-    const matchSampleType =
-      selectedSampleType === "all" || r.sample_type === selectedSampleType;
+    const matchLabType =
+      selectedLabType === "all" || r.lab_type === selectedLabType;
 
     const reportDateStr = r.created_at.slice(0, 10);
     const matchDateFrom = !from || reportDateStr >= from;
@@ -97,7 +97,7 @@ export default function ReportsPage() {
     return (
       matchSearch &&
       matchStatus &&
-      matchSampleType &&
+      matchLabType &&
       matchDateFrom &&
       matchDateTo
     );
@@ -108,6 +108,7 @@ export default function ReportsPage() {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
       setPdfReportStatus(report.status);
+      setPdfReportAssignedTo(report.assigned_to ?? null);
       setPdfModalOpen(true);
     } else {
       router.push(`/api/reports/${report.id}`);
@@ -131,30 +132,29 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 space-y-5">
       <FilterBar
         from={from}
         to={to}
         search={search}
-        selectedSampleType={selectedSampleType}
+        selectedLabType={selectedLabType}
         status={status}
-        sampleTypes={sampleTypes}
+        labTypes={labTypes}
         onFromChange={setFrom}
         onToChange={setTo}
         onSearchChange={setSearch}
-        onSampleTypeChange={setSelectedSampleType}
+        onLabTypeChange={setSelectedLabType}
         onStatusChange={setStatus}
         onCreateClick={() => setCreateModalOpen(true)}
         onExportClick={handleExcelConvert}
-        onLogout={logout}
       />
-
+  
       <ReportsTable data={filtered} onRowClick={handleRowClick} />
-
+      
       <CreateReportModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
-        sampleTypes={sampleTypes}
+        labTypes={labTypes}
         from={from}
         to={to}
         onCreated={fetchReports}
@@ -165,9 +165,10 @@ export default function ReportsPage() {
         reportTitle={pdfReportTitle}
         reportId={pdfReportId}
         reportStatus={pdfReportStatus}
+        assignedTo={pdfReportAssignedTo}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
-        sampleTypes={sampleTypes}
+        labTypes={labTypes}
       />
 
       <div className="text-sm font-bold text-muted-foreground text-right pr-6">

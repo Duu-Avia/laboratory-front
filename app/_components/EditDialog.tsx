@@ -15,14 +15,14 @@ import { SampleFormSection } from "./SampleFormSection";
 import type {
   Indicator,
   SampleGroup,
-  SampleType,
+  LabType,
 } from "@/types";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
 
 const emptySampleGroup: SampleGroup = {
-  sample_type_id: null,
+  lab_type_id: null,
   sample_ids: [],
   sample_amount: "",
   sample_names: [""],
@@ -37,7 +37,7 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   reportId: number | null;
-  sampleTypes: SampleType[];
+  labTypes: LabType[];
   onSaved?: () => void;
 };
 
@@ -45,7 +45,7 @@ export function EditReport({
   open,
   onOpenChange,
   reportId,
-  sampleTypes,
+  labTypes,
   onSaved,
 }: Props) {
   const [loading, setLoading] = useState(false);
@@ -80,7 +80,7 @@ export function EditReport({
         const loadedIds = samples.map((s: any) => s.sample_id);
 
         setSampleGroup({
-          sample_type_id: first?.sample_type_id ?? null,
+          lab_type_id: first?.lab_type_id ?? null,
           sample_ids: loadedIds,
           sample_amount: first?.sample_amount ?? "",
           sample_names: loadedNames.length ? loadedNames : [""],
@@ -97,19 +97,19 @@ export function EditReport({
 
   // Load available indicators when sample type changes
   useEffect(() => {
-    if (!open || !sampleGroup.sample_type_id) {
+    if (!open || !sampleGroup.lab_type_id) {
       return;
     }
 
     api
-      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_SAMPLE_TYPE(sampleGroup.sample_type_id))
+      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_LAB_TYPE(sampleGroup.lab_type_id))
       .then((indicators) => {
         setSampleGroup((p) => ({ ...p, availableIndicators: indicators }));
       })
       .catch(() => {
         setSampleGroup((p) => ({ ...p, availableIndicators: [] }));
       });
-  }, [open, sampleGroup.sample_type_id]);
+  }, [open, sampleGroup.lab_type_id]);
 
   const handleSave = async () => {
     if (!reportId) return;
@@ -117,7 +117,7 @@ export function EditReport({
     const samples = sampleGroup.sample_names
       .map((name, idx) => ({
         sample_id: sampleGroup.sample_ids[idx] ?? null,
-        sample_type_id: sampleGroup.sample_type_id,
+        lab_type_id: sampleGroup.lab_type_id,
         sample_name: name.trim(),
         location: sampleGroup.location,
         sample_date: sampleGroup.sample_date,
@@ -166,7 +166,7 @@ export function EditReport({
             <SampleFormSection
               sampleGroup={sampleGroup}
               setSampleGroup={setSampleGroup}
-              sampleTypes={sampleTypes}
+              labTypes={labTypes}
             />
           </div>
         )}

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ClipboardCheck, CheckCircle2, Clock, Pencil } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import UserMenu from "./UserMenu";
 
 const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
 
@@ -63,11 +64,8 @@ export default function LeftSidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="px-4 py-3 border-t border-white/10 text-xs text-white/60">
-        Авиагын <br />
-        Лабораторын төсөл
-      </div>
+      {/* User Menu */}
+      <UserMenu variant="sidebar" />
     </aside>
   );
 }

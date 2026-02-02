@@ -1,4 +1,4 @@
-import { ArchiveFilterBarProps } from "@/app/types/types";
+import { ArchiveFilterBarProps } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,13 +41,13 @@ export function ArchiveHeader({
   from,
   to,
   search,
-  selectedSampleType,
+  selectedLabType,
   status,
-  sampleTypes,
+  labTypes,
   onFromChange,
   onToChange,
   onSearchChange,
-  onSampleTypeChange,
+  onLabTypeChange,
   onStatusChange,
   onExportClick,
 }: ArchiveFilterBarProps) {
@@ -135,11 +135,11 @@ export function ArchiveHeader({
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => onSampleTypeChange("all")}
+                onClick={() => onLabTypeChange("all")}
                 className={`
                   px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
                   ${
-                    selectedSampleType === "all"
+                    selectedLabType === "all"
                       ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
                   }
@@ -147,14 +147,14 @@ export function ArchiveHeader({
               >
                 Бүгд
               </button>
-              {sampleTypes.map((type) => (
+              {labTypes.map((type) => (
                 <button
                   key={type.id}
-                  onClick={() => onSampleTypeChange(type.type_name)}
+                  onClick={() => onLabTypeChange(type.type_name)}
                   className={`
                     px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
                     ${
-                      selectedSampleType === type.type_name
+                      selectedLabType === type.type_name
                         ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
                     }

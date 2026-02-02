@@ -8,6 +8,7 @@ export const ENDPOINTS = {
     LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
     REGISTER: "/auth/register",
+    ME: "/auth/me",
   },
 
   // Reports
@@ -26,23 +27,29 @@ export const ENDPOINTS = {
     SIGN: (id: number | string) => `/reports/sign/${id}`,
   },
 
-  // Sample Types
-  SAMPLE_TYPES: {
-    LIST: "/sample-types",
+  // Lab Types
+  LAB_TYPES: {
+    LIST: "/lab-types",
   },
 
   // Indicators
   INDICATORS: {
-    BY_SAMPLE_TYPE: (sampleTypeId: number) =>
-      `/indicators/indicators/${sampleTypeId}`,
+    BY_LAB_TYPE: (labTypeId: number) =>
+      `/indicators/indicators/${labTypeId}`,
     LIST: "/indicators",
     CREATE: "/indicators/create-indicator",
   },
 
   // Locations
   LOCATIONS: {
-    BY_SAMPLE_TYPE: (sampleTypeId: number) =>
-      `/locations?sample_type_id=${sampleTypeId}`,
+    BY_LAB_TYPE: (labTypeId: number) =>
+      `/locations?lab_type_id=${labTypeId}`,
     SAMPLES: (packageId: number) => `/locations/samples/${packageId}`,
+  },
+
+  // Users
+  USERS: {
+    SENIORS: (labTypeId: number) => `/users/seniors?lab_type_id=${labTypeId}`,
+    LAB_TYPES: (userId: number) => `/users/${userId}/lab-types`,
   },
 } as const;

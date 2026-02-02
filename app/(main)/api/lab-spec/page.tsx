@@ -35,7 +35,7 @@ import { logError } from "@/lib/errors";
 
 export default function LabPage() {
   // data (UI only, you will fetch)
-  const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
+  const [labTypes, setSampleTypes] = useState<SampleType[]>([]);
   const [indicators, setIndicators] = useState<IndicatorRowForLabSpec[]>([]);
 
   // filters
@@ -45,7 +45,7 @@ export default function LabPage() {
   // modal
   const [openCreate, setOpenCreate] = useState(false);
   const [draft, setDraft] = useState<NewIndicatorDraft>({
-    sample_type_id: null,
+    lab_type_id: null,
     indicator_name: "",
     unit: "",
     test_method: "",
@@ -55,9 +55,9 @@ export default function LabPage() {
 
   useEffect(() => {
     api
-      .get<SampleType[]>(ENDPOINTS.SAMPLE_TYPES.LIST)
+      .get<SampleType[]>(ENDPOINTS.LAB_TYPES.LIST)
       .then((data) => setSampleTypes(data))
-      .catch((err) => logError(err, "Fetch sample types"));
+      .catch((err) => logError(err, "Fetch lab types"));
   }, []);
 
   useEffect(() => {
@@ -70,9 +70,9 @@ export default function LabPage() {
   const typeButtons = useMemo(() => {
     return [
       { key: "all", label: "Бүгд" },
-      ...sampleTypes.map((t) => ({ key: String(t.id), label: t.type_name })),
+      ...labTypes.map((t) => ({ key: String(t.id), label: t.type_name })),
     ];
-  }, [sampleTypes]);
+  }, [labTypes]);
 
   const filteredIndicators = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -81,7 +81,7 @@ export default function LabPage() {
       const matchType =
         selectedType === "all"
           ? true
-          : i.sample_type_id === Number(selectedType);
+          : i.lab_type_id === Number(selectedType);
       const matchSearch =
         !q ||
         i.indicator_name?.toLowerCase().includes(q) ||
@@ -96,15 +96,15 @@ export default function LabPage() {
   const grouped = useMemo(() => {
     const map = new Map<number, IndicatorRowForLabSpec[]>();
     for (const i of filteredIndicators) {
-      if (!map.has(i.sample_type_id)) map.set(i.sample_type_id, []);
-      map.get(i.sample_type_id)!.push(i);
+      if (!map.has(i.lab_type_id)) map.set(i.lab_type_id, []);
+      map.get(i.lab_type_id)!.push(i);
     }
     return map;
   }, [filteredIndicators]);
 
   function openCreateModal() {
     setDraft({
-      sample_type_id: selectedType === "all" ? null : Number(selectedType),
+      lab_type_id: selectedType === "all" ? null : Number(selectedType),
       indicator_name: "",
       unit: "",
       test_method: "",
@@ -116,12 +116,12 @@ export default function LabPage() {
 
   async function onSaveNewIndicator() {
     await api.post(ENDPOINTS.INDICATORS.CREATE, draft);
-    if (draft.sample_type_id && draft.indicator_name.trim()) {
+    if (draft.lab_type_id && draft.indicator_name.trim()) {
       setIndicators((prev) => [
         ...prev,
         {
           id: Math.floor(Math.random() * 100000),
-          sample_type_id: draft.sample_type_id!,
+          lab_type_id: draft.lab_type_id!,
           indicator_name: draft.indicator_name.trim(),
           unit: draft.unit || null,
           test_method: draft.test_method || null,
@@ -136,12 +136,12 @@ export default function LabPage() {
 
   function typeName(typeId: number) {
     return (
-      sampleTypes.find((t) => t.id === typeId)?.type_name ?? `Type #${typeId}`
+      labTypes.find((t) => t.id === typeId)?.type_name ?? `Type #${typeId}`
     );
   }
 
   function typeStandard(typeId: number) {
-    return sampleTypes.find((t) => t.id === typeId)?.standard ?? "";
+    return labTypes.find((t) => t.id === typeId)?.standard ?? "";
   }
 
   return (
@@ -280,16 +280,16 @@ export default function LabPage() {
                 Дээжний төрөл
               </Label>
               <Select
-                value={draft.sample_type_id ? String(draft.sample_type_id) : ""}
+                value={draft.lab_type_id ? String(draft.lab_type_id) : ""}
                 onValueChange={(v) =>
-                  setDraft((p) => ({ ...p, sample_type_id: Number(v) }))
+                  setDraft((p) => ({ ...p, lab_type_id: Number(v) }))
                 }
               >
                 <SelectTrigger className="bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
                   <SelectValue placeholder="Төрөл сонгох" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                  {sampleTypes.map((t) => (
+                  {labTypes.map((t) => (
                     <SelectItem key={t.id} value={String(t.id)}>
                       {t.type_name}
                     </SelectItem>
@@ -402,7 +402,7 @@ export default function LabPage() {
             </Button>
             <Button
               onClick={onSaveNewIndicator}
-              disabled={!draft.sample_type_id || !draft.indicator_name.trim()}
+              disabled={!draft.lab_type_id || !draft.indicator_name.trim()}
               className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className="h-4 w-4" />

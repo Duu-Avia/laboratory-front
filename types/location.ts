@@ -5,7 +5,7 @@
 export type LocationPackage = {
   id: number;
   package_name: string;
-  sample_type_id: number;
+  lab_type_id: number;
 };
 
 export type LocationSample = {

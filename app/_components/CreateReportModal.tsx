@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
 
 // Types - use @/types instead of relative path
-import type { CreateReportModalProps, Indicator, SampleGroup } from "@/types";
+import type { CreateReportModalProps, Indicator, SampleGroup, SeniorEngineer } from "@/types";
 
 // Lib - use new API client and error handling
 import { api } from "@/lib/api";
@@ -22,7 +22,7 @@ import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
 
 const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
-  sample_type_id: null,
+  lab_type_id: null,
   sample_ids: [],
   sample_names: [""],
   location: "",
@@ -36,18 +36,20 @@ const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
 export function CreateReportModal({
   open,
   onOpenChange,
-  sampleTypes,
+  labTypes,
   from,
   to,
   onCreated,
 }: CreateReportModalProps) {
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null); // Error state for UI
+  const [error, setError] = useState<string | null>(null);
   const [reportTitle, setReportTitle] = useState("");
   const [reportTitleTouched, setReportTitleTouched] = useState(false);
   const [sampleGroup, setSampleGroup] = useState<SampleGroup>(
     getEmptySampleGroup(from)
   );
+  const [seniors, setSeniors] = useState<SeniorEngineer[]>([]);
+  const [assignedTo, setAssignedTo] = useState<number | null>(null);
 
   const calculateTestEndDate = (startDate: string) => {
     const endTestDate = new Date(startDate);
@@ -60,8 +62,10 @@ export function CreateReportModal({
     if (open) {
       setReportTitle("");
       setReportTitleTouched(false);
-      setError(null); // Clear error when modal opens
+      setError(null);
       setSampleGroup(getEmptySampleGroup(to));
+      setSeniors([]);
+      setAssignedTo(null);
     }
   }, [open, to]);
 
@@ -72,13 +76,30 @@ export function CreateReportModal({
     setReportTitle(sampleGroup.location || "");
   }, [open, sampleGroup.location, reportTitleTouched]);
 
+  // Fetch senior engineers when lab type changes
+  useEffect(() => {
+    if (!open || !sampleGroup.lab_type_id) {
+      setSeniors([]);
+      setAssignedTo(null);
+      return;
+    }
+
+    api
+      .get<SeniorEngineer[]>(ENDPOINTS.USERS.SENIORS(sampleGroup.lab_type_id))
+      .then((data) => setSeniors(data))
+      .catch((err) => {
+        logError(err, "Fetch seniors");
+        setSeniors([]);
+      });
+  }, [open, sampleGroup.lab_type_id]);
+
   // Load available indicators when sample type changes
   useEffect(() => {
-    if (!open || !sampleGroup.sample_type_id) return;
+    if (!open || !sampleGroup.lab_type_id) return;
 
     // Using api client - auto adds auth headers
     api
-      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_SAMPLE_TYPE(sampleGroup.sample_type_id))
+      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_LAB_TYPE(sampleGroup.lab_type_id))
       .then((indicators) => {
         setSampleGroup((p) => ({
           ...p,
@@ -90,14 +111,14 @@ export function CreateReportModal({
         logError(err, "Fetch indicators");
         setSampleGroup((p) => ({ ...p, availableIndicators: [] }));
       });
-  }, [open, sampleGroup.sample_type_id]);
+  }, [open, sampleGroup.lab_type_id]);
 
   const handleSave = async () => {
     // Validation - set error state instead of alert()
     const samples = sampleGroup.sample_names
       .filter((name) => name.trim() !== "")
       .map((name) => ({
-        sample_type_id: sampleGroup.sample_type_id,
+        lab_type_id: sampleGroup.lab_type_id,
         sample_name: name.trim(),
         sample_amount: sampleGroup.sample_amount,
         location: sampleGroup.location,
@@ -111,8 +132,13 @@ export function CreateReportModal({
       return;
     }
 
-    if (!sampleGroup.sample_type_id) {
+    if (!sampleGroup.lab_type_id) {
       setError("Дээжний төрөл сонгоно уу");
+      return;
+    }
+
+    if (!assignedTo) {
+      setError("Хянах инженер сонгоно уу");
       return;
     }
 
@@ -122,6 +148,7 @@ export function CreateReportModal({
       test_end_date: calculateTestEndDate(sampleGroup.sample_date),
       analyst: "",
       approved_by: "",
+      assigned_to: assignedTo,
       samples,
     };
 
@@ -172,7 +199,10 @@ export function CreateReportModal({
           <SampleFormSection
             sampleGroup={sampleGroup}
             setSampleGroup={setSampleGroup}
-            sampleTypes={sampleTypes}
+            labTypes={labTypes}
+            seniors={seniors}
+            assignedTo={assignedTo}
+            onAssignedToChange={setAssignedTo}
           />
         </div>
 
