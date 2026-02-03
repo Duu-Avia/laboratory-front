@@ -51,5 +51,16 @@ export const ENDPOINTS = {
   USERS: {
     SENIORS: (labTypeId: number) => `/users/seniors?lab_type_id=${labTypeId}`,
     LAB_TYPES: (userId: number) => `/users/${userId}/lab-types`,
+    PROFILE: "/users/profile",
+    PROFILE_PASSWORD: "/users/profile/password",
+    LIST: "/users",
+    CREATE: "/users",
+    DETAIL: (id: number) => `/users/${id}`,
+    UPDATE: (id: number) => `/users/${id}`,
+    DEACTIVATE: (id: number) => `/users/${id}`,
+    RESET_PASSWORD: (id: number) => `/users/${id}/password`,
+    CHANGE_ROLE: (id: number) => `/users/${id}/role`,
+    ASSIGN_LAB_TYPES: (userId: number) => `/users/${userId}/lab-types`,
+    ROLES: "/users/roles/list"
   },
 } as const;

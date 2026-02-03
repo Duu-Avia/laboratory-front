@@ -34,7 +34,13 @@ export type {
 } from "./location";
 
 // User types
-export type { SeniorEngineer } from "./user";
+export type {
+  SeniorEngineer,
+  UserProfile,
+  UpdateProfilePayload,
+  ChangePasswordPayload,
+  Employee,
+} from "./user";
 
 // Component props types
 export type {

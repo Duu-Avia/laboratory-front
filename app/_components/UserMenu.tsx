@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LogOut, User, ChevronsUpDown } from "lucide-react";
+import { ProfileDialog } from "./ProfileDialog";
 import { useAuth, type TokenPayload } from "@/lib/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -35,6 +36,7 @@ interface UserMenuProps {
 export default function UserMenu({ variant = "default" }: UserMenuProps) {
   const { getUser, logout } = useAuth();
   const [user, setUser] = useState<TokenPayload | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     setUser(getUser());
@@ -71,6 +73,7 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
     );
 
   return (
+    <>
     <Popover>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
 
@@ -96,13 +99,17 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
         <Separator />
 
         <div className="py-1">
-          <div className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => setProfileOpen(true)}
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted transition cursor-pointer"
+          >
             <User className="h-4 w-4" />
             <span>Профайл</span>
             <Badge variant="secondary" className="ml-auto text-xs">
               {roleLabel}
             </Badge>
-          </div>
+          </button>
         </div>
 
         <Separator />
@@ -119,5 +126,7 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
         </div>
       </PopoverContent>
     </Popover>
+    <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
+    </>
   );
 }

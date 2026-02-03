@@ -74,16 +74,18 @@ export function FilterBar({
       <div className="flex justify-between">
         <div>
           <div className="text-xs text-center text-muted-foreground">
-            Лаб төрөлөөр хайх
+            Лаб төрөл
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              className="text-[13px] w-100% h-7"
-              variant={selectedLabType === "all" ? "default" : "outline"}
-              onClick={() => onLabTypeChange("all")}
-            >
-              Бүгд
-            </Button>
+            {labTypes.length !== 1 && (
+              <Button
+                className="text-[13px] w-100% h-7"
+                variant={selectedLabType === "all" ? "default" : "outline"}
+                onClick={() => onLabTypeChange("all")}
+              >
+                Бүгд
+              </Button>
+            )}
             {labTypes.map((type) => (
               <Button
                 className="text-[13px] w-100% h-7"

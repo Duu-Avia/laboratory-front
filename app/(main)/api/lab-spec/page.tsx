@@ -27,7 +27,7 @@ import { IndicatorCard } from "./_components/IndicatorCard";
 import {
   IndicatorRowForLabSpec,
   NewIndicatorDraft,
-  SampleType,
+  LabType,
 } from "@/types";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
@@ -35,7 +35,7 @@ import { logError } from "@/lib/errors";
 
 export default function LabPage() {
   // data (UI only, you will fetch)
-  const [labTypes, setSampleTypes] = useState<SampleType[]>([]);
+  const [labTypes, setLabTypes] = useState<LabType[]>([]);
   const [indicators, setIndicators] = useState<IndicatorRowForLabSpec[]>([]);
 
   // filters
@@ -55,8 +55,8 @@ export default function LabPage() {
 
   useEffect(() => {
     api
-      .get<SampleType[]>(ENDPOINTS.LAB_TYPES.LIST)
-      .then((data) => setSampleTypes(data))
+      .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
+      .then((data) => setLabTypes(data))
       .catch((err) => logError(err, "Fetch lab types"));
   }, []);
 

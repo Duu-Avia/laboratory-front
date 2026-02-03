@@ -13,6 +13,7 @@ import { api, fetchBlob } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { STATUS_LABELS } from "@/lib/constants";
 import { logError } from "@/lib/errors";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { RecentDay } from "../utils/GetRecentDays";
 import { FilterBar } from "../_components/FilterBar";
 import { ReportsTable } from "../_components/ReportsTable";
@@ -22,8 +23,11 @@ import * as motion from "motion/react-client"
 
 // Utils
 
+const ADMIN_ROLES = ["superadmin", "admin"];
+
 export default function ReportsPage() {
   const router = useRouter();
+  const { getUser } = useAuth();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
   const today = RecentDay().today;
 
@@ -46,13 +50,23 @@ export default function ReportsPage() {
   const [pdfReportStatus, setPdfReportStatus] = useState<ReportRow["status"] | undefined>();
   const [pdfReportAssignedTo, setPdfReportAssignedTo] = useState<number | null>(null);
 
-  // Fetch lab types
+  // Fetch lab types — admins get all, others get their assigned types from /auth/me
   useEffect(() => {
-    api
-      .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
-      .then((data) => setLabTypes(data))
-      .catch((err) => logError(err, "Fetch lab types"));
-  }, []);
+    const user = getUser();
+    const isAdmin = ADMIN_ROLES.includes(user?.roleName ?? "");
+
+    if (isAdmin) {
+      api
+        .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
+        .then((data) => setLabTypes(data))
+        .catch((err) => logError(err, "Fetch lab types"));
+    } else {
+      api
+        .get<{ lab_types: LabType[] }>(ENDPOINTS.AUTH.ME)
+        .then((data) => setLabTypes(data.lab_types ?? []))
+        .catch((err) => logError(err, "Fetch user lab types"));
+    }
+  }, [getUser]);
 
   // Fetch reports
   const fetchReports = () => {

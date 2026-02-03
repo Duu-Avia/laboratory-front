@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { ArchiveReportsTable } from "../archive/components/ArchiveReportsTable";
 import { RecentDay } from "@/app/utils/GetRecentDays";
-import { ReportRow, SampleType } from "@/types";
+import { ReportRow, LabType } from "@/types";
 import { PdfViewModal } from "@/app/_components/PdfViewModal";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
@@ -25,7 +25,7 @@ export default function ApprovePage() {
 
   // Data
   const [data, setData] = useState<ReportRow[]>([]);
-  const [labTypes, setSampleTypes] = useState<SampleType[]>([]);
+  const [labTypes, setSampleTypes] = useState<LabType[]>([]);
 
   // Modals
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function ApprovePage() {
   // Fetch lab types
   useEffect(() => {
     api
-      .get<SampleType[]>(ENDPOINTS.LAB_TYPES.LIST)
+      .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
       .then((data) => setSampleTypes(data))
       .catch((err) => logError(err, "Fetch lab types"));
   }, []);
