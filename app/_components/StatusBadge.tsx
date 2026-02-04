@@ -33,7 +33,13 @@ const DEFAULT_STYLE = {
   dotColor: "bg-slate-400",
 };
 
-export function StatusBadge({ status, label: labelOverride }: { status: string; label?: string }) {
+export function StatusBadge({
+  status,
+  label: labelOverride,
+}: {
+  status: string;
+  label?: string;
+}) {
   const style = STATUS_STYLES[status] || DEFAULT_STYLE;
   const label = labelOverride || STATUS_LABELS[status] || status;
 

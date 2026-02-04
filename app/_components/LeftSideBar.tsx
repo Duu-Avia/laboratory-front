@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ClipboardCheck, CheckCircle2, Clock, Pencil, Users } from "lucide-react";
+import {
+  ClipboardCheck,
+  CheckCircle2,
+  Clock,
+  Pencil,
+  Users,
+} from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import UserMenu from "./UserMenu";
 
@@ -12,7 +18,12 @@ const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
 const menu = [
   { href: "/", label: "Ажил шалгуулах хүсэлт", icon: ClipboardCheck },
   { href: "/api/archive", label: "Архив", icon: Clock },
-  { href: "/api/approve", label: "Баталгаажуулах хүсэлт", icon: CheckCircle2, roles: ELEVATED_ROLES },
+  {
+    href: "/api/approve",
+    label: "Баталгаажуулах хүсэлт",
+    icon: CheckCircle2,
+    roles: ELEVATED_ROLES,
+  },
   { href: "/api/employees", label: "Ажилчид", icon: Users },
   {
     href: "/api/lab-spec",

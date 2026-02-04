@@ -11,7 +11,7 @@ import { ENDPOINTS } from "@/lib/api/endpoints";
 import { fetchBlob } from "@/lib/api";
 import { logError } from "@/lib/errors";
 import { useAuth } from "@/lib/hooks/useAuth";
-import type { ReportStatus, SampleType } from "@/types";
+import type { ReportStatus, LabType } from "@/types";
 
 export interface PdfViewModalProps {
   open: boolean;
@@ -19,9 +19,10 @@ export interface PdfViewModalProps {
   reportTitle: string | null;
   reportStatus?: ReportStatus;
   assignedTo?: number | null;
+  createdBy?: number | null;
   onOpenChange: (open: boolean) => void;
   onApproved?: () => void;
-  labTypes: SampleType[];
+  labTypes: LabType[];
 }
 
 export function PdfViewModal({
@@ -30,16 +31,24 @@ export function PdfViewModal({
   reportId,
   reportStatus,
   assignedTo,
+  createdBy,
   onOpenChange,
   onApproved,
   labTypes,
 }: PdfViewModalProps) {
   const { getUser } = useAuth();
   const user = getUser();
-  const canSign = reportStatus === "tested";
+
+  const MANAGEMENT_ROLES = ["superadmin", "admin", "senior_engineer"];
+  const isManagement = MANAGEMENT_ROLES.includes(user?.roleName ?? "");
+  const isOwner =
+    user?.userId != null && createdBy != null && user.userId === createdBy;
+
+  const canEdit = isOwner || isManagement;
+  const canDelete = isOwner || isManagement;
+  const canSign = reportStatus === "tested" && isOwner;
   const canApprove =
-    reportStatus === "signed" &&
-    (user?.roleName === "superadmin" || user?.userId === assignedTo);
+    reportStatus === "signed" && assignedTo !== undefined && isManagement;
 
   const [deleteDialogOpener, setDeleteDialogOpener] = useState(false);
   const [editDialogOpener, setEditDialogOpener] = useState(false);
@@ -111,12 +120,14 @@ export function PdfViewModal({
           </div>
 
           <div className="shrink-0 border-t bg-background p-4 flex justify-end gap-2">
-            <Button
-              className="text-black bg-gray-200/75 hover:bg-gray-500 hover:text-white border-1 border-cyan-200 h-[28px]"
-              onClick={onEditClick}
-            >
-              Тайлан засах
-            </Button>
+            {canEdit && (
+              <Button
+                className="text-black bg-gray-200/75 hover:bg-gray-500 hover:text-white border-1 border-cyan-200 h-[28px]"
+                onClick={onEditClick}
+              >
+                Тайлан засах
+              </Button>
+            )}
 
             {canSign && (
               <Button
@@ -136,12 +147,14 @@ export function PdfViewModal({
               </Button>
             )}
 
-            <Button
-              className="text-black bg-gray-200/75 hover:bg-red-200 border-1 border-red-500 h-[28px]"
-              onClick={onDeleteClick}
-            >
-              Устгах
-            </Button>
+            {canDelete && (
+              <Button
+                className="text-black bg-gray-200/75 hover:bg-red-200 border-1 border-red-500 h-[28px]"
+                onClick={onDeleteClick}
+              >
+                Устгах
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>

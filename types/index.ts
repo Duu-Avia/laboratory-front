@@ -4,11 +4,7 @@
  */
 
 // Report types
-export type {
-  ReportStatus,
-  StatusFilter,
-  ReportRow,
-} from "./report";
+export type { ReportStatus, StatusFilter, ReportRow } from "./report";
 
 // Lab types
 export type {
@@ -28,10 +24,7 @@ export type {
 } from "./indicator";
 
 // Location types
-export type {
-  LocationPackage,
-  LocationSample,
-} from "./location";
+export type { LocationPackage, LocationSample } from "./location";
 
 // User types
 export type {

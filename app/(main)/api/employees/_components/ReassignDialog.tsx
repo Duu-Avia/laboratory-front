@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-} from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import {
   ArrowRightLeft,
   AlertCircle,
@@ -242,9 +238,7 @@ export function ReassignDialog({
                 <span className="text-xs">өөрчлөлт хийгдсэн</span>
               </div>
             ) : (
-              <span className="opacity-50 text-xs">
-                Өөрчлөлт хийгдээгүй
-              </span>
+              <span className="opacity-50 text-xs">Өөрчлөлт хийгдээгүй</span>
             )}
           </div>
 

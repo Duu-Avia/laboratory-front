@@ -29,20 +29,27 @@ export default function ArchivePage() {
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   const [pdfReportTitle, setPdfReportTitle] = useState("");
-  const [pdfReportStatus, setPdfReportStatus] = useState<ReportRow["status"] | undefined>();
+  const [pdfReportStatus, setPdfReportStatus] = useState<
+    ReportRow["status"] | undefined
+  >();
+  const [pdfReportCreatedBy, setPdfReportCreatedBy] = useState<number | null>(
+    null
+  );
 
   // Fetch lab types
   useEffect(() => {
-    api.get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
-    .then(data => setLabTypes(data))
-    .catch(err => logError(err, "Fetch lab types on archive page"));
+    api
+      .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
+      .then((data) => setLabTypes(data))
+      .catch((err) => logError(err, "Fetch lab types on archive page"));
   }, []);
 
   // Fetch reports
   const fetchReports = () => {
-    api.get<ReportRow[]>(`${ENDPOINTS.REPORTS.LIST}/archive?mode=${status}`)
-    .then(data => setData(data))
-    .catch(err=> logError(err, "Fetch archive reports") );
+    api
+      .get<ReportRow[]>(`${ENDPOINTS.REPORTS.LIST}/archive?mode=${status}`)
+      .then((data) => setData(data))
+      .catch((err) => logError(err, "Fetch archive reports"));
   };
 
   useEffect(() => {
@@ -72,11 +79,7 @@ export default function ArchivePage() {
     const matchDateTo = !to || reportDateStr <= to;
 
     return (
-      matchSearch &&
-      matchStatus &&
-      matchLabType &&
-      matchDateFrom &&
-      matchDateTo
+      matchSearch && matchStatus && matchLabType && matchDateFrom && matchDateTo
     );
   });
   console.log(selectedLabType);
@@ -85,6 +88,7 @@ export default function ArchivePage() {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
       setPdfReportStatus(report.status);
+      setPdfReportCreatedBy(report.created_by ?? null);
       setPdfModalOpen(true);
     } else {
       router.push(`/reports/${report.id}`);
@@ -140,6 +144,7 @@ export default function ArchivePage() {
         reportTitle={pdfReportTitle}
         reportId={pdfReportId}
         reportStatus={pdfReportStatus}
+        createdBy={pdfReportCreatedBy}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
         labTypes={labTypes}

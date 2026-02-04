@@ -34,16 +34,14 @@ export const ENDPOINTS = {
 
   // Indicators
   INDICATORS: {
-    BY_LAB_TYPE: (labTypeId: number) =>
-      `/indicators/indicators/${labTypeId}`,
+    BY_LAB_TYPE: (labTypeId: number) => `/indicators/indicators/${labTypeId}`,
     LIST: "/indicators",
     CREATE: "/indicators/create-indicator",
   },
 
   // Locations
   LOCATIONS: {
-    BY_LAB_TYPE: (labTypeId: number) =>
-      `/locations?lab_type_id=${labTypeId}`,
+    BY_LAB_TYPE: (labTypeId: number) => `/locations?lab_type_id=${labTypeId}`,
     SAMPLES: (packageId: number) => `/locations/samples/${packageId}`,
   },
 
@@ -57,10 +55,10 @@ export const ENDPOINTS = {
     CREATE: "/users",
     DETAIL: (id: number) => `/users/${id}`,
     UPDATE: (id: number) => `/users/${id}`,
-    DEACTIVATE: (id: number) => `/users/${id}`,
+    DEACTIVATE: (id: number) => `/users/${id}/deactive`,
     RESET_PASSWORD: (id: number) => `/users/${id}/password`,
     CHANGE_ROLE: (id: number) => `/users/${id}/role`,
     ASSIGN_LAB_TYPES: (userId: number) => `/users/${userId}/lab-types`,
-    ROLES: "/users/roles/list"
+    ROLES: "/users/roles/list",
   },
 } as const;

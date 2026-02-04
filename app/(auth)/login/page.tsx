@@ -36,7 +36,9 @@ export default function LoginPage() {
       console.log("Response data:", data);
 
       if (!res.ok) {
-        throw new Error(data.detail || data.message || "Нэвтрэхэд алдаа гарлаа");
+        throw new Error(
+          data.detail || data.message || "Нэвтрэхэд алдаа гарлаа"
+        );
       }
 
       // Store token in cookie (for middleware) and localStorage (for API calls)

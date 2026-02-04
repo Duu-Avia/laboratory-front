@@ -36,7 +36,7 @@ export type Employee = {
 };
 
 export type Roles = {
-  id:number,
-  role_name:string,
-  description:string
-}
+  id: number;
+  role_name: string;
+  description: string;
+};

@@ -33,12 +33,15 @@ export default function ReportDetailPage() {
   }
 
   useEffect(() => {
-    api.get<{ samples: SampleColumn[]; report_title: string }>(ENDPOINTS.REPORTS.DETAIL(reportId))
-    .then((data)=>{
-      setSamples(normalizeSamples(data.samples));
-      setReportTitle(data.report_title);
-    })
-    .catch((err)=> logError(err, "Fetch report details") );
+    api
+      .get<{ samples: SampleColumn[]; report_title: string }>(
+        ENDPOINTS.REPORTS.DETAIL(reportId)
+      )
+      .then((data) => {
+        setSamples(normalizeSamples(data.samples));
+        setReportTitle(data.report_title);
+      })
+      .catch((err) => logError(err, "Fetch report details"));
   }, [reportId]);
 
   // Update one indicator by sample_indicator_id (unique)

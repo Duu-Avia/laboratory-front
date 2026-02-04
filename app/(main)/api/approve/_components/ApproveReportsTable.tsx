@@ -133,7 +133,12 @@ export function ApproveReportsTable({ data, onRowClick }: ReportsTableProps) {
                 </div>
               </TableCell>
               <TableCell className="py-5 pr-6">
-                <StatusBadge status={dataItem.status} label={dataItem.status === "signed" ? "Хүлээгдэж байна" : undefined} />
+                <StatusBadge
+                  status={dataItem.status}
+                  label={
+                    dataItem.status === "signed" ? "Хүлээгдэж байна" : undefined
+                  }
+                />
               </TableCell>
             </TableRow>
           ))}

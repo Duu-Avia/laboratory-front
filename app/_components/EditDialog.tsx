@@ -12,11 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
-import type {
-  Indicator,
-  SampleGroup,
-  LabType,
-} from "@/types";
+import type { Indicator, SampleGroup, LabType } from "@/types";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
@@ -102,7 +98,9 @@ export function EditReport({
     }
 
     api
-      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_LAB_TYPE(sampleGroup.lab_type_id))
+      .get<Indicator[]>(
+        ENDPOINTS.INDICATORS.BY_LAB_TYPE(sampleGroup.lab_type_id)
+      )
       .then((indicators) => {
         setSampleGroup((p) => ({ ...p, availableIndicators: indicators }));
       })

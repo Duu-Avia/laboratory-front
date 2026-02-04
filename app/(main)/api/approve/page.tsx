@@ -1,19 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
-
-import { ArchiveReportsTable } from "../archive/components/ArchiveReportsTable";
 import { RecentDay } from "@/app/utils/GetRecentDays";
 import { ReportRow, LabType } from "@/types";
 import { PdfViewModal } from "@/app/_components/PdfViewModal";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar, Search, Filter } from "lucide-react";
 import { ApproveReportsTable } from "./_components/ApproveReportsTable";
 
 export default function ApprovePage() {
+  const { getUser } = useAuth();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
   const today = RecentDay().today;
 
@@ -34,14 +34,30 @@ export default function ApprovePage() {
   const [pdfReportStatus, setPdfReportStatus] = useState<
     ReportRow["status"] | undefined
   >();
+  const [pdfReportAssignedTo, setPdfReportAssignedTo] = useState<number | null>(
+    null
+  );
+  const [pdfReportCreatedBy, setPdfReportCreatedBy] = useState<number | null>(
+    null
+  );
 
-  // Fetch lab types
+  // Fetch lab types — only superadmin sees all
   useEffect(() => {
-    api
-      .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
-      .then((data) => setSampleTypes(data))
-      .catch((err) => logError(err, "Fetch lab types"));
-  }, []);
+    const user = getUser();
+    const isSuperAdmin = user?.roleName === "superadmin";
+
+    if (isSuperAdmin) {
+      api
+        .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
+        .then((data) => setSampleTypes(data))
+        .catch((err) => logError(err, "Fetch lab types"));
+    } else {
+      api
+        .get<{ lab_types: LabType[] }>(ENDPOINTS.AUTH.ME)
+        .then((data) => setSampleTypes(data.lab_types ?? []))
+        .catch((err) => logError(err, "Fetch user lab types"));
+    }
+  }, [getUser]);
 
   // Fetch only tested reports
   const fetchReports = () => {
@@ -88,6 +104,8 @@ export default function ApprovePage() {
     setPdfReportId(report.id);
     setPdfReportTitle(report.report_title);
     setPdfReportStatus(report.status);
+    setPdfReportAssignedTo(report.assigned_to ?? null);
+    setPdfReportCreatedBy(report.created_by ?? null);
     setPdfModalOpen(true);
   }
 
@@ -149,18 +167,20 @@ export default function ApprovePage() {
           </div>
         </div>
 
-        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        {labTypes.length > 1 && (
+          <>
+            <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
-        {/* Sample Type Filters */}
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase tracking-wide">
-            <Filter className="w-3 h-3" />
-            Лаб төрөлөөр хайх
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setSelectedSampleType("all")}
-              className={`
+            {/* Sample Type Filters */}
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase tracking-wide">
+                <Filter className="w-3 h-3" />
+                Лаб төрөлөөр хайх
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setSelectedSampleType("all")}
+                  className={`
                 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
                 ${
                   selectedSampleType === "all"
@@ -168,14 +188,14 @@ export default function ApprovePage() {
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
                 }
               `}
-            >
-              Бүгд
-            </button>
-            {labTypes.map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setSelectedSampleType(type.type_name)}
-                className={`
+                >
+                  Бүгд
+                </button>
+                {labTypes.map((type) => (
+                  <button
+                    key={type.id}
+                    onClick={() => setSelectedSampleType(type.type_name)}
+                    className={`
                   px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
                   ${
                     selectedSampleType === type.type_name
@@ -183,12 +203,14 @@ export default function ApprovePage() {
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
                   }
                 `}
-              >
-                {type.type_name}
-              </button>
-            ))}
-          </div>
-        </div>
+                  >
+                    {type.type_name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <ApproveReportsTable data={filtered} onRowClick={handleRowClick} />
@@ -198,6 +220,8 @@ export default function ApprovePage() {
         reportTitle={pdfReportTitle}
         reportId={pdfReportId}
         reportStatus={pdfReportStatus}
+        assignedTo={pdfReportAssignedTo}
+        createdBy={pdfReportCreatedBy}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
         labTypes={labTypes}

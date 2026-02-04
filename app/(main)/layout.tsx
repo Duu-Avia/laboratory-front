@@ -8,9 +8,8 @@ export default function MainLayout({
 }) {
   return (
     <div className="flex h-full">
-      
       <LeftSidebar />
-        <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
+      <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
     </div>
   );
 }

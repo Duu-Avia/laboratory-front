@@ -27,9 +27,9 @@ type Props = {
   sampleGroup: SampleGroup;
   setSampleGroup: (updater: (prev: SampleGroup) => SampleGroup) => void;
   labTypes: LabType[];
-  seniors: SeniorEngineer[];
-  assignedTo: number | null;
-  onAssignedToChange: (value: number | null) => void;
+  seniors?: SeniorEngineer[];
+  assignedTo?: number | null;
+  onAssignedToChange?: (value: number | null) => void;
 };
 
 export function SampleFormSection({
@@ -57,7 +57,9 @@ export function SampleFormSection({
     }
 
     api
-      .get<LocationPackage[]>(ENDPOINTS.LOCATIONS.BY_LAB_TYPE(sampleGroup.lab_type_id))
+      .get<LocationPackage[]>(
+        ENDPOINTS.LOCATIONS.BY_LAB_TYPE(sampleGroup.lab_type_id)
+      )
       .then((data) => {
         setLocationPackages(data);
         setSelectedPackageId(null);
@@ -73,7 +75,9 @@ export function SampleFormSection({
     setSelectedPackageId(packageId);
 
     try {
-      const samples = await api.get<LocationSample[]>(ENDPOINTS.LOCATIONS.SAMPLES(packageId));
+      const samples = await api.get<LocationSample[]>(
+        ENDPOINTS.LOCATIONS.SAMPLES(packageId)
+      );
 
       const selectedPackage = locationPackages.find((p) => p.id === packageId);
 
@@ -165,9 +169,6 @@ export function SampleFormSection({
             </SelectContent>
           </Select>
         </div>
-        
-
-
 
         {/* Location Package Selection */}
         <div className="space-y-2 col-span-3">
@@ -175,9 +176,7 @@ export function SampleFormSection({
           <Select
             value={selectedPackageId ? String(selectedPackageId) : undefined}
             onValueChange={(v) => handlePackageSelect(Number(v))}
-            disabled={
-              !sampleGroup.lab_type_id || locationPackages.length === 0
-            }
+            disabled={!sampleGroup.lab_type_id || locationPackages.length === 0}
           >
             <SelectTrigger>
               <SelectValue
@@ -278,7 +277,8 @@ export function SampleFormSection({
         </div>
       </div>
 
-       {/* Senior Engineer */}
+      {/* Senior Engineer */}
+      {seniors && onAssignedToChange && (
         <div className="space-y-2 col-span-2 pt-4">
           <Label>Хянах инженер</Label>
           <Select
@@ -306,6 +306,7 @@ export function SampleFormSection({
             </SelectContent>
           </Select>
         </div>
+      )}
 
       <Separator className="my-4" />
 

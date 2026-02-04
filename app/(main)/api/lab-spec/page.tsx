@@ -24,11 +24,7 @@ import { Plus, Search, FlaskConical, Beaker, Sparkles } from "lucide-react";
 
 import { FilterPill } from "./_components/FilterPill";
 import { IndicatorCard } from "./_components/IndicatorCard";
-import {
-  IndicatorRowForLabSpec,
-  NewIndicatorDraft,
-  LabType,
-} from "@/types";
+import { IndicatorRowForLabSpec, NewIndicatorDraft, LabType } from "@/types";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
@@ -79,9 +75,7 @@ export default function LabPage() {
 
     return indicators.filter((i) => {
       const matchType =
-        selectedType === "all"
-          ? true
-          : i.lab_type_id === Number(selectedType);
+        selectedType === "all" ? true : i.lab_type_id === Number(selectedType);
       const matchSearch =
         !q ||
         i.indicator_name?.toLowerCase().includes(q) ||

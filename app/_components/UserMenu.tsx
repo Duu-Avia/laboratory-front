@@ -74,59 +74,59 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
 
   return (
     <>
-    <Popover>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <Popover>
+        <PopoverTrigger asChild>{trigger}</PopoverTrigger>
 
-      <PopoverContent
-        side={variant === "sidebar" ? "top" : "bottom"}
-        align={variant === "sidebar" ? "start" : "end"}
-        className="w-56 p-0"
-      >
-        <div className="flex items-center gap-3 px-4 py-3">
-          <div className="h-10 w-10 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-semibold text-neutral-600 shrink-0">
-            {initials}
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-medium capitalize truncate">
-              {displayName}
+        <PopoverContent
+          side={variant === "sidebar" ? "top" : "bottom"}
+          align={variant === "sidebar" ? "start" : "end"}
+          className="w-56 p-0"
+        >
+          <div className="flex items-center gap-3 px-4 py-3">
+            <div className="h-10 w-10 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-semibold text-neutral-600 shrink-0">
+              {initials}
             </div>
-            <div className="text-xs text-muted-foreground truncate">
-              {user.email}
+            <div className="min-w-0">
+              <div className="text-sm font-medium capitalize truncate">
+                {displayName}
+              </div>
+              <div className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </div>
             </div>
           </div>
-        </div>
 
-        <Separator />
+          <Separator />
 
-        <div className="py-1">
-          <button
-            type="button"
-            onClick={() => setProfileOpen(true)}
-            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted transition cursor-pointer"
-          >
-            <User className="h-4 w-4" />
-            <span>Профайл</span>
-            <Badge variant="secondary" className="ml-auto text-xs">
-              {roleLabel}
-            </Badge>
-          </button>
-        </div>
+          <div className="py-1">
+            <button
+              type="button"
+              onClick={() => setProfileOpen(true)}
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-muted transition cursor-pointer"
+            >
+              <User className="h-4 w-4" />
+              <span>Профайл</span>
+              <Badge variant="secondary" className="ml-auto text-xs">
+                {roleLabel}
+              </Badge>
+            </button>
+          </div>
 
-        <Separator />
+          <Separator />
 
-        <div className="py-1">
-          <button
-            type="button"
-            onClick={logout}
-            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition cursor-pointer"
-          >
-            <LogOut className="h-4 w-4" />
-            Гарах
-          </button>
-        </div>
-      </PopoverContent>
-    </Popover>
-    <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
+          <div className="py-1">
+            <button
+              type="button"
+              onClick={logout}
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" />
+              Гарах
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
+      <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
     </>
   );
 }

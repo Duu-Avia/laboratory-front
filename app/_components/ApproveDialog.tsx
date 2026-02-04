@@ -98,7 +98,10 @@ export function ApproveDialog({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>Болих</AlertDialogCancel>
           <AlertDialogAction
-            onClick={handleApprove}
+            onClick={(e) => {
+              e.preventDefault();
+              handleApprove();
+            }}
             disabled={loading || !password.trim()}
             className="bg-blue-600 hover:bg-blue-700"
           >

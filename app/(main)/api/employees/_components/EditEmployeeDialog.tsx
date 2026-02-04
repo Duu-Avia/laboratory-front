@@ -35,6 +35,7 @@ import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
 import type { Employee } from "@/types";
+import { em } from "motion/react-client";
 
 const ROLE_OPTIONS = [
   { value: "engineer", label: "Инженер" },
@@ -167,7 +168,7 @@ export function EditEmployeeDialog({
       setDeactivating(false);
     }
   };
-
+  console.log("bi haana bainaaa???");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 overflow-hidden gap-0 border-slate-200 shadow-xl sm:rounded-xl">
@@ -225,7 +226,13 @@ export function EditEmployeeDialog({
             <Label className="text-slate-700 font-medium">Эрх</Label>
             <div className="relative">
               <Key className="absolute left-3 top-3 h-3.5 w-3.5 text-slate-400 z-10" />
-              <Select value={role} onValueChange={(v) => { setRole(v); setRoleSuccess(false); }}>
+              <Select
+                value={role}
+                onValueChange={(v) => {
+                  setRole(v);
+                  setRoleSuccess(false);
+                }}
+              >
                 <SelectTrigger className="pl-8 bg-slate-50 border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
@@ -264,7 +271,9 @@ export function EditEmployeeDialog({
 
           {/* Password Reset Section */}
           <div className="space-y-2">
-            <Label className="text-slate-700 font-medium">Нууц үг шинэчлэх</Label>
+            <Label className="text-slate-700 font-medium">
+              Нууц үг шинэчлэх
+            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
@@ -314,14 +323,19 @@ export function EditEmployeeDialog({
                   disabled={deactivating}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  {employee.is_active ? "Идэвхгүй болгох" : "Аль хэдийн идэвхгүй"}
+                  {employee.is_active
+                    ? "Идэвхгүй болгох"
+                    : "Аль хэдийн идэвхгүй"}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Ажилтныг идэвхгүй болгох уу?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Ажилтныг идэвхгүй болгох уу?
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    {employee.email} хэрэглэгчийг идэвхгүй болговол системд нэвтрэх боломжгүй болно.
+                    {employee.email} хэрэглэгчийг идэвхгүй болговол системд
+                    нэвтрэх боломжгүй болно.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

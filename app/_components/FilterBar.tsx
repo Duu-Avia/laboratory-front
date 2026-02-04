@@ -72,12 +72,12 @@ export function FilterBar({
       </div>
 
       <div className="flex justify-between">
-        <div>
-          <div className="text-xs text-center text-muted-foreground">
-            Лаб төрөл
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {labTypes.length !== 1 && (
+        {labTypes.length > 1 && (
+          <div>
+            <div className="text-xs text-center text-muted-foreground">
+              Лаб төрөл
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
               <Button
                 className="text-[13px] w-100% h-7"
                 variant={selectedLabType === "all" ? "default" : "outline"}
@@ -85,21 +85,21 @@ export function FilterBar({
               >
                 Бүгд
               </Button>
-            )}
-            {labTypes.map((type) => (
-              <Button
-                className="text-[13px] w-100% h-7"
-                key={type.id}
-                variant={
-                  selectedLabType === type.type_name ? "default" : "outline"
-                }
-                onClick={() => onLabTypeChange(type.type_name)}
-              >
-                {type.type_name}
-              </Button>
-            ))}
+              {labTypes.map((type) => (
+                <Button
+                  className="text-[13px] w-100% h-7"
+                  key={type.id}
+                  variant={
+                    selectedLabType === type.type_name ? "default" : "outline"
+                  }
+                  onClick={() => onLabTypeChange(type.type_name)}
+                >
+                  {type.type_name}
+                </Button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex flex-col gap-1">
           <div className="text-xs text-center text-muted-foreground">

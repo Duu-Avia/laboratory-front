@@ -52,7 +52,9 @@ export function CreateEmployeeDialog({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const labTypeName = labTypes.find((lt) => lt.id === defaultLabTypeId)?.type_name;
+  const labTypeName = labTypes.find(
+    (lt) => lt.id === defaultLabTypeId
+  )?.type_name;
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
       setEmail("");
@@ -155,7 +157,6 @@ export function CreateEmployeeDialog({
             </div>
           </div>
 
-          
           <div className="space-y-2">
             <Label className="text-slate-700 font-medium">Хочоо хэл</Label>
             <div className="relative">
@@ -190,7 +191,6 @@ export function CreateEmployeeDialog({
                     ))}
                   </SelectContent>
                 </Select>
-              
               </div>
             </div>
           )}
@@ -198,7 +198,9 @@ export function CreateEmployeeDialog({
           {labTypeName && (
             <div className="rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 text-sm">
               <span className="text-slate-500">Лаб төрөл: </span>
-              <span className="font-semibold text-slate-800">{labTypeName}</span>
+              <span className="font-semibold text-slate-800">
+                {labTypeName}
+              </span>
             </div>
           )}
         </div>
@@ -212,16 +214,16 @@ export function CreateEmployeeDialog({
           >
             Болих
           </Button>
-          <Button 
-            onClick={handleSave} 
+          <Button
+            onClick={handleSave}
             disabled={saving}
             className="bg-slate-900 text-white hover:bg-slate-800"
           >
             {saving ? (
-              <span className="flex items-center gap-2">
-                 Уншиж байна...
-              </span>
-            ) : "Нэмэх"}
+              <span className="flex items-center gap-2">Уншиж байна...</span>
+            ) : (
+              "Нэмэх"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

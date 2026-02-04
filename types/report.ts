@@ -26,4 +26,6 @@ export type ReportRow = {
   lab_type?: string;
   assigned_to?: number;
   assigned_to_name?: string;
+  created_by?: number;
+  created_by_name?: string;
 };

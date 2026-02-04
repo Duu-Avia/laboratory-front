@@ -10,10 +10,7 @@ export function StatCard({
   icon: any;
   colorClass: string;
   subtext?: string;
-})
-
-{
-    
+}) {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm border border-slate-100 transition-all hover:shadow-md">
       <div className="flex justify-between items-start">
@@ -21,7 +18,11 @@ export function StatCard({
           <p className="text-sm font-medium text-slate-500">{title}</p>
           <div className="flex items-baseline gap-2">
             <h2 className="text-3xl font-bold text-slate-900">{value}</h2>
-            {subtext && <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{subtext}</span>}
+            {subtext && (
+              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                {subtext}
+              </span>
+            )}
           </div>
         </div>
         <div className={`p-3 rounded-xl ${colorClass}`}>

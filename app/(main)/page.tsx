@@ -19,11 +19,11 @@ import { FilterBar } from "../_components/FilterBar";
 import { ReportsTable } from "../_components/ReportsTable";
 import { CreateReportModal } from "../_components/CreateReportModal";
 import { PdfViewModal } from "../_components/PdfViewModal";
-import * as motion from "motion/react-client"
+import * as motion from "motion/react-client";
 
 // Utils
 
-const ADMIN_ROLES = ["superadmin", "admin"];
+const ADMIN_ROLES = ["superadmin"];
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -47,10 +47,14 @@ export default function ReportsPage() {
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   const [pdfReportTitle, setPdfReportTitle] = useState("");
-  const [pdfReportStatus, setPdfReportStatus] = useState<ReportRow["status"] | undefined>();
-  const [pdfReportAssignedTo, setPdfReportAssignedTo] = useState<number | null>(null);
+  const [pdfReportStatus, setPdfReportStatus] = useState<
+    ReportRow["status"] | undefined
+  >();
+  const [pdfReportCreatedBy, setPdfReportCreatedBy] = useState<number | null>(
+    null
+  );
 
-  // Fetch lab types — admins get all, others get their assigned types from /auth/me
+  // Fetch lab types — super admin, others get their assigned types from /auth/me
   useEffect(() => {
     const user = getUser();
     const isAdmin = ADMIN_ROLES.includes(user?.roleName ?? "");
@@ -109,22 +113,28 @@ export default function ReportsPage() {
     const matchDateTo = !to || reportDateStr <= to;
 
     return (
-      matchSearch &&
-      matchStatus &&
-      matchLabType &&
-      matchDateFrom &&
-      matchDateTo
+      matchSearch && matchStatus && matchLabType && matchDateFrom && matchDateTo
     );
   });
 
   function handleRowClick(report: ReportRow) {
-    if (report.status === "tested" || report.status === "approved" || report.status === "signed") {
+    const user = getUser();
+    const isOwner =
+      user?.userId != null &&
+      report.created_by != null &&
+      user.userId === report.created_by;
+
+    if (
+      report.status === "tested" ||
+      report.status === "approved" ||
+      report.status === "signed"
+    ) {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
       setPdfReportStatus(report.status);
-      setPdfReportAssignedTo(report.assigned_to ?? null);
+      setPdfReportCreatedBy(report.created_by ?? null);
       setPdfModalOpen(true);
-    } else {
+    } else if (isOwner) {
       router.push(`/api/reports/${report.id}`);
     }
   }
@@ -162,9 +172,9 @@ export default function ReportsPage() {
         onCreateClick={() => setCreateModalOpen(true)}
         onExportClick={handleExcelConvert}
       />
-  
+
       <ReportsTable data={filtered} onRowClick={handleRowClick} />
-      
+
       <CreateReportModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
@@ -179,7 +189,7 @@ export default function ReportsPage() {
         reportTitle={pdfReportTitle}
         reportId={pdfReportId}
         reportStatus={pdfReportStatus}
-        assignedTo={pdfReportAssignedTo}
+        createdBy={pdfReportCreatedBy}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
         labTypes={labTypes}

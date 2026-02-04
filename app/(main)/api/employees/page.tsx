@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { Users, Settings2, Loader2, FlaskConical, UserCheck, UserX } from "lucide-react";
+import {
+  Users,
+  Settings2,
+  Loader2,
+  FlaskConical,
+  UserCheck,
+  UserX,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
@@ -17,7 +24,8 @@ import { Roles } from "@/types/user";
 const CAN_CREATE_ROLES = ["admin", "senior_engineer", "superadmin"] as const;
 
 const ReassignDialog = dynamic(
-  () => import("./_components/ReassignDialog").then((mod) => mod.ReassignDialog),
+  () =>
+    import("./_components/ReassignDialog").then((mod) => mod.ReassignDialog),
   { ssr: false }
 );
 
@@ -52,7 +60,6 @@ export default function EmployeesPage() {
     Promise.all([
       api.get<Employee[]>(ENDPOINTS.USERS.LIST),
       api.get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST),
-    
     ])
       .then(([users, types]) => {
         setEmployees(users);
@@ -90,7 +97,6 @@ export default function EmployeesPage() {
     return map;
   }, [employees, labTypes]);
 
-  
   const unassigned = useMemo(() => {
     return employees.filter(
       (emp) => !emp.lab_types || emp.lab_types.length === 0
@@ -101,7 +107,13 @@ export default function EmployeesPage() {
     labs: labTypes.length,
     assigned: employees.length - unassigned.length,
     unassigned: unassigned.length - 1,
-    assignedPercent: employees.length > 0 ? Math.round(((employees.length + 1 - unassigned.length) / employees.length) * 100) : 0
+    assignedPercent:
+      employees.length > 0
+        ? Math.round(
+            ((employees.length + 1 - unassigned.length) / employees.length) *
+              100
+          )
+        : 0,
   };
   const handleCreateInGroup = (labTypeId: number) => {
     setCreateDefaultLabType(labTypeId);
@@ -117,11 +129,10 @@ export default function EmployeesPage() {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 lg:p-8">
       <div className="mx-auto max-w-8xl space-y-8">
-        
         {/* Header Section */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
@@ -146,11 +157,10 @@ export default function EmployeesPage() {
                 <span className="hidden sm:inline">Засвар оруулах</span>
               </Button>
             )}
-
           </div>
         </div>
 
-         {/* Loading State */}
+        {/* Loading State */}
         {loading ? (
           <div className="flex h-64 w-full items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white/50">
             <div className="flex flex-col items-center gap-2 text-slate-400">
@@ -162,36 +172,35 @@ export default function EmployeesPage() {
           <div className="space-y-8">
             {/* Stats Row */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard 
-                title="Нийт ажилтан" 
-                value={stats.total} 
-                icon={Users} 
-                colorClass="bg-sky-50 text-sky-500" 
+              <StatCard
+                title="Нийт ажилтан"
+                value={stats.total}
+                icon={Users}
+                colorClass="bg-sky-50 text-sky-500"
               />
-              <StatCard 
-                title="Лаборатори" 
-                value={stats.labs} 
-                icon={FlaskConical} 
-                colorClass="bg-teal-50 text-teal-500" 
+              <StatCard
+                title="Лаборатори"
+                value={stats.labs}
+                icon={FlaskConical}
+                colorClass="bg-teal-50 text-teal-500"
               />
-              <StatCard 
-                title="Хуваарилагдсан" 
-                value={stats.assigned} 
+              <StatCard
+                title="Хуваарилагдсан"
+                value={stats.assigned}
                 subtext={`${stats.assignedPercent}%`}
-                icon={UserCheck} 
-                colorClass="bg-indigo-50 text-indigo-500" 
+                icon={UserCheck}
+                colorClass="bg-indigo-50 text-indigo-500"
               />
-              <StatCard 
-                title="Хуваарилагдаагүй" 
-                value={stats.unassigned} 
-                icon={UserX} 
-                colorClass="bg-slate-100 text-slate-500" 
+              <StatCard
+                title="Хуваарилагдаагүй"
+                value={stats.unassigned}
+                icon={UserX}
+                colorClass="bg-slate-100 text-slate-500"
               />
             </div>
-          
           </div>
         )}
-        
+
         {/* Content Section */}
         {loading ? (
           <div className="flex h-64 w-full items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50">
@@ -209,7 +218,7 @@ export default function EmployeesPage() {
                 employees={grouped.get(lt.id) ?? []}
                 canCreate={canCreate}
                 onCreateClick={() => handleCreateInGroup(lt.id)}
-                              />
+              />
             ))}
 
             {unassigned.length > 0 && (
@@ -217,7 +226,7 @@ export default function EmployeesPage() {
                 labType={{ id: 0, type_name: "Хуваарилагдаагүй", standard: "" }}
                 employees={unassigned}
                 canCreate={false}
-                              />
+              />
             )}
           </div>
         )}

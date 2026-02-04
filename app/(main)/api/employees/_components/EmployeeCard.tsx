@@ -1,8 +1,8 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Employee } from "@/types";
+import { MessageCircleX } from "lucide-react";
 
 export const ROLE_LABELS: Record<string, string> = {
   admin: "Admin",
@@ -59,20 +59,45 @@ export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
   const initials = getInitials(employee.email);
   const displayName = employee.email.split("@")[0].replace(/[._-]/g, " ");
   const roleLabel = ROLE_LABELS[employee.role_name] ?? employee.role_name;
-  
+
   const bgColor = stringToColor(employee.email);
   const textColor = stringToTextColor(employee.email);
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-100 text-sm shadow-sm">
-        <div 
-          className="h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-          style={{ backgroundColor: bgColor, color: textColor }}
-        >
-          {initials}
+      <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white border border-slate-100 text-sm shadow-sm">
+        <div className="relative shrink-0">
+          <div
+            className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold"
+            style={{ backgroundColor: bgColor, color: textColor }}
+          >
+            {initials}
+          </div>
+          <div
+            className={cn(
+              "absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white",
+              employee.is_active ? "bg-emerald-500" : "bg-slate-300"
+            )}
+          />
         </div>
-        <span className="truncate capitalize font-medium text-slate-700">{displayName}</span>
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="truncate capitalize font-medium text-slate-700 text-sm leading-none">
+              {displayName}
+            </span>
+            <span
+              className={cn(
+                "text-[9px] px-1.5 py-0.5 rounded-md font-medium shrink-0",
+                ROLE_COLORS[employee.role_name] || "bg-slate-100 text-slate-600"
+              )}
+            >
+              {roleLabel}
+            </span>
+          </div>
+          <span className="text-[11px] text-slate-400 truncate mt-0.5 font-medium">
+            {employee.email}
+          </span>
+        </div>
       </div>
     );
   }
@@ -84,17 +109,20 @@ export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
     >
       {/* Avatar */}
       <div className="relative shrink-0">
-        <div 
+        <div
           className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold shadow-sm"
           style={{ backgroundColor: bgColor, color: textColor }}
         >
           {initials}
         </div>
         {/* Active Status Dot */}
-        <div className={cn(
-          "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white",
-          employee.is_active ? "bg-emerald-500" : "bg-slate-300"
-        )} />
+        {employee.is_active ? (     <div
+          className={cn(
+            "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white",
+            employee.is_active ? "bg-emerald-500" : "bg-slate-300"
+          )}
+        />) : <MessageCircleX className="absolute -bottom-0.5 -right-0.5 h-3 w-3 text-slate-500" />}
+   
       </div>
 
       {/* Info */}
@@ -104,10 +132,12 @@ export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
             {displayName}
           </span>
           {/* Mobile-friendly role badge */}
-          <span className={cn(
-            "text-[10px] px-1.5 py-0.5 rounded-md font-medium shrink-0",
-            ROLE_COLORS[employee.role_name] || "bg-slate-100 text-slate-600"
-          )}>
+          <span
+            className={cn(
+              "text-[10px] px-1.5 py-0.5 rounded-md font-medium shrink-0",
+              ROLE_COLORS[employee.role_name] || "bg-slate-100 text-slate-600"
+            )}
+          >
             {roleLabel}
           </span>
         </div>
@@ -116,11 +146,6 @@ export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
         </span>
       </div>
 
-      {!employee.is_active && (
-        <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <span className="text-xs font-bold text-slate-500 bg-white px-2 py-1 rounded shadow-sm border">Inactive</span>
-        </div>
-      )}
     </div>
   );
 }

@@ -23,7 +23,7 @@ export function LabTypeGroup({
   onEmployeeEdit,
 }: LabTypeGroupProps) {
   const isEmpty = employees.length === 0;
-
+  console.log(employees, "from lab type group");
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md h-full">
       {/* Card Header */}
@@ -42,10 +42,12 @@ export function LabTypeGroup({
             </p>
           )}
         </div>
-        <Badge 
-          variant="secondary" 
+        <Badge
+          variant="secondary"
           className={`px-2.5 py-0.5 text-xs font-semibold ${
-            isEmpty ? "bg-slate-100 text-slate-500" : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+            isEmpty
+              ? "bg-slate-100 text-slate-500"
+              : "bg-blue-50 text-blue-600 hover:bg-blue-100"
           }`}
         >
           {employees.length}
@@ -66,7 +68,11 @@ export function LabTypeGroup({
         ) : (
           <div className="space-y-1 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
             {employees.map((emp) => (
-              <EmployeeCard key={emp.id} employee={emp} onEdit={onEmployeeEdit} />
+              <EmployeeCard
+                key={emp.id}
+                employee={emp}
+                onEdit={onEmployeeEdit}
+              />
             ))}
           </div>
         )}

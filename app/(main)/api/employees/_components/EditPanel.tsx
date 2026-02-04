@@ -2,14 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import {
-  AlertCircle,
-  X,
-  Mail,
-  Key,
-  Lock,
-  Trash2,
-} from "lucide-react";
+import { AlertCircle, X, Mail, Key, Lock, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -130,16 +123,17 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
   };
 
   const handleDeactivate = async () => {
-    if (!employee) return;
+    if (!employee) return console.log("sonogoson employee id algaa");
     try {
-      await api.delete(ENDPOINTS.USERS.DEACTIVATE(employee.id));
+      const id = employee.id;
+      await api.put(ENDPOINTS.USERS.DEACTIVATE(id));
       onClose();
       onSaved?.();
     } catch (err) {
       logError(err, "Deactivate user");
     }
   };
-
+  console.log(employee?.id," songogdson empoyee id shvv");
   return (
     <AnimatePresence>
       {employee && (
@@ -310,8 +304,8 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
                         Ажилтныг идэвхгүй болгох уу?
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        {employee.email} хэрэглэгчийг идэвхгүй болговол
-                        системд нэвтрэх боломжгүй болно.
+                        {employee.email} хэрэглэгчийг идэвхгүй болговол системд
+                        нэвтрэх боломжгүй болно.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

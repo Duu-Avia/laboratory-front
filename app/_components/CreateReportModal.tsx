@@ -14,7 +14,12 @@ import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
 
 // Types - use @/types instead of relative path
-import type { CreateReportModalProps, Indicator, SampleGroup, SeniorEngineer } from "@/types";
+import type {
+  CreateReportModalProps,
+  Indicator,
+  SampleGroup,
+  SeniorEngineer,
+} from "@/types";
 
 // Lib - use new API client and error handling
 import { api } from "@/lib/api";
@@ -99,7 +104,9 @@ export function CreateReportModal({
 
     // Using api client - auto adds auth headers
     api
-      .get<Indicator[]>(ENDPOINTS.INDICATORS.BY_LAB_TYPE(sampleGroup.lab_type_id))
+      .get<Indicator[]>(
+        ENDPOINTS.INDICATORS.BY_LAB_TYPE(sampleGroup.lab_type_id)
+      )
       .then((indicators) => {
         setSampleGroup((p) => ({
           ...p,
