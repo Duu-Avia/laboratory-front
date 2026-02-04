@@ -20,6 +20,8 @@ import { LabTypeGroup } from "./_components/LabTypeGroup";
 import { CreateEmployeeDialog } from "./_components/CreateEmployeeDialog";
 import { StatCard } from "./_components/Statcard";
 import { Roles } from "@/types/user";
+import * as motion from "motion/react-client";
+import { AnimatePresence } from "motion/react";
 
 const CAN_CREATE_ROLES = ["admin", "senior_engineer", "superadmin"] as const;
 
@@ -160,76 +162,93 @@ export default function EmployeesPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {loading ? (
-          <div className="flex h-64 w-full items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white/50">
-            <div className="flex flex-col items-center gap-2 text-slate-400">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span className="text-sm">Өгөгдөл татаж байна...</span>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Stats Row */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard
-                title="Нийт ажилтан"
-                value={stats.total}
-                icon={Users}
-                colorClass="bg-sky-50 text-sky-500"
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div
+              key="loader"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center justify-center h-[60vh]"
+            >
+              <motion.div
+                animate={{
+                  scale: [1, 2, 2, 1, 1],
+                  rotate: [0, 0, 180, 180, 0],
+                  borderRadius: ["0%", "0%", "50%", "50%", "0%"],
+                }}
+                transition={{
+                  duration: 2,
+                  ease: "easeInOut",
+                  times: [0, 0.2, 0.5, 0.8, 1],
+                  repeat: Infinity,
+                  repeatDelay: 1,
+                }}
+                className="w-12 h-12 bg-[#D1B23F]"
+                style={{ borderRadius: 5 }}
               />
-              <StatCard
-                title="Лаборатори"
-                value={stats.labs}
-                icon={FlaskConical}
-                colorClass="bg-teal-50 text-teal-500"
-              />
-              <StatCard
-                title="Хуваарилагдсан"
-                value={stats.assigned}
-                subtext={`${stats.assignedPercent}%`}
-                icon={UserCheck}
-                colorClass="bg-indigo-50 text-indigo-500"
-              />
-              <StatCard
-                title="Хуваарилагдаагүй"
-                value={stats.unassigned}
-                icon={UserX}
-                colorClass="bg-slate-100 text-slate-500"
-              />
-            </div>
-          </div>
-        )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="content"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              className="space-y-8"
+            >
+              {/* Stats Row */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                  title="Нийт ажилтан"
+                  value={stats.total}
+                  icon={Users}
+                  colorClass="bg-sky-50 text-sky-500"
+                />
+                <StatCard
+                  title="Лаборатори"
+                  value={stats.labs}
+                  icon={FlaskConical}
+                  colorClass="bg-teal-50 text-teal-500"
+                />
+                <StatCard
+                  title="Хуваарилагдсан"
+                  value={stats.assigned}
+                  subtext={`${stats.assignedPercent}%`}
+                  icon={UserCheck}
+                  colorClass="bg-indigo-50 text-indigo-500"
+                />
+                <StatCard
+                  title="Хуваарилагдаагүй"
+                  value={stats.unassigned}
+                  icon={UserX}
+                  colorClass="bg-slate-100 text-slate-500"
+                />
+              </div>
 
-        {/* Content Section */}
-        {loading ? (
-          <div className="flex h-64 w-full items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50">
-            <div className="flex flex-col items-center gap-2 text-slate-400">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span className="text-sm">Өгөгдөл татаж байна...</span>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 items-start">
-            {labTypes.map((lt) => (
-              <LabTypeGroup
-                key={lt.id}
-                labType={lt}
-                employees={grouped.get(lt.id) ?? []}
-                canCreate={canCreate}
-                onCreateClick={() => handleCreateInGroup(lt.id)}
-              />
-            ))}
+              {/* Lab Groups */}
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 items-start">
+                {labTypes.map((lt) => (
+                  <LabTypeGroup
+                    key={lt.id}
+                    labType={lt}
+                    employees={grouped.get(lt.id) ?? []}
+                    canCreate={canCreate}
+                    onCreateClick={() => handleCreateInGroup(lt.id)}
+                  />
+                ))}
 
-            {unassigned.length > 0 && (
-              <LabTypeGroup
-                labType={{ id: 0, type_name: "Хуваарилагдаагүй", standard: "" }}
-                employees={unassigned}
-                canCreate={false}
-              />
-            )}
-          </div>
-        )}
+                {unassigned.length > 0 && (
+                  <LabTypeGroup
+                    labType={{ id: 0, type_name: "Хуваарилагдаагүй", standard: "" }}
+                    employees={unassigned}
+                    canCreate={false}
+                  />
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <CreateEmployeeDialog
           open={createOpen}

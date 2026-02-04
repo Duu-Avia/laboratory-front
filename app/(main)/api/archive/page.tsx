@@ -9,6 +9,9 @@ import { PdfViewModal } from "@/app/_components/PdfViewModal";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
+import * as motion from "motion/react-client";
+import { AnimatePresence } from "motion/react";
+
 
 export default function ArchivePage() {
   const router = useRouter();
@@ -29,6 +32,7 @@ export default function ArchivePage() {
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [pdfReportId, setPdfReportId] = useState<number | null>(null);
   const [pdfReportTitle, setPdfReportTitle] = useState("");
+  const [loading, setLoading] = useState(true);
   const [pdfReportStatus, setPdfReportStatus] = useState<
     ReportRow["status"] | undefined
   >();
@@ -50,6 +54,7 @@ export default function ArchivePage() {
       .get<ReportRow[]>(`${ENDPOINTS.REPORTS.LIST}/archive?mode=${status}`)
       .then((data) => setData(data))
       .catch((err) => logError(err, "Fetch archive reports"));
+      setLoading(false);
   };
 
   useEffect(() => {
@@ -122,7 +127,43 @@ export default function ArchivePage() {
   console.log(data);
   return (
     <div className="p-6 space-y-5">
-      <ArchiveHeader
+            <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="loader"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center justify-center h-[80vh]"
+          >
+            <motion.div
+              animate={{
+                scale: [1, 2, 2, 1, 1],
+                rotate: [0, 0, 180, 180, 0],
+                borderRadius: ["0%", "0%", "50%", "50%", "0%"],
+              }}
+              transition={{
+                duration: 2,
+                ease: "easeInOut",
+                times: [0, 0.2, 0.5, 0.8, 1],
+                repeat: Infinity,
+                repeatDelay: 1,
+              }}
+              className="w-12 h-12 bg-[#D1B23F]"
+              style={{ borderRadius: 5 }}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="space-y-5"
+          >
+       
+ <ArchiveHeader
         from={from}
         to={to}
         search={search}
@@ -139,6 +180,13 @@ export default function ArchivePage() {
 
       <ArchiveReportsTable data={archiveFiltered} onRowClick={handleRowClick} />
 
+
+
+           
+          </motion.div>
+        )}
+      </AnimatePresence>
+     
       <PdfViewModal
         open={pdfModalOpen}
         reportTitle={pdfReportTitle}

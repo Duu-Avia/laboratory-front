@@ -25,6 +25,7 @@ import type {
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
+import { reportValidation } from "@/lib/validators";
 
 const getEmptySampleGroup = (defaultDate: string): SampleGroup => ({
   lab_type_id: null,
@@ -121,7 +122,22 @@ export function CreateReportModal({
   }, [open, sampleGroup.lab_type_id]);
 
   const handleSave = async () => {
-    // Validation - set error state instead of alert()
+    // Validate with zod
+    const result = reportValidation.safeParse({
+      reportTitle,
+      labTypeId: sampleGroup.lab_type_id ?? 0,
+      assignedTo: assignedTo ?? 0,
+      sampleNames: sampleGroup.sample_names,
+      sampled_by: sampleGroup.sampled_by,
+      sample_amount: sampleGroup.sample_amount,
+      indicatorNames: sampleGroup.indicators,
+    });
+
+    if (!result.success) {
+      setError(result.error.issues[0]?.message ?? "Мэдээллээ шалгана уу");
+      return;
+    }
+
     const samples = sampleGroup.sample_names
       .filter((name) => name.trim() !== "")
       .map((name) => ({
@@ -133,21 +149,6 @@ export function CreateReportModal({
         sampled_by: sampleGroup.sampled_by,
         indicators: sampleGroup.indicators,
       }));
-
-    if (samples.length === 0) {
-      setError("Дор хаяж нэг дээж нэмнэ үү");
-      return;
-    }
-
-    if (!sampleGroup.lab_type_id) {
-      setError("Дээжний төрөл сонгоно уу");
-      return;
-    }
-
-    if (!assignedTo) {
-      setError("Хянах инженер сонгоно уу");
-      return;
-    }
 
     const payload = {
       report_title: reportTitle || sampleGroup.location || "",

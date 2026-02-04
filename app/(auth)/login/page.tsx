@@ -2,62 +2,56 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FlaskConical, Loader2 } from "lucide-react";
+import { loginValidation, type LoginForm } from "@/lib/validators";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginValidation),
+    defaultValues: { email: "", password: "" },
+  });
+
+  const onSubmit = async (data: LoginForm) => {
+    setServerError("");
 
     try {
-      console.log("Logging in with:", { email, password });
-
       const res = await fetch("http://localhost:8000/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
 
-      console.log("Response status:", res.status);
-
-      const data = await res.json();
-      console.log("Response data:", data);
+      const json = await res.json();
 
       if (!res.ok) {
-        throw new Error(
-          data.detail || data.message || "Нэвтрэхэд алдаа гарлаа"
+        setServerError(
+          json.detail || json.message || "Нэвтрэхэд алдаа гарлаа"
         );
+        return;
       }
 
-      // Store token in cookie (for middleware) and localStorage (for API calls)
-      // Handle both "access_token" and "token" field names
-      const token = data.access_token || data.token;
+      const token = json.access_token || json.token;
       if (token) {
-        document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+        document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         localStorage.setItem("token", token);
-        console.log("Token saved:", token);
       }
 
-      // Redirect to home page
       router.push("/");
       router.refresh();
-    } catch (err) {
-      console.error("Login error:", err);
-      setError(err instanceof Error ? err.message : "Нэвтрэхэд алдаа гарлаа");
-    } finally {
-      setLoading(false);
+    } catch {
+      setServerError("Нэвтрэхэд алдаа гарлаа");
     }
   };
 
@@ -79,7 +73,7 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <Label
                 htmlFor="email"
@@ -90,12 +84,17 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register("email")}
                 placeholder="Нэвтрэх email"
-                required
-                className="h-11 border-slate-200 dark:border-slate-800 focus:border-blue-300 focus:ring-blue-200"
+                className={`h-11 border-slate-200 dark:border-slate-800 focus:border-blue-300 focus:ring-blue-200 ${
+                  errors.email
+                    ? "border-red-300 focus:border-red-400 focus:ring-red-200"
+                    : ""
+                }`}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -108,26 +107,33 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
                 placeholder="Нууц үг"
-                required
-                className="h-11 border-slate-200 dark:border-slate-800 focus:border-blue-300 focus:ring-blue-200"
+                className={`h-11 border-slate-200 dark:border-slate-800 focus:border-blue-300 focus:ring-blue-200 ${
+                  errors.password
+                    ? "border-red-300 focus:border-red-400 focus:ring-red-200"
+                    : ""
+                }`}
               />
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
-            {error && (
+            {serverError && (
               <div className="rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 p-3 text-sm text-red-600 dark:text-red-400">
-                {error}
+                {serverError}
               </div>
             )}
 
             <Button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
             >
-              {loading ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Нэвтэрч байна...

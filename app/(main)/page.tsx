@@ -20,7 +20,7 @@ import { ReportsTable } from "../_components/ReportsTable";
 import { CreateReportModal } from "../_components/CreateReportModal";
 import { PdfViewModal } from "../_components/PdfViewModal";
 import * as motion from "motion/react-client";
-
+import { AnimatePresence } from "motion/react";
 // Utils
 
 const ADMIN_ROLES = ["superadmin"];
@@ -41,6 +41,7 @@ export default function ReportsPage() {
   // Data
   const [data, setData] = useState<ReportRow[]>([]);
   const [labTypes, setLabTypes] = useState<LabType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Modals
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -59,20 +60,37 @@ export default function ReportsPage() {
     const user = getUser();
     const isAdmin = ADMIN_ROLES.includes(user?.roleName ?? "");
 
-    if (isAdmin) {
-      api
-        .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
-        .then((data) => setLabTypes(data))
-        .catch((err) => logError(err, "Fetch lab types"));
-    } else {
-      api
-        .get<{ lab_types: LabType[] }>(ENDPOINTS.AUTH.ME)
-        .then((data) => setLabTypes(data.lab_types ?? []))
-        .catch((err) => logError(err, "Fetch user lab types"));
-    }
+    const labTypesPromise = isAdmin
+      ? api
+          .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
+          .then((data) => setLabTypes(data))
+          .catch((err) => logError(err, "Fetch lab types"))
+      : api
+          .get<{ lab_types: LabType[] }>(ENDPOINTS.AUTH.ME)
+          .then((data) => setLabTypes(data.lab_types ?? []))
+          .catch((err) => logError(err, "Fetch user lab types"));
+
+    const reportsPromise = api
+      .get<ReportRow[]>(ENDPOINTS.REPORTS.LIST)
+      .then((response) => {
+        if (!Array.isArray(response)) {
+          logError("Expected array from /reports", "Fetch reports");
+          setData([]);
+          return;
+        }
+        setData(response);
+      })
+      .catch((err) => {
+        logError(err, "Fetch reports");
+        setData([]);
+      });
+
+    Promise.all([labTypesPromise, reportsPromise]).finally(() =>
+      setLoading(false)
+    );
   }, [getUser]);
 
-  // Fetch reports
+  // Fetch reports (for refresh after create/approve/etc)
   const fetchReports = () => {
     api
       .get<ReportRow[]>(ENDPOINTS.REPORTS.LIST)
@@ -89,10 +107,6 @@ export default function ReportsPage() {
         setData([]);
       });
   };
-
-  useEffect(() => {
-    fetchReports();
-  }, []);
 
   // Filter data
   const filtered = data.filter((r) => {
@@ -157,23 +171,68 @@ export default function ReportsPage() {
 
   return (
     <div className="p-4 space-y-5">
-      <FilterBar
-        from={from}
-        to={to}
-        search={search}
-        selectedLabType={selectedLabType}
-        status={status}
-        labTypes={labTypes}
-        onFromChange={setFrom}
-        onToChange={setTo}
-        onSearchChange={setSearch}
-        onLabTypeChange={setSelectedLabType}
-        onStatusChange={setStatus}
-        onCreateClick={() => setCreateModalOpen(true)}
-        onExportClick={handleExcelConvert}
-      />
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="loader"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center justify-center h-[80vh]"
+          >
+            <motion.div
+              animate={{
+                scale: [1, 2, 2, 1, 1],
+                rotate: [0, 0, 180, 180, 0],
+                borderRadius: ["0%", "0%", "50%", "50%", "0%"],
+              }}
+              transition={{
+                duration: 2,
+                ease: "easeInOut",
+                times: [0, 0.2, 0.5, 0.8, 1],
+                repeat: Infinity,
+                repeatDelay: 1,
+              }}
+              className="w-12 h-12 bg-[#D1B23F]"
+              style={{ borderRadius: 5 }}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="space-y-5"
+          >
+            <FilterBar
+              from={from}
+              to={to}
+              search={search}
+              selectedLabType={selectedLabType}
+              status={status}
+              labTypes={labTypes}
+              onFromChange={setFrom}
+              onToChange={setTo}
+              onSearchChange={setSearch}
+              onLabTypeChange={setSelectedLabType}
+              onStatusChange={setStatus}
+              onCreateClick={() => setCreateModalOpen(true)}
+              onExportClick={handleExcelConvert}
+            />
 
-      <ReportsTable data={filtered} onRowClick={handleRowClick} />
+            <ReportsTable data={filtered} onRowClick={handleRowClick} />
+
+            <div className="text-sm font-bold text-muted-foreground text-right pr-6">
+              <span>
+                Нийт илэрц:{" "}
+                {filtered.filter((item) => item.status !== "deleted").length}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <CreateReportModal
         open={createModalOpen}
@@ -194,13 +253,6 @@ export default function ReportsPage() {
         onApproved={fetchReports}
         labTypes={labTypes}
       />
-
-      <div className="text-sm font-bold text-muted-foreground text-right pr-6">
-        <span>
-          Нийт илэрц:{" "}
-          {filtered.filter((item) => item.status !== "deleted").length}
-        </span>
-      </div>
     </div>
   );
 }
