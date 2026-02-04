@@ -34,3 +34,9 @@ export type Employee = {
   created_at: string;
   lab_types: LabType[];
 };
+
+export type Roles = {
+  id:number,
+  role_name:string,
+  description:string
+}

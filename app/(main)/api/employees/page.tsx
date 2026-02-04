@@ -12,6 +12,7 @@ import type { Employee, LabType } from "@/types";
 import { LabTypeGroup } from "./_components/LabTypeGroup";
 import { CreateEmployeeDialog } from "./_components/CreateEmployeeDialog";
 import { StatCard } from "./_components/Statcard";
+import { Roles } from "@/types/user";
 
 const CAN_CREATE_ROLES = ["admin", "senior_engineer", "superadmin"] as const;
 
@@ -25,7 +26,7 @@ export default function EmployeesPage() {
 
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<TokenPayload | null>(null);
-  const [roleId, setRoleId] = useState<number | null>(null);
+  const [roleId, setRoleId] = useState<Roles[]>([]);
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [labTypes, setLabTypes] = useState<LabType[]>([]);
@@ -64,8 +65,8 @@ export default function EmployeesPage() {
   };
   const fetchRoleId = async () => {
     try {
-      const data = await api.get(ENDPOINTS.USERS.ROLES);
-      console.log(data)
+      const data = await api.get<Roles[]>(ENDPOINTS.USERS.ROLES);
+      setRoleId(data);
     } catch (err) {
       logError(err, "Fetch user role");
     }
@@ -106,7 +107,6 @@ export default function EmployeesPage() {
     setCreateDefaultLabType(labTypeId);
     setCreateOpen(true);
   };
-
   if (!mounted) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50/50">
@@ -117,7 +117,7 @@ export default function EmployeesPage() {
       </div>
     );
   }
-  console.log(roleId)
+  
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 lg:p-8">
       <div className="mx-auto max-w-8xl space-y-8">
@@ -226,6 +226,7 @@ export default function EmployeesPage() {
           open={createOpen}
           onOpenChange={setCreateOpen}
           labTypes={labTypes}
+          roles={roleId}
           defaultLabTypeId={createDefaultLabType}
           isSuperAdmin={isSuperAdmin}
           onCreated={fetchData}

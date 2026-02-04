@@ -24,17 +24,12 @@ import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
 import type { LabType } from "@/types";
-
-const ROLE_OPTIONS = [
-  { value: "engineer", label: "Инженер" },
-  { value: "senior_engineer", label: "Ахлах инженер" },
-  { value: "admin", label: "Админ" },
-  { value: "superadmin", label: "Супер админ" },
-];
+import { Roles } from "@/types/user";
 
 interface CreateEmployeeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  roles: Roles[];
   labTypes: LabType[];
   defaultLabTypeId?: number;
   isSuperAdmin?: boolean;
@@ -44,6 +39,7 @@ interface CreateEmployeeDialogProps {
 export function CreateEmployeeDialog({
   open,
   onOpenChange,
+  roles,
   labTypes,
   defaultLabTypeId,
   isSuperAdmin,
@@ -52,17 +48,16 @@ export function CreateEmployeeDialog({
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
-  const [roleName, setRoleName] = useState("engineer");
+  const [roleId, setRoleId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const labTypeName = labTypes.find((lt) => lt.id === defaultLabTypeId)?.type_name;
-
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
       setEmail("");
       setPassword("");
-      setRoleName("engineer");
+      setRoleId(null);
       setError(null);
     }
     onOpenChange(isOpen);
@@ -86,14 +81,14 @@ export function CreateEmployeeDialog({
       setError(null);
       setSaving(true);
 
-      const roles =  await api.get(ENDPOINTS.USERS.ROLES)
-      .then((data)=> setRoleName(""))
+      const engineerRole = roles.find((r) => r.role_name === "engineer");
+      const selectedRoleId = isSuperAdmin && roleId ? roleId : engineerRole?.id;
 
       const created = await api.post<{ id: number }>(ENDPOINTS.USERS.CREATE, {
         email: email.trim(),
         full_name: fullName.trim(),
         password,
-        role_name: isSuperAdmin ? roleName : "engineer",
+        role_id: selectedRoleId,
         lab_type_ids: [defaultLabTypeId],
       });
 
@@ -180,18 +175,22 @@ export function CreateEmployeeDialog({
               <Label className="text-slate-700 font-medium">Эрх</Label>
               <div className="relative">
                 <Key className="absolute left-3 top-3 h-3.5 w-3.5 text-slate-400 z-10" />
-                <Select value={roleName} onValueChange={setRoleName}>
+                <Select
+                  value={roleId?.toString() ?? ""}
+                  onValueChange={(val) => setRoleId(Number(val))}
+                >
                   <SelectTrigger className="pl-8 bg-slate-50 border-slate-200">
-                    <SelectValue />
+                    <SelectValue placeholder="Эрх сонгоно уу" />
                   </SelectTrigger>
                   <SelectContent>
-                    {ROLE_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
+                    {roles.map((role) => (
+                      <SelectItem key={role.id} value={role.id.toString()}>
+                        {role.role_name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              
               </div>
             </div>
           )}
