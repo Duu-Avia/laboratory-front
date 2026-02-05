@@ -44,3 +44,20 @@ export const reportValidation = z.object({
     }),
 });
 export type ReportForm = z.infer<typeof reportValidation>;
+
+// ─── Lab Type ─────────────────────────────────────────────
+export const labTypeValidation = z.object({
+  type_name: z
+    .string()
+    .trim()
+    .min(1, "Төрлийн нэр оруулна уу")
+    .min(2, "Төрлийн нэр хамгийн багадаа 2 тэмдэгт байх ёстой")
+    .max(100, "Төрлийн нэр хэтэрхий урт байна"),
+  standard: z
+    .string()
+    .trim()
+    .min(1, "Стандарт оруулна уу")
+    .min(2, "Стандарт хамгийн багадаа 2 тэмдэгт байх ёстой")
+    .max(200, "Стандарт хэтэрхий урт байна"),
+});
+export type LabTypeForm = z.infer<typeof labTypeValidation>;

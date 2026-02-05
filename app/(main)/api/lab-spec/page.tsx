@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -23,13 +25,35 @@ import {
 import { Plus, Search, FlaskConical, Beaker, Sparkles } from "lucide-react";
 
 import { FilterPill } from "./_components/FilterPill";
-import { IndicatorCard } from "./_components/IndicatorCard";
+import { GroupedIndicatorsSection } from "./_components/GroupedLabTypeCard";
+import { CreateLabTypeDialog } from "./_components/CreateLabTypeDialog";
+import { EditLabTypeDialog } from "./_components/EditLabTypeDialog";
+import { DeleteLabTypeDialog } from "./_components/DeleteLabTypeDialog";
+import { ReactivateLabTypeDialog } from "./_components/ReactivateLabTypeDialog";
 import { IndicatorRowForLabSpec, NewIndicatorDraft, LabType } from "@/types";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
 
+const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
+
 export default function LabPage() {
+  const router = useRouter();
+  const { getUser } = useAuth();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  // Role-based access control
+  useEffect(() => {
+    const user = getUser();
+    const userRole = user?.roleName ?? "";
+
+    if (!ELEVATED_ROLES.includes(userRole)) {
+      router.push("/");
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [getUser, router]);
+
   // data (UI only, you will fetch)
   const [labTypes, setLabTypes] = useState<LabType[]>([]);
   const [indicators, setIndicators] = useState<IndicatorRowForLabSpec[]>([]);
@@ -38,7 +62,7 @@ export default function LabPage() {
   const [selectedType, setSelectedType] = useState<string>("all");
   const [search, setSearch] = useState("");
 
-  // modal
+  // indicator modal
   const [openCreate, setOpenCreate] = useState(false);
   const [draft, setDraft] = useState<NewIndicatorDraft>({
     lab_type_id: null,
@@ -49,11 +73,25 @@ export default function LabPage() {
     is_default: false,
   });
 
-  useEffect(() => {
+  // lab type modals
+  const [createLabTypeOpen, setCreateLabTypeOpen] = useState(false);
+  const [editLabTypeOpen, setEditLabTypeOpen] = useState(false);
+  const [deleteLabTypeOpen, setDeleteLabTypeOpen] = useState(false);
+  const [reactivateLabTypeOpen, setReactivateLabTypeOpen] = useState(false);
+  const [selectedLabType, setSelectedLabType] = useState<LabType | null>(null);
+
+  const fetchLabTypes = () => {
     api
       .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
-      .then((data) => setLabTypes(data))
+      .then((data) => {
+        // Show all lab types (active and inactive)
+        setLabTypes(data);
+      })
       .catch((err) => logError(err, "Fetch lab types"));
+  };
+
+  useEffect(() => {
+    fetchLabTypes();
   }, []);
 
   useEffect(() => {
@@ -64,9 +102,16 @@ export default function LabPage() {
   }, []);
 
   const typeButtons = useMemo(() => {
+    // Only show active lab types in filter pills
+    const activeLabTypes = labTypes.filter(
+      (t) => t.is_active === 1 || t.is_active === true || t.is_active === undefined
+    );
     return [
       { key: "all", label: "Бүгд" },
-      ...labTypes.map((t) => ({ key: String(t.id), label: t.type_name })),
+      ...activeLabTypes.map((t) => ({
+        key: String(t.id),
+        label: t.type_name,
+      })),
     ];
   }, [labTypes]);
 
@@ -128,21 +173,16 @@ export default function LabPage() {
     setOpenCreate(false);
   }
 
-  function typeName(typeId: number) {
-    return (
-      labTypes.find((t) => t.id === typeId)?.type_name ?? `Type #${typeId}`
-    );
-  }
-
-  function typeStandard(typeId: number) {
-    return labTypes.find((t) => t.id === typeId)?.standard ?? "";
+  // Don't render content until authorization check completes
+  if (!isAuthorized) {
+    return null;
   }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Hero Header */}
       <div className="border-b border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-2 py-10">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-4">
@@ -160,20 +200,31 @@ export default function LabPage() {
               </div>
             </div>
 
-            <Button
-              onClick={openCreateModal}
-              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
-              size="lg"
-            >
-              <Plus className="h-4 w-4" />
-              Шинэ шинжилгээ
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setCreateLabTypeOpen(true)}
+                variant="outline"
+                className="gap-2 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                size="lg"
+              >
+                <Plus className="h-4 w-4" />
+                Лаб төрөл нэмэх
+              </Button>
+              <Button
+                onClick={openCreateModal}
+                className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
+                size="lg"
+              >
+                <Plus className="h-4 w-4" />
+                Шинэ шинжилгээ
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-7xl px-2 py-8 space-y-6">
         {/* Filters Card */}
         <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 p-6 space-y-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -228,30 +279,24 @@ export default function LabPage() {
         </div>
 
         {/* Grouped Indicator Cards */}
-        <div className="space-y-5">
-          {Array.from(grouped.entries())
-            .sort((a, b) => a[0] - b[0])
-            .map(([typeId, items]) => (
-              <IndicatorCard
-                key={typeId}
-                typeName={typeName(typeId)}
-                standard={typeStandard(typeId)}
-                items={items}
-              />
-            ))}
-
-          {filteredIndicators.length === 0 && (
-            <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl py-20 text-center">
-              <FlaskConical className="mx-auto h-16 w-16 text-slate-300 dark:text-slate-700 mb-6" />
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                Шинжилгээ олдсонгүй
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Өөр хайлтын утга оруулж үзнэ үү
-              </p>
-            </div>
-          )}
-        </div>
+        <GroupedIndicatorsSection
+          grouped={grouped}
+          labTypes={labTypes}
+          filteredIndicatorsCount={filteredIndicators.length}
+          selectedFilter={selectedType}
+          onReactivateClick={(labType) => {
+            setSelectedLabType(labType);
+            setReactivateLabTypeOpen(true);
+          }}
+          onEditClick={(labType) => {
+            setSelectedLabType(labType);
+            setEditLabTypeOpen(true);
+          }}
+          onDeleteClick={(labType) => {
+            setSelectedLabType(labType);
+            setDeleteLabTypeOpen(true);
+          }}
+        />
       </div>
 
       {/* Create Indicator Modal */}
@@ -283,11 +328,13 @@ export default function LabPage() {
                   <SelectValue placeholder="Төрөл сонгох" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                  {labTypes.map((t) => (
-                    <SelectItem key={t.id} value={String(t.id)}>
-                      {t.type_name}
-                    </SelectItem>
-                  ))}
+                  {labTypes
+                    .filter((t) => t.is_active === 1 || t.is_active === true || t.is_active === undefined)
+                    .map((t) => (
+                      <SelectItem key={t.id} value={String(t.id)}>
+                        {t.type_name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
@@ -405,6 +452,39 @@ export default function LabPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Lab Type Dialogs */}
+      <CreateLabTypeDialog
+        open={createLabTypeOpen}
+        onOpenChange={setCreateLabTypeOpen}
+        onCreated={fetchLabTypes}
+      />
+
+      <EditLabTypeDialog
+        open={editLabTypeOpen}
+        onOpenChange={setEditLabTypeOpen}
+        labType={selectedLabType}
+        onUpdated={fetchLabTypes}
+      />
+
+      <DeleteLabTypeDialog
+        open={deleteLabTypeOpen}
+        onOpenChange={setDeleteLabTypeOpen}
+        labType={selectedLabType}
+        indicatorCount={
+          selectedLabType
+            ? indicators.filter((i) => i.lab_type_id === selectedLabType.id).length
+            : 0
+        }
+        onDeleted={fetchLabTypes}
+      />
+
+      <ReactivateLabTypeDialog
+        open={reactivateLabTypeOpen}
+        onOpenChange={setReactivateLabTypeOpen}
+        labType={selectedLabType}
+        onReactivated={fetchLabTypes}
+      />
     </div>
   );
 }

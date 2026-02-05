@@ -8,6 +8,7 @@ export type LabType = {
   id: number;
   type_name: string;
   standard: string;
+  is_active?: boolean | number; // Backend uses 0/1, frontend may use boolean
 };
 
 export type SampleIndicatorItem = {

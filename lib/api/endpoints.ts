@@ -30,6 +30,11 @@ export const ENDPOINTS = {
   // Lab Types
   LAB_TYPES: {
     LIST: "/lab-types",
+    CREATE: "/lab-types",
+    DETAIL: (id: number) => `/lab-types/${id}`,
+    UPDATE: (id: number) => `/lab-types/${id}`,
+    DEACTIVATE: (id: number) => `/lab-types/${id}/deactivate`,
+    REACTIVATE: (id: number) => `/lab-types/${id}/reactivate`,
   },
 
   // Indicators
