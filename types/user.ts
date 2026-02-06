@@ -32,6 +32,8 @@ export type Employee = {
   role_name: string;
   is_active: boolean;
   created_at: string;
+  position_name:string;
+  full_name: string;
   lab_types: LabType[];
 };
 

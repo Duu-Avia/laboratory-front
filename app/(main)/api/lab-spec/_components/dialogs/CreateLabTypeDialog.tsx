@@ -105,7 +105,7 @@ export function CreateLabTypeDialog({
               <Input
                 id="type_name"
                 {...register("type_name")}
-                placeholder="Усны дээж, Агаарын дээж гэх мэт"
+                placeholder="Усны Сорьц, Агаарын Сорьц гэх мэт"
                 className={`pl-10 bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 ${
                   errors.type_name ? "border-red-300 focus:border-red-400" : ""
                 }`}

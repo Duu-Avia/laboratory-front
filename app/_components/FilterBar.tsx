@@ -8,7 +8,7 @@ import { FilterBarProps, StatusFilter } from "@/types";
 const statusOptions: { key: StatusFilter; label: string }[] = [
   { key: "all", label: "Бүгд" },
   { key: "signed", label: "Шалгагдаж байна" },
-  { key: "pending_samples", label: "Дээж хүлээгдэж байна" },
+  { key: "pending_samples", label: "Сорьц хүлээгдэж байна" },
   { key: "tested", label: "Шинжилгээ хийгдсэн" },
 ];
 
@@ -68,7 +68,7 @@ export function FilterBar({
           Экселрүү хөрвүүлэх
         </Button>
 
-        <Button onClick={onCreateClick}>+ Дээж шинээр оруулах</Button>
+        <Button onClick={onCreateClick}>+ Сорьц шинээр оруулах</Button>
       </div>
 
       <div className="flex justify-between">

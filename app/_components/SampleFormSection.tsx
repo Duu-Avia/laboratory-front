@@ -148,7 +148,7 @@ export function SampleFormSection({
       <div className="grid grid-cols-3 gap-3">
         {/* Sample Type */}
         <div className="space-y-2">
-          <Label>Дээжний төрөл</Label>
+          <Label>Сорьцын төрөл</Label>
           <Select
             value={
               sampleGroup.lab_type_id
@@ -182,7 +182,7 @@ export function SampleFormSection({
               <SelectValue
                 placeholder={
                   !sampleGroup.lab_type_id
-                    ? "Эхлээд дээжний төрөл сонгоно уу"
+                    ? "Эхлээд Сорьцын төрөл сонгоно уу"
                     : locationPackages.length === 0
                       ? "Байршил байхгүй"
                       : "Байршил сонгох"
@@ -202,14 +202,14 @@ export function SampleFormSection({
         {/* Sample Names */}
         <div className="space-y-2 col-span-3">
           <div className="flex items-center justify-between">
-            <Label>Дээжний нэр</Label>
+            <Label>Сорьцын нэр</Label>
             <Button
               variant="ghost"
               size="sm"
               onClick={addSampleName}
               type="button"
             >
-              + Дээж нэмэх
+              + Сорьц нэмэх
             </Button>
           </div>
 
@@ -219,7 +219,7 @@ export function SampleFormSection({
                 <Input
                   value={name}
                   onChange={(e) => updateSampleName(idx, e.target.value)}
-                  placeholder={`Дээж ${idx + 1}`}
+                  placeholder={`Сорьц ${idx + 1}`}
                 />
                 {sampleGroup.sample_names.length > 1 && (
                   <Button
@@ -238,7 +238,7 @@ export function SampleFormSection({
 
         {/* Location (auto-filled from package, but editable) */}
         <div className="space-y-2 col-span-2">
-          <Label>Дээж авсан байршил</Label>
+          <Label>Сорьц авсан байршил</Label>
           <Input
             value={sampleGroup.location}
             onChange={(e) => onFieldChange("location", e.target.value)}
@@ -258,7 +258,7 @@ export function SampleFormSection({
 
         {/* Sample Date */}
         <div className="space-y-2">
-          <Label>Дээж авсан огноо</Label>
+          <Label>Сорьц авсан огноо</Label>
           <Input
             type="date"
             value={sampleGroup.sample_date}
@@ -268,7 +268,7 @@ export function SampleFormSection({
 
         {/* Sampled By */}
         <div className="space-y-2 col-span-2">
-          <Label>Дээж өгсөн хүний нэр</Label>
+          <Label>Сорьц өгсөн хүний нэр</Label>
           <Input
             value={sampleGroup.sampled_by}
             onChange={(e) => onFieldChange("sampled_by", e.target.value)}
@@ -316,7 +316,7 @@ export function SampleFormSection({
         <div className="text-xs text-muted-foreground">
           {sampleGroup.lab_type_id
             ? "Санал болгох шинжилгээнүүд"
-            : "Дээжний төрлөө эхлээд сонгоно уу"}
+            : "Сорьцын төрлөө эхлээд сонгоно уу"}
         </div>
       </div>
 

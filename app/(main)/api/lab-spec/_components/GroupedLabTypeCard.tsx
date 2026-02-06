@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { IndicatorRowForLabSpec, LabType } from "@/types";
-import { IndicatorCard } from "./IndicatorCard";
+import { ActiveLabTypeCard, InactiveLabTypeCard } from "./LabTypeCard";
 import { FlaskConical, ChevronDown, ChevronUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -33,13 +33,11 @@ export function GroupedIndicatorsSection({
   // - If specific filter: only show lab types that have indicators (respect the filter)
   const activeLabTypes = labTypes
     .filter((lt) => lt.is_active === 1 || lt.is_active === true || lt.is_active === undefined)
-    .filter((lt) => selectedFilter === "all" || grouped.has(lt.id))
-    .sort((a, b) => a.id - b.id);
+    .filter((lt) => selectedFilter === "all" || grouped.has(lt.id));
 
   // Inactive lab types: show ALL inactive lab types regardless of filter
   const inactiveLabTypes = labTypes
-    .filter((lt) => lt.is_active === 0 || lt.is_active === false)
-    .sort((a, b) => a.id - b.id);
+    .filter((lt) => lt.is_active === 0 || lt.is_active === false);
 
   return (
     <div className="space-y-5">
@@ -47,12 +45,11 @@ export function GroupedIndicatorsSection({
       {activeLabTypes.map((labType) => {
         const items = grouped.get(labType.id) || [];
         return (
-          <IndicatorCard
+          <ActiveLabTypeCard
             key={labType.id}
             typeName={labType.type_name}
             standard={labType.standard}
             items={items}
-            isActive={true}
             onEdit={() => onEditClick?.(labType)}
             onDelete={() => onDeleteClick?.(labType)}
           />
@@ -96,13 +93,11 @@ export function GroupedIndicatorsSection({
               {inactiveLabTypes.map((labType) => {
                 const items = grouped.get(labType.id) || [];
                 return (
-                  <IndicatorCard
+                  <InactiveLabTypeCard
                     key={labType.id}
                     typeName={labType.type_name}
                     standard={labType.standard}
                     items={items}
-                    isActive={false}
-                    compact={true}
                     onReactivate={() => onReactivateClick?.(labType)}
                   />
                 );

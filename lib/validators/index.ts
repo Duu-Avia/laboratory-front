@@ -26,21 +26,22 @@ export const employeeValidation = z.object({
   password: rules.password,
   fullName: z.string().trim().min(4, "Дууддаг хочоо оруулааач???"),
   roleId: z.number().min(1, "Шинэ хэрэглэгчийн эрхээ сонгоно уу"),
+  position_name: z.string().trim().min(1, "Албан тушаал оруулна уу"),
 });
 export type EmployeeForm = z.infer<typeof employeeValidation>;
 
 // ─── Report ───────────────────────────────────────────────────
 export const reportValidation = z.object({
   reportTitle: z.string().optional(),
-  labTypeId: rules.requiredNumber("Дээжний төрөл сонгоно уу"),
+  labTypeId: rules.requiredNumber("Сорьцын төрөл сонгоно уу"),
   assignedTo: rules.requiredNumber("Хянах инженер сонгоно уу"),
-  sampled_by: rules.requiredString("Дээж авчирсан хүний нэр оруулна уу"),
-  sample_amount:rules.requiredString("Дээжний хэмжээ оруулна уу"),
+  sampled_by: rules.requiredString("Сорьц авчирсан хүний нэр оруулна уу"),
+  sample_amount:rules.requiredString("Сорьцын хэмжээ оруулна уу"),
   indicatorNames:z.array(z.number()).min(1, "Дор хаяж нэг үзүүлэлт сонгоно уу"),
   sampleNames: z
     .array(z.string())
     .refine((names) => names.some((n) => n.trim() !== ""), {
-      message: "Дор хаяж нэг дээж нэмнэ үү",
+      message: "Дор хаяж нэг Сорьц нэмнэ үү",
     }),
 });
 export type ReportForm = z.infer<typeof reportValidation>;
@@ -61,3 +62,27 @@ export const labTypeValidation = z.object({
     .max(200, "Стандарт хэтэрхий урт байна"),
 });
 export type LabTypeForm = z.infer<typeof labTypeValidation>;
+
+// ─── Location Package ─────────────────────────────────────────
+export const locationPackageValidation = z.object({
+  package_name: z
+    .string()
+    .trim()
+    .min(1, "Багцын нэр оруулна уу")
+    .min(2, "Багцын нэр хамгийн багадаа 2 тэмдэгт байх ёстой")
+    .max(100, "Багцын нэр хэтэрхий урт байна"),
+  lab_type_id: z.number().min(1, "Сорьцын төрөл сонгоно уу"),
+});
+export type LocationPackageForm = z.infer<typeof locationPackageValidation>;
+
+// ─── Location Sample ──────────────────────────────────────────
+export const locationSampleValidation = z.object({
+  location_name: z
+    .string()
+    .trim()
+    .min(1, "Байршлын нэр оруулна уу")
+    .min(2, "Байршлын нэр хамгийн багадаа 2 тэмдэгт байх ёстой")
+    .max(100, "Байршлын нэр хэтэрхий урт байна"),
+  sort_order: z.number().min(0, "Дараалал 0-ээс их байх ёстой"),
+});
+export type LocationSampleForm = z.infer<typeof locationSampleValidation>;

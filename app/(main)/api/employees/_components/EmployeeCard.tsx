@@ -57,8 +57,8 @@ interface EmployeeCardProps {
 
 export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
   const initials = getInitials(employee.email);
-  const displayName = employee.email.split("@")[0].replace(/[._-]/g, " ");
-  const roleLabel = ROLE_LABELS[employee.role_name] ?? employee.role_name;
+  const displayName = employee.full_name 
+  const roleLabel = ROLE_LABELS[employee.position_name] ?? employee.position_name
 
   const bgColor = stringToColor(employee.email);
   const textColor = stringToTextColor(employee.email);

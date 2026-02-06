@@ -19,8 +19,8 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
           <TableRow>
             <TableHead>Он сар</TableHead>
             <TableHead>№</TableHead>
-            <TableHead>Дээжны нэр</TableHead>
-            <TableHead>Оруулсан дээжүүд</TableHead>
+            <TableHead>Сорьцны нэр</TableHead>
+            <TableHead>Оруулсан Сорьцүүд</TableHead>
             <TableHead>Сонгогдсон/Ши</TableHead>
             <TableHead>Төлөв</TableHead>
           </TableRow>

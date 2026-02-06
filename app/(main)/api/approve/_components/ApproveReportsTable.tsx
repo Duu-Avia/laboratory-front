@@ -53,13 +53,13 @@ export function ApproveReportsTable({ data, onRowClick }: ReportsTableProps) {
             <TableHead className="py-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <FileText className="w-3.5 h-3.5" />
-                Дээжны нэр
+                Сорьцны нэр
               </div>
             </TableHead>
             <TableHead className="py-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <FlaskConical className="w-3.5 h-3.5" />
-                Оруулсан дээжүүд
+                Оруулсан Сорьцүүд
               </div>
             </TableHead>
             <TableHead className="py-4">

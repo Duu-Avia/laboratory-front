@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { Mail, Lock, Key, UserPen } from "lucide-react";
+import { Mail, Lock, Key, UserPen, Briefcase } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -62,7 +62,7 @@ export function CreateEmployeeDialog({
     formState: { errors, isSubmitting },
   } = useForm<EmployeeForm>({
     resolver: zodResolver(employeeValidation),
-    defaultValues: { email: "", password: "", fullName: "", roleId: 0 },
+    defaultValues: { email: "", password: "", fullName: "", roleId: 0, position_name: "" },
   });
 
   const roleId = watch("roleId");
@@ -97,6 +97,7 @@ export function CreateEmployeeDialog({
         full_name: data.fullName?.trim() ?? "",
         password: data.password,
         role_id: selectedRoleId,
+        position_name: data.position_name,
         lab_type_ids: [defaultLabTypeId],
       });
 
@@ -186,6 +187,26 @@ export function CreateEmployeeDialog({
               {errors.fullName && (
                 <p className="text-sm text-red-500">
                   {errors.fullName.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-slate-700 font-medium">Албан тушаал</Label>
+              <div className="relative">
+                <Briefcase className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Input
+                  type="text"
+                  className={`pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-colors ${
+                    errors.position_name ? "border-red-300 focus:border-red-400" : ""
+                  }`}
+                  {...register("position_name")}
+                  placeholder="Жишээ: Инженер, Лабораторийн эрхлэгч"
+                />
+              </div>
+              {errors.position_name && (
+                <p className="text-sm text-red-500">
+                  {errors.position_name.message}
                 </p>
               )}
             </div>
