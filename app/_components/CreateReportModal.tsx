@@ -71,11 +71,16 @@ export function CreateReportModal({
       setReportTitle("");
       setReportTitleTouched(false);
       setError(null);
-      setSampleGroup(getEmptySampleGroup(to));
+      // Auto-set lab type if user has only one
+      const autoLabTypeId = labTypes.length === 1 ? labTypes[0].id : null;
+      setSampleGroup({
+        ...getEmptySampleGroup(to),
+        lab_type_id: autoLabTypeId,
+      });
       setSeniors([]);
       setAssignedTo(null);
     }
-  }, [open, to]);
+  }, [open, to, labTypes]);
 
   // Update report title when location changes
   useEffect(() => {
@@ -229,16 +234,7 @@ export function CreateReportModal({
             transition={{ duration: 0.3, delay: 0.05 }}
             className="space-y-2"
           >
-            <Label className="text-sm font-medium">Тайлангийн нэр</Label>
-            <Input
-              value={reportTitle}
-              onChange={(e) => {
-                setReportTitleTouched(true);
-                setReportTitle(e.target.value);
-              }}
-              placeholder="Нэгдсэн төв ус гэх мэт..."
-              className="h-11 bg-modal-section-bg border-modal-section-border focus:border-modal-accent focus:ring-modal-accent/20 transition-all duration-200"
-            />
+            
           </motion.div>
 
           {/* Sample Form Section */}

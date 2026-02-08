@@ -17,9 +17,9 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Он сар</TableHead>
             <TableHead>№</TableHead>
-            <TableHead>Сорьцны нэр</TableHead>
+            <TableHead>Он сар</TableHead>
+            <TableHead>Дугаар</TableHead>
             <TableHead>Оруулсан Сорьцүүд</TableHead>
             <TableHead>Сонгогдсон/Ши</TableHead>
             <TableHead>Төлөв</TableHead>
@@ -32,11 +32,12 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
               className="hover:bg-muted/50 cursor-pointer"
               onClick={() => onRowClick(dataItem)}
             >
+
+              <TableCell className="text-gray-500 text-[11px]">{index + 1}</TableCell>
               <TableCell>{dataItem.created_at.slice(0, 10)}</TableCell>
-              <TableCell>{index + 1}</TableCell>
               <TableCell>
                 <button className="dark:text-sky-400 font-semibold hover:underline text-left">
-                  {dataItem.report_title}
+                  {dataItem.id}
                 </button>
               </TableCell>
               <TableCell className="max-w-[420px]">

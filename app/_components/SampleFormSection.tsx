@@ -191,25 +191,34 @@ export function SampleFormSection({
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Сорьцын төрөл
             </Label>
-            <Select
-              value={
-                sampleGroup.lab_type_id
-                  ? String(sampleGroup.lab_type_id)
-                  : undefined
-              }
-              onValueChange={(v) => onTypeChange(Number(v))}
-            >
-              <SelectTrigger className={selectTriggerClasses}>
-                <SelectValue placeholder="Сонгох" />
-              </SelectTrigger>
-              <SelectContent>
-                {labTypes.map((t) => (
-                  <SelectItem key={t.id} value={String(t.id)}>
-                    {t.type_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {labTypes.length > 1 ? (
+              <Select
+                value={
+                  sampleGroup.lab_type_id
+                    ? String(sampleGroup.lab_type_id)
+                    : undefined
+                }
+                onValueChange={(v) => onTypeChange(Number(v))}
+              >
+                <SelectTrigger className={selectTriggerClasses}>
+                  <SelectValue placeholder="Сонгох" />
+                </SelectTrigger>
+                <SelectContent>
+                  {labTypes.map((t) => (
+                    <SelectItem key={t.id} value={String(t.id)}>
+                      {t.type_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                value={labTypes[0]?.type_name || ""}
+                readOnly
+                tabIndex={-1}
+                className={inputClasses + " bg-muted cursor-not-allowed !text-gray-900 dark:!text-gray-100 font-semibold"}
+              />
+            )}
           </div>
 
           {/* Location Package */}
