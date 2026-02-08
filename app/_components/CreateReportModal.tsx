@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SampleFormSection } from "./SampleFormSection";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, AlertCircle, Loader2, Save, X } from "lucide-react";
 
 // Types - use @/types instead of relative path
 import type {
@@ -103,7 +105,6 @@ export function CreateReportModal({
   useEffect(() => {
     if (!open || !sampleGroup.lab_type_id) return;
 
-    // Using api client - auto adds auth headers
     api
       .get<Indicator[]>(
         ENDPOINTS.INDICATORS.BY_LAB_TYPE(sampleGroup.lab_type_id)
@@ -161,17 +162,14 @@ export function CreateReportModal({
     };
 
     try {
-      setError(null); // Clear previous errors
+      setError(null);
       setSaving(true);
-
-      // Using api client - auto adds auth headers
       await api.post(ENDPOINTS.REPORTS.CREATE, payload);
-
       onCreated?.();
       onOpenChange(false);
     } catch (err) {
       logError(err, "Create report");
-      setError(getErrorMessage(err)); // Show user-friendly error
+      setError(getErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -179,21 +177,59 @@ export function CreateReportModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl">
-        <DialogHeader>
-          <DialogTitle>Шинэ хүсэлт</DialogTitle>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 gap-0 overflow-hidden border-modal-section-border shadow-2xl">
+        {/* Header */}
+        <DialogHeader className="bg-modal-header-bg px-6 py-5 border-b border-modal-section-border">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-modal-accent/10">
+              <FileText className="h-5 w-5 text-modal-accent" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-semibold tracking-tight">
+                Шинэ хүсэлт
+              </DialogTitle>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Шинжилгээний хүсэлтийн мэдээллийг бөглөнө үү
+              </p>
+            </div>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Error message display */}
-          {error && (
-            <div className="rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 p-3 text-sm text-red-600 dark:text-red-400">
-              {error}
-            </div>
-          )}
+        {/* Body - scrollable */}
+        <div className="overflow-y-auto modal-scrollbar px-6 py-5 space-y-5 max-h-[calc(90vh-160px)]">
+          {/* Error message */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -8, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex items-start gap-3 rounded-xl bg-modal-error-light border border-modal-error/20 p-4"
+              >
+                <AlertCircle className="h-5 w-5 text-modal-error shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-modal-error">Алдаа гарлаа</p>
+                  <p className="text-sm text-modal-error/80 mt-0.5">{error}</p>
+                </div>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-modal-error/60 hover:text-modal-error transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <div className="space-y-2">
-            <Label>Тайлан</Label>
+          {/* Report Title Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+            className="space-y-2"
+          >
+            <Label className="text-sm font-medium">Тайлангийн нэр</Label>
             <Input
               value={reportTitle}
               onChange={(e) => {
@@ -201,32 +237,59 @@ export function CreateReportModal({
                 setReportTitle(e.target.value);
               }}
               placeholder="Нэгдсэн төв ус гэх мэт..."
+              className="h-11 bg-modal-section-bg border-modal-section-border focus:border-modal-accent focus:ring-modal-accent/20 transition-all duration-200"
             />
-          </div>
+          </motion.div>
 
-          <SampleFormSection
-            sampleGroup={sampleGroup}
-            setSampleGroup={setSampleGroup}
-            labTypes={labTypes}
-            seniors={seniors}
-            assignedTo={assignedTo}
-            onAssignedToChange={setAssignedTo}
-          />
+          {/* Sample Form Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <SampleFormSection
+              sampleGroup={sampleGroup}
+              setSampleGroup={setSampleGroup}
+              labTypes={labTypes}
+              seniors={seniors}
+              assignedTo={assignedTo}
+              onAssignedToChange={setAssignedTo}
+            />
+          </motion.div>
         </div>
 
-        <DialogFooter className="mt-4">
-          <Button
-            variant="secondary"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
-          >
-            Болих
-          </Button>
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Хадгалж байна..." : "Хадгалах"}
-          </Button>
+        {/* Footer */}
+        <DialogFooter className="bg-modal-header-bg border-t border-modal-section-border px-6 py-4">
+          <div className="flex items-center justify-end gap-3 w-full">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={saving}
+              className="h-10 px-5 border-modal-section-border hover:bg-modal-section-bg transition-all duration-200"
+            >
+              Болих
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="h-10 px-6 bg-modal-accent text-modal-accent-foreground hover:bg-modal-accent/90 shadow-sm transition-all duration-200"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Хадгалж байна...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Хадгалах
+                </>
+              )}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+

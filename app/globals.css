@@ -44,6 +44,19 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  /* ============ LOVABLE MODAL COLOR MAPPING ============ */
+  --color-modal-header-bg: hsl(var(--modal-header-bg));
+  --color-modal-section-bg: hsl(var(--modal-section-bg));
+  --color-modal-section-border: hsl(var(--modal-section-border));
+  --color-modal-accent: hsl(var(--modal-accent));
+  --color-modal-accent-foreground: hsl(var(--modal-accent-foreground));
+  --color-modal-success: hsl(var(--modal-success));
+  --color-modal-success-light: hsl(var(--modal-success-light));
+  --color-modal-error: hsl(var(--modal-error));
+  --color-modal-error-light: hsl(var(--modal-error-light));
+  --color-modal-indicator-selected: hsl(var(--modal-indicator-selected));
+  --color-modal-indicator-selected-border: hsl(var(--modal-indicator-selected-border));
+
 }
 
 :root {
@@ -79,6 +92,37 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+/* ===================== LOVABLE MODAL TOKENS ===================== */
+
+/* Light mode */
+:root {
+  --modal-header-bg: 220 14% 96%;
+  --modal-section-bg: 220 14% 98%;
+  --modal-section-border: 220 13% 91%;
+  --modal-accent: 217 91% 60%;
+  --modal-accent-foreground: 0 0% 100%;
+  --modal-success: 142 76% 36%;
+  --modal-success-light: 142 76% 96%;
+  --modal-error: 0 84% 60%;
+  --modal-error-light: 0 84% 97%;
+  --modal-indicator-selected: 217 91% 97%;
+  --modal-indicator-selected-border: 217 91% 80%;
+}
+
+/* Dark mode */
+.dark {
+  --modal-header-bg: 222 47% 8%;
+  --modal-section-bg: 222 47% 7%;
+  --modal-section-border: 217 33% 20%;
+  --modal-accent: 217 91% 60%;
+  --modal-accent-foreground: 0 0% 100%;
+  --modal-success: 142 76% 46%;
+  --modal-success-light: 142 76% 12%;
+  --modal-error: 0 84% 60%;
+  --modal-error-light: 0 62% 15%;
+  --modal-indicator-selected: 217 91% 12%;
+  --modal-indicator-selected-border: 217 91% 40%;
 }
 
 .dark {
@@ -121,5 +165,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+@layer utilities {
+  .modal-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .modal-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .modal-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 3px;
+  }
+  .modal-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
   }
 }

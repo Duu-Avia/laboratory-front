@@ -168,7 +168,6 @@ export default function ReportsPage() {
       logError(err, "Excel export");
     }
   };
-
   return (
     <div className="p-4 space-y-5">
       <AnimatePresence mode="wait">
