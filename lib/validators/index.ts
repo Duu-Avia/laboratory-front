@@ -34,7 +34,6 @@ export type EmployeeForm = z.infer<typeof employeeValidation>;
 export const reportValidation = z.object({
   reportTitle: z.string().optional(),
   labTypeId: rules.requiredNumber("Сорьцын төрөл сонгоно уу"),
-  assignedTo: rules.requiredNumber("Хянах инженер сонгоно уу"),
   sampled_by: rules.requiredString("Сорьц авчирсан хүний нэр оруулна уу"),
   sample_amount:rules.requiredString("Сорьцын хэмжээ оруулна уу"),
   indicatorNames:z.array(z.number()).min(1, "Дор хаяж нэг үзүүлэлт сонгоно уу"),

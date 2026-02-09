@@ -20,6 +20,7 @@ export interface PdfViewModalProps {
   reportStatus?: ReportStatus;
   assignedTo?: number | null;
   createdBy?: number | null;
+  reportLabType?: string | null;
   onOpenChange: (open: boolean) => void;
   onApproved?: () => void;
   labTypes: LabType[];
@@ -32,6 +33,7 @@ export function PdfViewModal({
   reportStatus,
   assignedTo,
   createdBy,
+  reportLabType,
   onOpenChange,
   onApproved,
   labTypes,
@@ -43,6 +45,9 @@ export function PdfViewModal({
   const isManagement = MANAGEMENT_ROLES.includes(user?.roleName ?? "");
   const isOwner =
     user?.userId != null && createdBy != null && user.userId === createdBy;
+
+  const labTypeId =
+    labTypes.find((lt) => lt.type_name === reportLabType)?.id ?? null;
 
   const canEdit = isOwner || isManagement;
   const canDelete = isOwner || isManagement;
@@ -179,6 +184,7 @@ export function PdfViewModal({
         open={signDialogOpen}
         onOpenChange={setSignDialogOpen}
         reportId={reportId}
+        labTypeId={labTypeId}
         onSigned={() => {
           onOpenChange(false);
           onApproved?.();

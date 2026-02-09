@@ -17,18 +17,15 @@ import {
   Beaker,
   Calendar,
   User,
-  UserCheck,
   Plus,
   Trash2,
   CheckCircle2,
   Circle,
 } from "lucide-react";
 import type {
-  Indicator,
   LocationPackage,
   LocationSample,
   SampleGroup,
-  SeniorEngineer,
   LabType,
 } from "@/types";
 import { api } from "@/lib/api";
@@ -39,9 +36,6 @@ type Props = {
   sampleGroup: SampleGroup;
   setSampleGroup: (updater: (prev: SampleGroup) => SampleGroup) => void;
   labTypes: LabType[];
-  seniors?: SeniorEngineer[];
-  assignedTo?: number | null;
-  onAssignedToChange?: (value: number | null) => void;
 };
 
 function SectionHeader({
@@ -72,9 +66,6 @@ export function SampleFormSection({
   sampleGroup,
   setSampleGroup,
   labTypes,
-  seniors,
-  assignedTo,
-  onAssignedToChange,
 }: Props) {
   const [locationPackages, setLocationPackages] = useState<LocationPackage[]>([]);
   const [selectedPackageId, setSelectedPackageId] = useState<number | null>(null);
@@ -375,42 +366,6 @@ export function SampleFormSection({
           </div>
         </div>
       </div>
-
-      {/* Senior Engineer */}
-      {seniors && onAssignedToChange && (
-        <div className="rounded-xl border border-modal-section-border bg-modal-section-bg/50 p-5">
-          <SectionHeader
-            icon={UserCheck}
-            title="Хянах инженер"
-            description="Тайланг хянах ахлах инженерийг сонгоно уу"
-          />
-
-          <Select
-            value={assignedTo ? String(assignedTo) : undefined}
-            onValueChange={(v) => onAssignedToChange(Number(v))}
-            disabled={!sampleGroup.lab_type_id || seniors.length === 0}
-          >
-            <SelectTrigger className={selectTriggerClasses}>
-              <SelectValue
-                placeholder={
-                  !sampleGroup.lab_type_id
-                    ? "Эхлээд төрөл сонгоно уу"
-                    : seniors.length === 0
-                      ? "Инженер олдсонгүй"
-                      : "Инженер сонгох"
-                }
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {seniors.map((s) => (
-                <SelectItem key={s.id} value={String(s.id)}>
-                  {s.email}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
 
       {/* Indicators Section */}
       <div className="rounded-xl border border-modal-section-border bg-modal-section-bg/50 p-5">

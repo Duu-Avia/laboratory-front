@@ -20,7 +20,6 @@ import type {
   CreateReportModalProps,
   Indicator,
   SampleGroup,
-  SeniorEngineer,
 } from "@/types";
 
 // Lib - use new API client and error handling
@@ -51,13 +50,12 @@ export function CreateReportModal({
 }: CreateReportModalProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nextId, setNextId] = useState<string | null>(null);
   const [reportTitle, setReportTitle] = useState("");
   const [reportTitleTouched, setReportTitleTouched] = useState(false);
   const [sampleGroup, setSampleGroup] = useState<SampleGroup>(
     getEmptySampleGroup(from)
   );
-  const [seniors, setSeniors] = useState<SeniorEngineer[]>([]);
-  const [assignedTo, setAssignedTo] = useState<number | null>(null);
 
   const calculateTestEndDate = (startDate: string) => {
     const endTestDate = new Date(startDate);
@@ -71,14 +69,18 @@ export function CreateReportModal({
       setReportTitle("");
       setReportTitleTouched(false);
       setError(null);
+      setNextId(null);
       // Auto-set lab type if user has only one
       const autoLabTypeId = labTypes.length === 1 ? labTypes[0].id : null;
       setSampleGroup({
         ...getEmptySampleGroup(to),
         lab_type_id: autoLabTypeId,
       });
-      setSeniors([]);
-      setAssignedTo(null);
+      // Fetch next report ID
+      api
+        .get<{ next_id: string }>(ENDPOINTS.REPORTS.NEXT_ID)
+        .then((data) => setNextId(data.next_id))
+        .catch((err) => logError(err, "Fetch next report ID"));
     }
   }, [open, to, labTypes]);
 
@@ -88,23 +90,6 @@ export function CreateReportModal({
     if (reportTitleTouched) return;
     setReportTitle(sampleGroup.location || "");
   }, [open, sampleGroup.location, reportTitleTouched]);
-
-  // Fetch senior engineers when lab type changes
-  useEffect(() => {
-    if (!open || !sampleGroup.lab_type_id) {
-      setSeniors([]);
-      setAssignedTo(null);
-      return;
-    }
-
-    api
-      .get<SeniorEngineer[]>(ENDPOINTS.USERS.SENIORS(sampleGroup.lab_type_id))
-      .then((data) => setSeniors(data))
-      .catch((err) => {
-        logError(err, "Fetch seniors");
-        setSeniors([]);
-      });
-  }, [open, sampleGroup.lab_type_id]);
 
   // Load available indicators when sample type changes
   useEffect(() => {
@@ -132,7 +117,6 @@ export function CreateReportModal({
     const result = reportValidation.safeParse({
       reportTitle,
       labTypeId: sampleGroup.lab_type_id ?? 0,
-      assignedTo: assignedTo ?? 0,
       sampleNames: sampleGroup.sample_names,
       sampled_by: sampleGroup.sampled_by,
       sample_amount: sampleGroup.sample_amount,
@@ -162,7 +146,6 @@ export function CreateReportModal({
       test_end_date: calculateTestEndDate(sampleGroup.sample_date),
       analyst: "",
       approved_by: "",
-      assigned_to: assignedTo,
       samples,
     };
 
@@ -185,16 +168,17 @@ export function CreateReportModal({
       <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 gap-0 overflow-hidden border-modal-section-border shadow-2xl">
         {/* Header */}
         <DialogHeader className="bg-modal-header-bg px-6 py-5 border-b border-modal-section-border">
+          
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-modal-accent/10">
               <FileText className="h-5 w-5 text-modal-accent" />
             </div>
             <div>
               <DialogTitle className="text-xl font-semibold tracking-tight">
-                Шинэ хүсэлт
+                Шинэ сорьц
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Шинжилгээний хүсэлтийн мэдээллийг бөглөнө үү
+               Үүсгэх сорьцын мэдээллийг бөглөнө үү
               </p>
             </div>
           </div>
@@ -202,6 +186,13 @@ export function CreateReportModal({
 
         {/* Body - scrollable */}
         <div className="overflow-y-auto modal-scrollbar px-6 py-5 space-y-5 max-h-[calc(90vh-160px)]">
+{nextId && (
+            <div className="flex justify-center mb-3">
+              <span className="text-sm font-medium text-muted-foreground">
+                №: <span className="text-foreground">{nextId}</span>
+              </span>
+            </div>
+          )}
           {/* Error message */}
           <AnimatePresence>
             {error && (
@@ -247,9 +238,6 @@ export function CreateReportModal({
               sampleGroup={sampleGroup}
               setSampleGroup={setSampleGroup}
               labTypes={labTypes}
-              seniors={seniors}
-              assignedTo={assignedTo}
-              onAssignedToChange={setAssignedTo}
             />
           </motion.div>
         </div>

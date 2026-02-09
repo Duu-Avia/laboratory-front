@@ -39,6 +39,7 @@ export default function ArchivePage() {
   const [pdfReportCreatedBy, setPdfReportCreatedBy] = useState<number | null>(
     null
   );
+  const [pdfReportLabType, setPdfReportLabType] = useState<string | null>(null);
 
   // Fetch lab types
   useEffect(() => {
@@ -94,6 +95,7 @@ export default function ArchivePage() {
       setPdfReportTitle(report.report_title);
       setPdfReportStatus(report.status);
       setPdfReportCreatedBy(report.created_by ?? null);
+      setPdfReportLabType(report.lab_type ?? null);
       setPdfModalOpen(true);
     } else {
       router.push(`/reports/${report.id}`);
@@ -193,6 +195,7 @@ export default function ArchivePage() {
         reportId={pdfReportId}
         reportStatus={pdfReportStatus}
         createdBy={pdfReportCreatedBy}
+        reportLabType={pdfReportLabType}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
         labTypes={labTypes}

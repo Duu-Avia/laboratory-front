@@ -43,6 +43,7 @@ export default function ApprovePage() {
   const [pdfReportCreatedBy, setPdfReportCreatedBy] = useState<number | null>(
     null
   );
+  const [pdfReportLabType, setPdfReportLabType] = useState<string | null>(null);
 
   // Fetch lab types + reports in parallel
   useEffect(() => {
@@ -119,6 +120,7 @@ export default function ApprovePage() {
     setPdfReportStatus(report.status);
     setPdfReportAssignedTo(report.assigned_to ?? null);
     setPdfReportCreatedBy(report.created_by ?? null);
+    setPdfReportLabType(report.lab_type ?? null);
     setPdfModalOpen(true);
   }
 
@@ -277,6 +279,7 @@ export default function ApprovePage() {
         reportStatus={pdfReportStatus}
         assignedTo={pdfReportAssignedTo}
         createdBy={pdfReportCreatedBy}
+        reportLabType={pdfReportLabType}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
         labTypes={labTypes}

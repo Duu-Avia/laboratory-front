@@ -85,39 +85,38 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <Table>
+      <Table className="table-fixed">
         <TableHeader>
           <TableRow className="bg-gradient-to-r from-slate-50 to-slate-100/80 hover:bg-slate-50 border-b border-slate-200">
-            <TableHead className="py-4 pl-6">
+            <TableHead style={{ width: "5%" }} className="py-4 pl-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                №
+              </div>
+            </TableHead>
+            <TableHead style={{ width: "13%"  }} className="py-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <Hash className="w-3.5 h-3.5" /> Он сар
+              </div>
+            </TableHead>
+            <TableHead style={{ width: "8%" }} className="py-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <Calendar className="w-3.5 h-3.5" />
-                Он сар
+                Дугаар
               </div>
             </TableHead>
-            <TableHead className="py-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <Hash className="w-3.5 h-3.5" />№
-              </div>
-            </TableHead>
-            <TableHead className="py-4">
+            <TableHead style={{ width: "28%" }} className="py-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <FileText className="w-3.5 h-3.5" />
-                Сорьцны нэр
+                Сорьцын нэр
               </div>
             </TableHead>
-            <TableHead className="py-4">
+            <TableHead style={{ width: "32%" }} className="py-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <FlaskConical className="w-3.5 h-3.5" />
-                Оруулсан Сорьцүүд
+                Сонгосон шинжилгээ
               </div>
             </TableHead>
-            <TableHead className="py-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <TestTube className="w-3.5 h-3.5" />
-                Сонгогдсон/Ши
-              </div>
-            </TableHead>
-            <TableHead className="py-4 pr-6">
+            <TableHead style={{ width: "14%" }} className="py-4 pr-6">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Төлөв
@@ -193,7 +192,7 @@ function MonthGroup({
             }}
           >
             <div className="overflow-hidden">
-              <table className="w-full">
+              <table className="w-full table-fixed">
                 <tbody>
                   {items.map((dataItem, index) => (
                     <tr
@@ -201,7 +200,12 @@ function MonthGroup({
                       onClick={() => onRowClick(dataItem)}
                       className="group cursor-pointer border-b border-slate-100 last:border-0 hover:bg-gradient-to-r hover:from-blue-200 hover:to-indigo-50/30 duration-500"
                     >
-                      <TableCell className="py-5 pl-10">
+                        <td style={{ width: "5%" }} className="py-5 pl-4">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-bold text-slate-600 group-hover:from-blue-100 group-hover:to-blue-200 group-hover:text-blue-400 transition-all shadow-sm">
+                          {index + 1}
+                        </span>
+                      </td>
+                      <td style={{ width: "13%" }} className="py-5">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                             <Calendar className="w-4 h-4 text-slate-500 group-hover:text-blue-400" />
@@ -210,18 +214,13 @@ function MonthGroup({
                             {dataItem.created_at.slice(0, 10)}
                           </span>
                         </div>
-                      </TableCell>
-                      <TableCell className="py-5">
-                        <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-bold text-slate-600 group-hover:from-blue-100 group-hover:to-blue-200 group-hover:text-blue-400 transition-all shadow-sm">
-                          {index + 1}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-5">
+                      </td>
+                      <td style={{ width: "8%" }} className="py-5">
                         <span className="font-semibold text-slate-800 group-hover:text-blue-400 transition-colors text-base">
-                          {dataItem.report_title}
+                          {dataItem.id}
                         </span>
-                      </TableCell>
-                      <TableCell className="py-5">
+                      </td>
+                      <td style={{ width: "28%" }} className="py-5">
                         <div className="flex flex-col gap-1.5">
                           {dataItem.sample_names?.split(",").map((name, i) => (
                             <div
@@ -237,8 +236,8 @@ function MonthGroup({
                             </div>
                           ))}
                         </div>
-                      </TableCell>
-                      <TableCell className="py-5">
+                      </td>
+                      <td style={{ width: "32%" }} className="py-5">
                         <div className="flex flex-wrap gap-1.5">
                           {dataItem.indicator_names
                             ?.split(",")
@@ -251,10 +250,10 @@ function MonthGroup({
                               </span>
                             ))}
                         </div>
-                      </TableCell>
-                      <TableCell className="py-5 pr-6">
+                      </td>
+                      <td style={{ width: "14%" }} className="py-5 pr-6">
                         <StatusBadge status={dataItem.status} />
-                      </TableCell>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

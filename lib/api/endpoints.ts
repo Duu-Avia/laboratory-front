@@ -14,6 +14,7 @@ export const ENDPOINTS = {
   // Reports
   REPORTS: {
     LIST: "/reports",
+    NEXT_ID: "/reports/next-id",
     CREATE: "/reports/create",
     DETAIL: (id: number | string) => `/reports/${id}`,
     EDIT: (id: number | string) => `/reports/edit/${id}`,

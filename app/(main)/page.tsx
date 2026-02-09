@@ -54,6 +54,7 @@ export default function ReportsPage() {
   const [pdfReportCreatedBy, setPdfReportCreatedBy] = useState<number | null>(
     null
   );
+  const [pdfReportLabType, setPdfReportLabType] = useState<string | null>(null);
 
   // Fetch lab types — super admin, others get their assigned types from /auth/me
   useEffect(() => {
@@ -147,6 +148,7 @@ export default function ReportsPage() {
       setPdfReportTitle(report.report_title);
       setPdfReportStatus(report.status);
       setPdfReportCreatedBy(report.created_by ?? null);
+      setPdfReportLabType(report.lab_type ?? null);
       setPdfModalOpen(true);
     } else if (isOwner) {
       router.push(`/api/reports/${report.id}`);
@@ -248,6 +250,7 @@ export default function ReportsPage() {
         reportId={pdfReportId}
         reportStatus={pdfReportStatus}
         createdBy={pdfReportCreatedBy}
+        reportLabType={pdfReportLabType}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
         labTypes={labTypes}
