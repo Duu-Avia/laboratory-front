@@ -12,11 +12,11 @@ export const ReportHeader = ({ reportId, onSave, saving }: ReportHeaderSaveProps
           href="/reports"
           className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
         >
-          Тайлангууд
+          Тайлангийн дугаар
         </Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-slate-900 dark:text-white font-medium">
-          #{reportId}
+          № {reportId}
         </span>
       </div>
 

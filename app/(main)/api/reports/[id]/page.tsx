@@ -188,8 +188,8 @@ export default function ReportDetailPage() {
               {/* Sample Header */}
               <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-purple-950/50 border border-emerald-200 dark:border-purple-900">
-                    <span className="text-sm font-bold text-gray-600 dark:text-purple-400">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-gray-100 dark:bg-purple-950/50 border border-emerald-100 dark:border-purple-900">
+                    <span className="text-sm font-bold text-gray-500 dark:text-purple-400">
                       {index + 1}
                     </span>
                   </div>
@@ -200,7 +200,7 @@ export default function ReportDetailPage() {
                   </div>
                 </div>
                 <div className="text-xs font-mono text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
-                  ID: {s.sample_id}
+                  Сорьцын дугаар: {s.sample_id}
                 </div>
               </div>
 

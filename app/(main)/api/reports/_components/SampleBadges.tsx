@@ -15,12 +15,9 @@ export function SampleBadges({ reportTitle, samples }: SampleBadgesProps) {
       <div className="flex items-center gap-3 mb-4">
    
       <div className="font-bold pl-2 text-lg text-slate-900 dark:text-white">Үүсгэсэн сорьцууд</div>  
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-          {reportTitle}
-        </h2>
       </div>
 
-        <div className="font-semibold text-gray-600 text-sm pl-2 pb-3">Дээж өгсөн : {samples[0]?.sampled_by} </div>
+        <div className="font-semibold text-gray-600 text-sm pl-2 pb-3">Сорьц өгсөн : {samples[0]?.sampled_by} </div>
       {/* Sample Badges */}
       <div className="flex flex-wrap gap-2">
         {samples.map((s, index) => (
@@ -29,8 +26,9 @@ export function SampleBadges({ reportTitle, samples }: SampleBadgesProps) {
             variant="outline"
             className="px-3 py-1.5 text-sm border-gray-100 dark:border-emerald-800 bg-gray-100  dark:bg-emerald-950/30 text-gray-700 dark:text-emerald-400 font-medium"
           >
-            <span className="font-bold mr-1">Дээж-{index + 1}:</span>
-            {s.sample_name}
+            <span className="font-bold mr-1">Сорьц -</span>
+            <span className="font-bold">{s.sample_id}</span>.{s.sample_name}
+            
           </Badge>
         ))}
       </div>
