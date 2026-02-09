@@ -24,10 +24,10 @@ export function SampleBadges({ reportTitle, samples }: SampleBadgesProps) {
           <Badge
             key={s.sample_id}
             variant="outline"
-            className="px-3 py-1.5 text-sm border-gray-100 dark:border-emerald-800 bg-gray-100  dark:bg-emerald-950/30 text-gray-700 dark:text-emerald-400 font-medium"
+            className="px-3 py-1.5 rounded-sm text-sm border-blue-100 dark:border-emerald-800 bg-sky-50  dark:bg-emerald-950/30 text-gray-700 dark:text-emerald-400 font-medium"
           >
-            <span className="font-bold mr-1">Сорьц -</span>
-            <span className="font-bold">{s.sample_id}</span>.{s.sample_name}
+            <span className="font-semibold mr-1">Сорьц -</span>
+            <span className="font-bold">{s.sample_id}.</span>{s.sample_name}
             
           </Badge>
         ))}

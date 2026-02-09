@@ -1,6 +1,6 @@
 import { ReportHeaderSaveProps } from "@/types";
 import { Button } from "@/components/ui/button";
-import { FileText, Save, FileDown, ChevronRight, Loader2 } from "lucide-react";
+import { FileText, Save, FileDown, ChevronRight, Loader2, ClipboardList } from "lucide-react";
 import Link from "next/link";
 
 export const ReportHeader = ({ reportId, onSave, saving }: ReportHeaderSaveProps & { saving?: boolean }) => {
@@ -23,8 +23,8 @@ export const ReportHeader = ({ reportId, onSave, saving }: ReportHeaderSaveProps
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900">
-            <FileText className="h-7 w-7 text-emerald-black dark:text-emerald-4400" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-sky-100 dark:bg-emerald-950/50 border  dark:border-emerald-900">
+            <ClipboardList className="h-7 w-7 text-sky-600 dark:text-emerald-4400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -48,7 +48,7 @@ export const ReportHeader = ({ reportId, onSave, saving }: ReportHeaderSaveProps
               <Save className="h-4 w-4" />
             )}
             {saving ? "Хадгалж байна..." : "Хадгалах"}
-          </Button>
+          </Button>.
         </div>
       </div>
     </div>

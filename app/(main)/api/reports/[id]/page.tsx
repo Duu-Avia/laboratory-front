@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { IndicatorRow, SampleColumn } from "@/types";
+import { SampleColumn } from "@/types";
 import { ReportHeader } from "../_components/ReportHeader";
 import { SampleBadges } from "../_components/SampleBadges";
 import { ResultsTable } from "../_components/ResultTable";
+import type { IndicatorGroup } from "../_components/ResultTable";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
@@ -21,6 +22,40 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+/** Transform sample-grouped data into indicator-grouped data */
+function groupByIndicator(samples: SampleColumn[]): IndicatorGroup[] {
+  const map = new Map<number, IndicatorGroup>();
+  const order: number[] = [];
+
+  for (const sample of samples) {
+    for (const ind of sample.indicators as any[]) {
+      if (!map.has(ind.indicator_id)) {
+        order.push(ind.indicator_id);
+        map.set(ind.indicator_id, {
+          indicator_id: ind.indicator_id,
+          indicator_name: ind.indicator_name,
+          unit: ind.unit ?? null,
+          limit_value: ind.limit_value ?? null,
+          input_type: ind.input_type,
+          test_method: ind.test_method ?? null,
+          sampleResults: [],
+        });
+      }
+      map.get(ind.indicator_id)!.sampleResults.push({
+        sample_id: sample.sample_id,
+        sample_name: sample.sample_name,
+        sample_indicator_id: ind.sample_indicator_id,
+        result_value: ind.result_value ?? null,
+        is_detected: ind.is_detected ?? null,
+        is_within_limit: ind.is_within_limit ?? null,
+        avg: ind.avg ?? null,
+      });
+    }
+  }
+
+  return order.map((id) => map.get(id)!);
+}
+
 export default function ReportDetailPage() {
   const params = useParams<{ id: string }>();
   const reportId = params?.id;
@@ -32,7 +67,10 @@ export default function ReportDetailPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  //Normalize result fields so table can use ind.result_value directly
+  // Indicator-grouped view (derived from samples state)
+  const indicatorGroups = useMemo(() => groupByIndicator(samples), [samples]);
+
+  // Normalize result fields so table can use ind.result_value directly
   function normalizeSamples(rawSamples: SampleColumn[]) {
     return (rawSamples ?? []).map((s) => ({
       ...s,
@@ -116,7 +154,7 @@ export default function ReportDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-screen-2xl mx-auto space-y-6">
         {/* Success Alert */}
         {saveSuccess && (
           <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 p-6 shadow-lg animate-in fade-in slide-in-from-top-2">
@@ -178,42 +216,15 @@ export default function ReportDetailPage() {
         {/* Sample Badges */}
         <SampleBadges reportTitle={reportTitle} samples={samples} />
 
-        {/* Results by Sample */}
-        <div className="space-y-6">
-          {samples.map((s: any, index: number) => (
-            <div
-              key={s.sample_id}
-              className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-lg transition-shadow"
-            >
-              {/* Sample Header */}
-              <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-gray-100 dark:bg-purple-950/50 border border-emerald-100 dark:border-purple-900">
-                    <span className="text-sm font-bold text-gray-500 dark:text-purple-400">
-                      {index + 1}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-slate-900 dark:text-white">
-                      {s.sample_name}
-                    </h3>
-                  </div>
-                </div>
-                <div className="text-xs font-mono text-slate-500 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
-                  Сорьцын дугаар: {s.sample_id}
-                </div>
-              </div>
-
-              {/* Results Table */}
-              <ResultsTable
-                indicators={s.indicators ?? []}
-                onUpdateIndicator={(sampleIndicatorId, patch) =>
-                  updateSampleIndicator(sampleIndicatorId, patch)
-                }
-              />
-            </div>
-          ))}
-        </div>
+        {/* Results Table - grouped by indicator */}
+        {samples.length > 0 && (
+          <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <ResultsTable
+              indicatorGroups={indicatorGroups}
+              onUpdateIndicator={updateSampleIndicator}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
