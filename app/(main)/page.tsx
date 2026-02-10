@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Components
-
 // Types
 import type { ReportRow, LabType, StatusFilter } from "@/types";
 
