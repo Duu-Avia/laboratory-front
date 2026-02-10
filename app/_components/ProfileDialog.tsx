@@ -15,6 +15,7 @@ import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
 import type { UserProfile } from "@/types";
+import { q } from "motion/react-client";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -99,7 +100,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       setPasswordSuccess(false);
       setPasswordSaving(true);
       await api.put(ENDPOINTS.USERS.PROFILE_PASSWORD, {
-        old_password: oldPassword,
+        current_password: oldPassword,
         new_password: newPassword,
       });
       setPasswordSuccess(true);

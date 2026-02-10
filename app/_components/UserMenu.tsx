@@ -52,13 +52,11 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
     variant === "sidebar" ? (
       <button
         type="button"
-        className="w-full flex items-center gap-3 px-4 py-3 border-t border-white/10 hover:bg-white/5 transition cursor-pointer text-left"
+        className="w-full flex items-center gap-3 px-4 py-4  transition cursor-pointer text-left"
       >
-        <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold text-white shrink-0">
-          {initials}
-        </div>
+  <img src={"/logo-without-text.jpg"} alt="User avatar" className="h-9 w-9 rounded-xl object-cover shrink-0 shadow-md" />
         <div className="flex-1 min-w-0">
-          <div className="text-sm text-white truncate">{displayName}</div>
+          <div className="text-sm font-semibold capitalize truncate text-white truncate">{displayName}</div>
           <div className="text-xs text-white/50">{roleLabel}</div>
         </div>
         <ChevronsUpDown className="h-4 w-4 text-white/40 shrink-0" />
@@ -80,17 +78,16 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
         <PopoverContent
           side={variant === "sidebar" ? "top" : "bottom"}
           align={variant === "sidebar" ? "start" : "end"}
-          className="w-56 p-0"
+          className="w-[100%] p-0"
         >
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="h-10 w-10 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-semibold text-neutral-600 shrink-0">
-              {initials}
-            </div>
+           
+            <img src={"/logo-without-text.jpg"} alt="User avatar" className="h-9 w-9 rounded-xl object-cover shrink-0 shadow-md" />
             <div className="min-w-0">
-              <div className="text-sm font-medium capitalize truncate">
+              <div className="text-[14px] font-medium capitalize truncate">
                 {displayName}
               </div>
-              <div className="text-xs text-muted-foreground truncate">
+              <div className="text-[12px] text-muted-foreground truncate">
                 {user.email}
               </div>
             </div>

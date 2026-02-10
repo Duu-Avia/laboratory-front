@@ -86,12 +86,20 @@ export default function LeftSidebar() {
   };
 
   return (
-    <aside className="w-50 bg-[#2f3533] text-white flex flex-col">
+    <aside className="w-[240px] bg-cyan-950 text-white flex flex-col">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-white/10">
-        <div className="text-xl font-semibold">Лаборатори</div>
-        <div className="text-sm text-white/70">бүртгэлийн систем</div>
+      <div className="px-5 py-4">
+        <div className="flex items-center gap-3">
+          <img src={"/logo-without-text.jpg"} alt="Лаборатори лого" className="h-9 w-9 rounded-xl object-cover shadow-lg" />
+        <div>
+        <div className="text-[15px] font-semibold">Лаборатори</div>
+        <div className="text-[11px] text-white/70">бүртгэлийн систем</div>
+</div>
+        </div>
       </div>
+
+      {/* huwaaj baigaa heseg*/}
+      <div className="mx-4 h-px bg-white" />
 
       {/* Menu */}
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -131,7 +139,7 @@ export default function LeftSidebar() {
                       transition={{ duration: 0.2, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <div className="ml-7 mt-1 space-y-1 pb-1">
+                      <div className="ml-7 mt-1 space-y-1 pl-2 pb-1 border-l-1">
                         {item.submenu.map((subItem) => {
                           const subActive = pathname.startsWith(subItem.href);
                           return (
@@ -173,6 +181,7 @@ export default function LeftSidebar() {
         })}
       </nav>
 
+      <div className="mx-4 h-px bg-white" />
       {/* User Menu */}
       <UserMenu variant="sidebar" />
     </aside>
