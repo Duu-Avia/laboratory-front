@@ -8,6 +8,7 @@ export type ReportStatus =
   | "signed"
   | "tested"
   | "approved"
+  | "rejected"
   | "deleted";
 
 export type StatusFilter = ReportStatus | "all";

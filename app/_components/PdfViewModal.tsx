@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 import { DeleteDialog } from "./DeleteDialog";
 import { EditReport } from "./EditDialog";
 import { ApproveDialog } from "./ApproveDialog";
+import { RejectDialog } from "./RejectDialog";
 import { SignDialog } from "./SignDialog";
 import { ENDPOINTS } from "@/lib/api/endpoints";
-import { fetchBlob } from "@/lib/api";
+import { api, fetchBlob } from "@/lib/api";
 import { logError } from "@/lib/errors";
 import { useAuth } from "@/lib/hooks/useAuth";
 import type { ReportStatus, LabType } from "@/types";
@@ -51,16 +52,37 @@ export function PdfViewModal({
 
   const canEdit = isOwner || isManagement;
   const canDelete = isOwner || isManagement;
-  const canSign = reportStatus === "tested" && isOwner;
+  const canSign =
+    (reportStatus === "tested" || reportStatus === "rejected") && isOwner;
   const canApprove =
     reportStatus === "signed" && assignedTo !== undefined && isManagement;
+  const canReject =
+    reportStatus === "signed" && isManagement;
 
   const [deleteDialogOpener, setDeleteDialogOpener] = useState(false);
   const [editDialogOpener, setEditDialogOpener] = useState(false);
   const [signDialogOpen, setSignDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [comments, setComments] = useState<
+    { comment: string; action_type: string; created_at: string }[]
+  >([]);
+
+  // Fetch rejection comments when viewing a rejected report
+  useEffect(() => {
+    if (!open || !reportId || reportStatus !== "rejected") {
+      setComments([]);
+      return;
+    }
+    api
+      .get<{ comments?: { comment: string; action_type: string; created_at: string }[] }>(
+        ENDPOINTS.REPORTS.DETAIL(reportId)
+      )
+      .then((data) => setComments(data.comments ?? []))
+      .catch((err) => logError(err, "Fetch report comments"));
+  }, [open, reportId, reportStatus]);
 
   useEffect(() => {
     if (!open || !reportId) {
@@ -108,6 +130,20 @@ export function PdfViewModal({
 
           <div className="pt-2 pl-2 font-normal text-xl">{reportTitle}</div>
 
+          {/* Rejection comments banner */}
+          {reportStatus === "rejected" && comments.length > 0 && (
+            <div className="mx-4 mt-2 rounded-lg border border-orange-200 bg-orange-50 p-3">
+              <p className="text-sm font-medium text-red-900 mb-1">
+                Буцаасан шалтгаан:
+              </p>
+              {comments.map((c, i) => (
+                <p key={i} className="text-sm text-orange-700">
+                  {c.comment}
+                </p>
+              ))}
+            </div>
+          )}
+
           <div className="flex-1 min-h-0">
             {pdfLoading ? (
               <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
@@ -149,6 +185,15 @@ export function PdfViewModal({
                 onClick={onApproveClick}
               >
                 Батлах
+              </Button>
+            )}
+
+            {canReject && (
+              <Button
+                className="text-black bg-gray-200/75 hover:bg-orange-200 border-1 border-orange-500 h-[28px]"
+                onClick={() => setRejectDialogOpen(true)}
+              >
+                Буцаах
               </Button>
             )}
 
@@ -196,6 +241,16 @@ export function PdfViewModal({
         onOpenChange={setApproveDialogOpen}
         reportId={reportId}
         onApproved={() => {
+          onOpenChange(false);
+          onApproved?.();
+        }}
+      />
+
+      <RejectDialog
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+        reportId={reportId}
+        onRejected={() => {
           onOpenChange(false);
           onApproved?.();
         }}

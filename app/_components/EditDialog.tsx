@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { CheckCircle2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { SampleFormSection } from "./SampleFormSection";
 import {
   ResultsTable,
@@ -96,6 +107,8 @@ export function EditReport({
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [reportTitle, setReportTitle] = useState("");
   const [sampleGroup, setSampleGroup] = useState<SampleGroup>(emptySampleGroup);
   const [rawSamples, setRawSamples] = useState<SampleColumn[]>([]);
@@ -110,6 +123,7 @@ export function EditReport({
       setSampleGroup(emptySampleGroup);
       setReportTitle("");
       setRawSamples([]);
+      setSaveSuccess(false);
     }
   }, [open]);
 
@@ -190,6 +204,10 @@ export function EditReport({
     );
   }
 
+  const handleSaveClick = () => {
+    setShowConfirmDialog(true);
+  };
+
   const handleSave = async () => {
     if (!reportId) return;
 
@@ -198,6 +216,7 @@ export function EditReport({
         sample_id: sampleGroup.sample_ids[idx] ?? null,
         lab_type_id: sampleGroup.lab_type_id,
         sample_name: name.trim(),
+        sample_amount: sampleGroup.sample_amount,
         location: sampleGroup.location,
         sample_date: sampleGroup.sample_date,
         sampled_by: sampleGroup.sampled_by,
@@ -233,8 +252,14 @@ export function EditReport({
         await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results });
       }
 
-      onSaved?.();
-      onOpenChange(false);
+      setSaveSuccess(true);
+
+      // Show success briefly, then close
+      setTimeout(() => {
+        setSaveSuccess(false);
+        onSaved?.();
+        onOpenChange(false);
+      }, 1500);
     } catch (err) {
       logError(err, "Update report");
     } finally {
@@ -248,6 +273,24 @@ export function EditReport({
         <DialogHeader>
           <DialogTitle>Тайлан засах</DialogTitle>
         </DialogHeader>
+
+        {saveSuccess && (
+          <div className="mx-1 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600">
+                <CheckCircle2 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-emerald-900">
+                  Амжилттай хадгалагдлаа!
+                </h3>
+                <p className="text-xs text-emerald-700">
+                  Тайлангийн мэдээлэл амжилттай шинэчлэгдлээ.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto pr-1">
           {loading ? (
@@ -299,11 +342,34 @@ export function EditReport({
           >
             Болих
           </Button>
-          <Button onClick={handleSave} disabled={saving || loading}>
+          <Button onClick={handleSaveClick} disabled={saving || loading}>
             {saving ? "Хадгалж байна..." : "Хадгалах"}
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Тайлан хадгалах уу?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Та өөрчлөлтөө зөв оруулсан эсэхээ шалгана уу.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Болих</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowConfirmDialog(false);
+                handleSave();
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              Тийм, хадгалах
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

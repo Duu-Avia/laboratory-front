@@ -13,6 +13,7 @@ import { Calendar, Search, Filter } from "lucide-react";
 import { ApproveReportsTable } from "./_components/ApproveReportsTable";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
+import { Button } from "@/components/ui/button";
 
 export default function ApprovePage() {
   const { getUser } = useAuth();
@@ -228,34 +229,22 @@ export default function ApprovePage() {
                       Лаб төрөлөөр хайх
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <button
+                      <Button
                         onClick={() => setSelectedSampleType("all")}
-                        className={`
-                      px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                      ${
-                        selectedSampleType === "all"
-                          ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
-                      }
-                    `}
+                        variant="pill"
+                        active={selectedSampleType === "all"}
                       >
                         Бүгд
-                      </button>
+                      </Button>
                       {labTypes.map((type) => (
-                        <button
+                        <Button
                           key={type.id}
                           onClick={() => setSelectedSampleType(type.type_name)}
-                          className={`
-                        px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                        ${
-                          selectedSampleType === type.type_name
-                            ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
-                        }
-                      `}
+                          variant="pill"
+                          active={selectedSampleType === type.type_name}
                         >
                           {type.type_name}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>

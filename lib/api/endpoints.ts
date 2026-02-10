@@ -26,6 +26,7 @@ export const ENDPOINTS = {
     ARCHIVE: (mode: string) => `/reports/archive?mode=${mode}`,
     APPROVE: (id: number | string) => `/reports/approve/${id}`,
     SIGN: (id: number | string) => `/reports/sign/${id}`,
+    REJECT: (id: number | string) => `/reports/reject/${id}`,
   },
 
   // Lab Types

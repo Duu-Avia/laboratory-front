@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Components
@@ -13,6 +13,7 @@ import { api, fetchBlob } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { STATUS_LABELS } from "@/lib/constants";
 import { logError } from "@/lib/errors";
+import { countByLabType } from "@/lib/counterLab";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { RecentDay } from "../utils/GetRecentDays";
 import { FilterBar } from "../_components/FilterBar";
@@ -142,7 +143,8 @@ export default function ReportsPage() {
     if (
       report.status === "tested" ||
       report.status === "approved" ||
-      report.status === "signed"
+      report.status === "signed" ||
+      report.status === "rejected"
     ) {
       setPdfReportId(report.id);
       setPdfReportTitle(report.report_title);
@@ -154,6 +156,8 @@ export default function ReportsPage() {
       router.push(`/api/reports/${report.id}`);
     }
   }
+
+  const labTypeCounts = useMemo(() => countByLabType(data), [data]);
 
   const handleExcelConvert = async () => {
     try {
@@ -214,6 +218,7 @@ export default function ReportsPage() {
               selectedLabType={selectedLabType}
               status={status}
               labTypes={labTypes}
+              labTypeCounts={labTypeCounts}
               onFromChange={setFrom}
               onToChange={setTo}
               onSearchChange={setSearch}

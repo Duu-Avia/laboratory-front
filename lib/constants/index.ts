@@ -10,6 +10,7 @@ export const STATUS_OPTIONS = [
   { key: "tested", label: "Шинжилгээ хийгдсэн" },
   { key: "signed", label: "Шалгагдаж байна" },
   { key: "approved", label: "Батлагдсан" },
+  { key: "rejected", label: "Буцаагдсан" },
 ] as const;
 
 // Status labels for display
@@ -19,6 +20,7 @@ export const STATUS_LABELS: Record<string, string> = {
   pending_samples: "Сорьц хүлээгдэж байна",
   signed: "Шалгагдаж байна",
   approved: "Батлагдсан",
+  rejected: "Буцаагдсан",
   deleted: "Устгагдсан",
 };
 

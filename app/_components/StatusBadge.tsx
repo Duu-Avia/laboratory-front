@@ -7,7 +7,7 @@ const STATUS_STYLES: Record<string, { className: string; dotColor: string }> = {
     dotColor: "bg-slate-500",
   },
   pending_samples: {
-    className: " text-amber-700  hover:bg-amber-50 ",
+    className: " text-[#D1B23F]  hover:bg-amber-50 ",
     dotColor: "bg-amber-200",
   },
   tested: {
@@ -21,6 +21,10 @@ const STATUS_STYLES: Record<string, { className: string; dotColor: string }> = {
   approved: {
     className: "bg-emerald-50 text-emerald-700  hover:bg-emerald-100 ",
     dotColor: "bg-emerald-200",
+  },
+  rejected: {
+    className: "bg-orange-50 text-orange-700 hover:bg-orange-100",
+    dotColor: "bg-orange-400",
   },
   deleted: {
     className: "bg-rose-50 text-rose-700  hover:bg-rose-",

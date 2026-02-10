@@ -12,6 +12,7 @@ export interface FilterBarProps {
   selectedLabType: string;
   status: StatusFilter;
   labTypes: LabType[];
+  labTypeCounts?: Record<string, number>;
   onFromChange: (value: string) => void;
   onToChange: (value: string) => void;
   onSearchChange: (value: string) => void;

@@ -134,34 +134,23 @@ export function ArchiveHeader({
               Лаб төрөлөөр хайх
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <button
+              <Button
                 onClick={() => onLabTypeChange("all")}
-                className={`
-                  px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                  ${
-                    selectedLabType === "all"
-                      ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
-                  }
-                `}
+                variant="pill"
+                active={selectedLabType === "all"}
               >
                 Бүгд
-              </button>
+              </Button>
               {labTypes.map((type) => (
-                <button
+                <Button
                   key={type.id}
                   onClick={() => onLabTypeChange(type.type_name)}
-                  className={`
-                    px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                    ${
-                      selectedLabType === type.type_name
-                        ? "bg-slate-800 text-white shadow-lg shadow-slate-800/25"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800"
-                    }
-                  `}
+                  variant="pill"
+                  active={selectedLabType === type.type_name
+                  }
                 >
                   {type.type_name}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
