@@ -15,7 +15,7 @@ import { logError } from "@/lib/errors";
 import { countByLabType } from "@/lib/counterLab";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { RecentDay } from "../utils/GetRecentDays";
-import { FilterBar } from "../_components/FilterBar";
+import { Header } from "../_components/Header";
 import { ReportsTable } from "../_components/ReportsTable";
 import { CreateReportModal } from "../_components/CreateReportModal";
 import { PdfViewModal } from "../_components/PdfViewModal";
@@ -210,7 +210,7 @@ export default function ReportsPage() {
             transition={{ duration: 0.35 }}
             className="space-y-5"
           >
-            <FilterBar
+            <Header
               from={from}
               to={to}
               search={search}

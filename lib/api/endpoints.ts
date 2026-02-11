@@ -52,7 +52,7 @@ export const ENDPOINTS = {
     ALL_WITH_SAMPLES: "/locations/all-with-samples",
     CREATE: "/locations",
     DETAIL: (id: number) => `/locations/${id}`,
-    DELETE: (id: number) => `/locations/${id}`,
+    DELETE: (id: number) => `/locations/${id}/delete`,
     BY_LAB_TYPE: (labTypeId: number) => `/locations?lab_type_id=${labTypeId}`,
     SAMPLES: (packageId: number) => `/locations/samples/${packageId}`,
     CREATE_SAMPLE: (packageId: number) => `/locations/samples/${packageId}/edit`,

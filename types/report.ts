@@ -30,3 +30,13 @@ export type ReportRow = {
   created_by?: number;
   created_by_name?: string;
 };
+
+
+export type ColumnFilters = {
+  created_at: string;
+  id: string;
+  sample_names: string;
+  indicator_names: string;
+  created_by_name: string;
+  status: string;
+};

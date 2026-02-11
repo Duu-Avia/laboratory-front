@@ -5,7 +5,7 @@
 import { ReportRow, StatusFilter } from "./report";
 import { LabType } from "./sample";
 
-export interface FilterBarProps {
+export interface HeaderProps {
   from: string;
   to: string;
   search: string;

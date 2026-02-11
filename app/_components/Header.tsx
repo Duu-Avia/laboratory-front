@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FilterBarProps, StatusFilter } from "@/types";
+import { HeaderProps, StatusFilter } from "@/types";
 
 const statusOptions: { key: StatusFilter; label: string }[] = [
   { key: "all", label: "Бүгд" },
@@ -13,7 +13,7 @@ const statusOptions: { key: StatusFilter; label: string }[] = [
   { key: "rejected", label: "Буцаагдсан" },
 ];
 
-export function FilterBar({
+export function Header({
   from,
   to,
   search,
@@ -28,7 +28,7 @@ export function FilterBar({
   onStatusChange,
   onCreateClick,
   onExportClick,
-}: FilterBarProps) {
+}: HeaderProps) {
   const totalCount = labTypeCounts
     ? Object.values(labTypeCounts).reduce((a, b) => a + b, 0)
     : 0;

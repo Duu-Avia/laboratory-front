@@ -45,7 +45,7 @@ export type {
 
 // Component props types
 export type {
-  FilterBarProps,
+  HeaderProps,
   ArchiveFilterBarProps,
   ReportsTableProps,
   ReportHeaderSaveProps,

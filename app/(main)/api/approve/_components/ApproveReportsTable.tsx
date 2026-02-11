@@ -47,13 +47,8 @@ export function ApproveReportsTable({ data, onRowClick }: ReportsTableProps) {
             </TableHead>
             <TableHead className="py-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <Hash className="w-3.5 h-3.5" />№
-              </div>
-            </TableHead>
-            <TableHead className="py-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <FileText className="w-3.5 h-3.5" />
-                Сорьцны нэр
+               Т/Дугаар 
               </div>
             </TableHead>
             <TableHead className="py-4">
@@ -94,13 +89,8 @@ export function ApproveReportsTable({ data, onRowClick }: ReportsTableProps) {
                 </div>
               </TableCell>
               <TableCell className="py-5">
-                <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-bold text-slate-600 group-hover:from-blue-100 group-hover:to-blue-200 group-hover:text-blue-400 transition-all shadow-sm">
-                  {index + 1}
-                </span>
-              </TableCell>
-              <TableCell className="py-5">
                 <span className="font-semibold text-slate-800 group-hover:text-blue-400 transition-colors text-base">
-                  {dataItem.report_title}
+                  {dataItem.id}
                 </span>
               </TableCell>
               <TableCell className="py-5">

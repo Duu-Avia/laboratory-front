@@ -12,14 +12,25 @@ import {
 import {
   FileText,
   Calendar,
-  Hash,
-  FlaskConical,
-  TestTube,
-  CheckCircle2,
   ChevronDown,
 } from "lucide-react";
-import { ReportsTableProps, ReportRow } from "@/types";
+import { ReportsTableProps, ReportRow} from "@/types";
 import { StatusBadge } from "@/app/_components/StatusBadge";
+import { ColumnFilter } from "@/app/_components/ColumnFilter";
+import { STATUS_OPTIONS } from "@/lib/constants";
+import { ColumnFiltersType } from "@/types/report";
+
+const INITIAL_FILTERS: ColumnFiltersType = {
+  created_at: "",
+  id: "",
+  sample_names: "",
+  indicator_names: "",
+  created_by_name: "",
+  status: "",
+};
+
+// Filter out "all" from STATUS_OPTIONS for column filter dropdown
+const STATUS_FILTER_OPTIONS = STATUS_OPTIONS.filter(opt => opt.key !== "all");
 
 const MONTH_NAMES = [
   "1-р сар",
@@ -55,8 +66,61 @@ function formatMonthLabel(key: string) {
 
 export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+  const [filters, setFilters] = useState<ColumnFiltersType>(INITIAL_FILTERS);
 
-  const grouped = useMemo(() => groupByMonth(data), [data]);
+  const setFilter = (key: keyof ColumnFiltersType, value: string) =>
+    setFilters((prev: ColumnFiltersType) => ({ ...prev, [key]: value }));
+
+  // Extract unique suggestions for autocomplete columns
+  const suggestions = useMemo(() => {
+    const samples = new Set<string>();
+    const indicators = new Set<string>();
+
+    for (const row of data) {
+      row.sample_names?.split(",").forEach((s) => {
+        const trimmed = s.trim();
+        if (trimmed) samples.add(trimmed);
+      });
+      row.indicator_names?.split(",").forEach((s) => {
+        const trimmed = s.trim();
+        if (trimmed) indicators.add(trimmed);
+      });
+    }
+
+    return {
+      samples: Array.from(samples).sort(),
+      indicators: Array.from(indicators).sort(),
+    };
+  }, [data]);
+
+  // Apply column filters before grouping
+  const filtered = useMemo(() => { return data.filter((row) => {
+      if (filters.created_at && !row.created_at.slice(0, 10).includes(filters.created_at))
+        return false;
+
+      if (filters.id && !String(row.id).includes(filters.id))
+        return false;
+
+      if (
+        filters.sample_names &&
+        !row.sample_names?.toLowerCase().includes(filters.sample_names.toLowerCase())
+      )
+        return false;
+
+      if (
+        filters.indicator_names &&
+        !row.indicator_names?.toLowerCase().includes(filters.indicator_names.toLowerCase())
+      )
+        return false;
+
+      if (filters.status && row.status !== filters.status)
+        return false;
+
+      return true;
+    });
+  }, [data, filters]);
+
+  const grouped = useMemo(() => groupByMonth(filtered), [filtered]);
 
   const toggleMonth = (key: string) => {
     setExpandedMonths((prev) => {
@@ -93,34 +157,38 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
                 №
               </div>
             </TableHead>
-            <TableHead style={{ width: "13%"  }} className="py-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <Hash className="w-3.5 h-3.5" /> Он сар
-              </div>
+            <TableHead style={{ width: "13%" }} className="py-4">
+              <ColumnFilter
+                label="Он сар"
+                value={filters.created_at}
+                onChange={(val) => setFilter("created_at", val)}
+              />
             </TableHead>
             <TableHead style={{ width: "8%" }} className="py-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <Calendar className="w-3.5 h-3.5" />
-                Дугаар
-              </div>
+              <ColumnFilter
+                label="Дугаар"
+                value={filters.id}
+                onChange={(val) => setFilter("id", val)}
+              />
             </TableHead>
             <TableHead style={{ width: "28%" }} className="py-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <FileText className="w-3.5 h-3.5" />
-                Сорьцын нэр
-              </div>
+              <ColumnFilter
+                label="Сорьцын нэр"
+                value={filters.sample_names}
+                onChange={(val) => setFilter("sample_names", val)}
+                suggestions={suggestions.samples}
+              />
             </TableHead>
             <TableHead style={{ width: "32%" }} className="py-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <FlaskConical className="w-3.5 h-3.5" />
-                Сонгосон шинжилгээ
-              </div>
+              <ColumnFilter
+                label="Сонгосон шинжилгээ"
+                value={filters.indicator_names}
+                onChange={(val) => setFilter("indicator_names", val)}
+                suggestions={suggestions.indicators}
+              />
             </TableHead>
             <TableHead style={{ width: "14%" }} className="py-4 pr-6">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                Төлөв
-              </div>
+            Төлөв
             </TableHead>
           </TableRow>
         </TableHeader>
