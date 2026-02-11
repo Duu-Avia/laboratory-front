@@ -75,4 +75,12 @@ export const ENDPOINTS = {
     ASSIGN_LAB_TYPES: (userId: number) => `/users/${userId}/lab-types`,
     ROLES: "/users/roles/list",
   },
+  // Notifications
+  NOTIFICATIONS: {
+    STREAM: "/notifications/stream",
+    LIST: "/notifications",
+    UNREAD_COUNT: "/notifications/unread-count",
+    READ_ALL: "/notifications/read-all",
+    READ: (id: number) => `/notifications/${id}/read`,
+  },
 } as const;

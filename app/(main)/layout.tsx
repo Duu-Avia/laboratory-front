@@ -9,7 +9,10 @@ export default function MainLayout({
   return (
     <div className="flex h-full">
       <LeftSidebar />
-      <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* <TopHeader /> */}
+        <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
+      </div>
     </div>
   );
 }

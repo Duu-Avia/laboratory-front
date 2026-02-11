@@ -35,6 +35,14 @@ export type {
   Employee,
 } from "./user";
 
+// Notification types
+export type {
+  NotificationType,
+  Notification,
+  NotificationListResponse,
+  UnreadCountResponse,
+} from "./notification";
+
 // Component props types
 export type {
   FilterBarProps,

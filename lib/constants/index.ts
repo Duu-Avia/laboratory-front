@@ -35,3 +35,10 @@ export const TOKEN_KEY = "token";
 
 // Cookie max age (7 days in seconds)
 export const TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
+
+// Notification type labels
+export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
+  report_assigned: "Хянах хүсэлт",
+  report_approved: "Тайлан батлагдсан",
+  report_rejected: "Тайлан буцаагдсан",
+};

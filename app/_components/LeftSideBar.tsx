@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
+import NotificationBell from "./NotificationBell";
 
 const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
 
@@ -95,6 +96,8 @@ export default function LeftSidebar() {
         <div className="text-[15px] font-semibold">Лаборатори</div>
         <div className="text-[11px] text-white/70">бүртгэлийн систем</div>
 </div>
+
+      <NotificationBell/>
         </div>
       </div>
 
