@@ -7,6 +7,7 @@ export const STATUS_OPTIONS = [
   { key: "all", label: "Бүгд" },
   { key: "draft", label: "Draft" },
   { key: "pending_samples", label: "Сорьц хүлээгдэж байна" },
+  { key: "incomplete", label: "Дутуу" },
   { key: "tested", label: "Шинжилгээ хийгдсэн" },
   { key: "signed", label: "Шалгагдаж байна" },
   { key: "approved", label: "Батлагдсан" },
@@ -17,6 +18,7 @@ export const STATUS_OPTIONS = [
 export const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
   tested: "Шинжилгээ хийгдсэн",
+  incomplete: "Дутуу",
   pending_samples: "Сорьц хүлээгдэж байна",
   signed: "Шалгагдаж байна",
   approved: "Батлагдсан",

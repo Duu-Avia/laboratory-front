@@ -18,9 +18,10 @@ export function DeleteDialog({
   deleteDialogOpener,
   reportId,
   setDeleteDialogOpener,
+  onDeleted,
 }: DeleteDialogProps) {
-  // useState goes HERE - inside function body, not in parameters!
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const onDeleteClick = async () => {
     if (!reportId) {
@@ -30,11 +31,15 @@ export function DeleteDialog({
 
     try {
       setError(null);
+      setLoading(true);
       await api.delete(ENDPOINTS.REPORTS.DELETE(reportId));
       setDeleteDialogOpener(false);
+      onDeleted?.();
     } catch (err) {
       logError(err, "Delete report");
       setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,12 +60,13 @@ export function DeleteDialog({
         )}
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Болих</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>Болих</AlertDialogCancel>
           <AlertDialogAction
             onClick={onDeleteClick}
+            disabled={loading}
             className="bg-red-600 hover:bg-red-700"
           >
-            Устгах
+            {loading ? "Устгаж байна..." : "Устгах"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

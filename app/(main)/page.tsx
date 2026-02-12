@@ -55,6 +55,7 @@ export default function ReportsPage() {
     null
   );
   const [pdfReportLabType, setPdfReportLabType] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   // Fetch lab types — super admin, others get their assigned types from /auth/me
   useEffect(() => {
@@ -173,8 +174,36 @@ export default function ReportsPage() {
       logError(err, "Excel export");
     }
   };
+
+  const handleDeleteSuccess = () => {
+    setDeleteSuccess(true);
+    fetchReports();
+    setTimeout(() => {
+      setDeleteSuccess(false);
+    }, 3000);
+  };
+
   return (
     <div className="p-4 space-y-5">
+      {/* Delete Success Banner */}
+      {deleteSuccess && (
+        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 p-6 shadow-lg animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-2xl font-bold">
+              ✓
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-emerald-900 dark:text-emerald-400">
+                Амжилттай устгагдлаа!
+              </h3>
+              <p className="text-sm text-emerald-700 dark:text-emerald-500 mt-0.5">
+                Тайлан амжилттай устгагдлаа.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         {loading ? (
           <motion.div
@@ -257,6 +286,7 @@ export default function ReportsPage() {
         reportLabType={pdfReportLabType}
         onOpenChange={setPdfModalOpen}
         onApproved={fetchReports}
+        onDeleted={handleDeleteSuccess}
         labTypes={labTypes}
       />
     </div>

@@ -24,6 +24,7 @@ export interface PdfViewModalProps {
   reportLabType?: string | null;
   onOpenChange: (open: boolean) => void;
   onApproved?: () => void;
+  onDeleted?: () => void;
   labTypes: LabType[];
 }
 
@@ -37,6 +38,7 @@ export function PdfViewModal({
   reportLabType,
   onOpenChange,
   onApproved,
+  onDeleted,
   labTypes,
 }: PdfViewModalProps) {
   const { getUser } = useAuth();
@@ -213,6 +215,10 @@ export function PdfViewModal({
         reportId={reportId}
         deleteDialogOpener={deleteDialogOpener}
         setDeleteDialogOpener={setDeleteDialogOpener}
+        onDeleted={() => {
+          onOpenChange(false);
+          onDeleted?.();
+        }}
       />
 
       <EditReport

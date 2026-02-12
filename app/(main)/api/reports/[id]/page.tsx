@@ -63,6 +63,7 @@ export default function ReportDetailPage() {
 
   const [samples, setSamples] = useState<SampleColumn[]>([]);
   const [reportTitle, setReportTitle] = useState("");
+  const [reportStatus, setReportStatus] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -87,12 +88,13 @@ export default function ReportDetailPage() {
 
   useEffect(() => {
     api
-      .get<{ samples: SampleColumn[]; report_title: string }>(
+      .get<{ samples: SampleColumn[]; report_title: string; status?: string }>(
         ENDPOINTS.REPORTS.DETAIL(reportId)
       )
       .then((data) => {
         setSamples(normalizeSamples(data.samples));
         setReportTitle(data.report_title);
+        setReportStatus(data.status ?? "");
       })
       .catch((err) => logError(err, "Fetch report details"));
   }, [reportId]);
@@ -110,6 +112,36 @@ export default function ReportDetailPage() {
       }))
     );
   }
+
+  // Find missing results for the confirmation dialog
+  const missingResults = useMemo(() => {
+    const missing: { indicatorName: string; sampleName: string }[] = [];
+    for (const s of samples) {
+      for (const ind of (s.indicators ?? []) as any[]) {
+        const isCfu = ind.unit?.toLowerCase().includes("cfu") ?? false;
+        if (isCfu) {
+          if (!ind.result_value) {
+            missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+            continue;
+          }
+          try {
+            const parsed = JSON.parse(ind.result_value);
+            if (parsed.temp22 === "" || parsed.temp37 === "") {
+              missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+            }
+          } catch {
+            missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+          }
+        } else if (ind.is_detected === null || ind.is_detected === undefined) {
+          missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+        }
+      }
+    }
+    return missing;
+  }, [samples]);
+
+  // Whether to highlight missing inputs in the table
+  const highlightMissing = missingResults.length > 0;
 
   // Show confirmation dialog
   const handleSaveClick = () => {
@@ -132,10 +164,27 @@ export default function ReportDetailPage() {
       });
     });
 
+    // Check if all results are filled
+    const isComplete = samples.every((s: any) =>
+      (s.indicators ?? []).every((ind: any) => {
+        const isCfu = ind.unit?.toLowerCase().includes("cfu") ?? false;
+        if (isCfu) {
+          if (!ind.result_value) return false;
+          try {
+            const parsed = JSON.parse(ind.result_value);
+            return parsed.temp22 !== "" && parsed.temp37 !== "";
+          } catch {
+            return false;
+          }
+        }
+        return ind.is_detected !== null && ind.is_detected !== undefined;
+      })
+    );
+
     try {
       setSaving(true);
       setShowConfirmDialog(false);
-      await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results });
+      await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results, is_complete: isComplete });
       setSaveSuccess(true);
 
       // Redirect to main page after 2 seconds
@@ -179,8 +228,8 @@ export default function ReportDetailPage() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/50">
-                  <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-500" />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-full ${missingResults.length > 0 ? "bg-red-100 dark:bg-red-950/50" : "bg-amber-100 dark:bg-amber-950/50"}`}>
+                  <AlertTriangle className={`h-6 w-6 ${missingResults.length > 0 ? "text-red-600 dark:text-red-500" : "text-amber-600 dark:text-amber-500"}`} />
                 </div>
                 <AlertDialogTitle className="text-xl">
                   Шинжилгээний үр дүнг хадгалах уу?
@@ -191,15 +240,39 @@ export default function ReportDetailPage() {
                 энэ үйлдлийг буцаах боломжгүй болохыг анхаарна уу.
               </AlertDialogDescription>
             </AlertDialogHeader>
+
+            {missingResults.length > 0 && (
+              <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-3 max-h-[200px] overflow-y-auto">
+                <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">
+                  Дутуу шинжилгээний хариу ({missingResults.length}):
+                </p>
+                <ul className="space-y-1">
+                  {missingResults.map((m, i) => (
+                    <li key={i} className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                      <span className="font-medium">{m.indicatorName}</span>
+                      <span className="text-red-400 dark:text-red-500">— {m.sampleName}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-red-500 dark:text-red-500 mt-2">
+                  Хадгалвал тайлангийн төлөв &quot;Дутуу&quot; болно.
+                </p>
+              </div>
+            )}
+
             <AlertDialogFooter>
               <AlertDialogCancel className="border-slate-200 dark:border-slate-800">
                 Болих
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmSave}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className={missingResults.length > 0
+                  ? "bg-amber-600 hover:bg-amber-700 text-white"
+                  : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                }
               >
-                Тийм, хадгалах
+                {missingResults.length > 0 ? "Дутуу хадгалах" : "Тийм, хадгалах"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -222,6 +295,7 @@ export default function ReportDetailPage() {
             <ResultsTable
               indicatorGroups={indicatorGroups}
               onUpdateIndicator={updateSampleIndicator}
+              highlightMissing={highlightMissing}
             />
           </div>
         )}

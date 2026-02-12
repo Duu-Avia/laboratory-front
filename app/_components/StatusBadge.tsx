@@ -10,6 +10,10 @@ const STATUS_STYLES: Record<string, { className: string; dotColor: string }> = {
     className: " text-[#D1B23F]  hover:bg-amber-50 ",
     dotColor: "bg-amber-200",
   },
+  incomplete: {
+    className: "text-red-700 hover:bg-yellow-100",
+    dotColor: "bg-red-400",
+  },
   tested: {
     className: "text-cyan-700 hover:bg-cyan-50 ",
     dotColor: "bg-cyan-200",

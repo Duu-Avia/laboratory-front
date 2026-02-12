@@ -36,11 +36,13 @@ type ResultsTableProps = {
     sampleIndicatorId: number,
     patch: Record<string, any>
   ) => void;
+  highlightMissing?: boolean;
 };
 
 export function ResultsTable({
   indicatorGroups,
   onUpdateIndicator,
+  highlightMissing = false,
 }: ResultsTableProps) {
   const handleCfuChange = (
     sampleIndicatorId: number,
@@ -97,6 +99,7 @@ export function ResultsTable({
                 rowCount={rowCount}
                 onCfuChange={handleCfuChange}
                 onUpdateIndicator={onUpdateIndicator}
+                highlightMissing={highlightMissing}
               />
             );
           })}
@@ -112,6 +115,7 @@ function IndicatorGroupRows({
   rowCount,
   onCfuChange,
   onUpdateIndicator,
+  highlightMissing,
 }: {
   group: IndicatorGroup;
   isCfu: boolean;
@@ -126,6 +130,7 @@ function IndicatorGroupRows({
     sampleIndicatorId: number,
     patch: Record<string, any>
   ) => void;
+  highlightMissing: boolean;
 }) {
   return (
     <>
@@ -177,11 +182,12 @@ function IndicatorGroupRows({
           )}
           <td className="px-4 py-3">
             {isCfu ? (
-              <CfuInput sr={sr} onCfuChange={onCfuChange} />
+              <CfuInput sr={sr} onCfuChange={onCfuChange} highlightMissing={highlightMissing} />
             ) : (
               <DetectionToggle
                 sr={sr}
                 onUpdateIndicator={onUpdateIndicator}
+                highlightMissing={highlightMissing}
               />
             )}
           </td>
@@ -194,6 +200,7 @@ function IndicatorGroupRows({
 function CfuInput({
   sr,
   onCfuChange,
+  highlightMissing,
 }: {
   sr: SampleResult;
   onCfuChange: (
@@ -202,16 +209,22 @@ function CfuInput({
     field: "temp22" | "temp37" | "average",
     newValue: string
   ) => void;
+  highlightMissing: boolean;
 }) {
   const cfuData = parseCfuValue(sr.result_value);
+  const emptyT22 = highlightMissing && cfuData.temp22 === "";
+  const emptyT37 = highlightMissing && cfuData.temp37 === "";
+  const missingStyle = "border-red-400 bg-red-50 dark:bg-red-950/20 dark:border-red-700";
+  const normalStyle = "bg-slate-50 dark:bg-slate-950/50 border-gray-300 dark:border-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20";
+
   return (
     <div className="flex gap-3 items-center">
       <div className="flex  gap-2 items-center">
-        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+        <label className={`text-xs font-semibold ${emptyT22 ? "text-red-500" : "text-slate-500 dark:text-slate-400"}`}>
           22°C
         </label>
         <Input
-          className="w-[80px] bg-slate-50 dark:bg-slate-950/50 border-gray-300 dark:border-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+          className={`w-[80px] ${emptyT22 ? missingStyle : normalStyle}`}
           type="number"
           value={cfuData.temp22}
           onChange={(e) =>
@@ -226,11 +239,11 @@ function CfuInput({
         />
       </div>
       <div className="flex gap-2 items-center ">
-        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+        <label className={`text-xs font-semibold ${emptyT37 ? "text-red-500" : "text-slate-500 dark:text-slate-400"}`}>
           37°C
         </label>
         <Input
-          className="w-[80px] bg-slate-50 dark:bg-slate-950/50 border-gray-300 dark:border-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+          className={`w-[80px] ${emptyT37 ? missingStyle : normalStyle}`}
           type="number"
           value={cfuData.temp37}
           onChange={(e) =>
@@ -263,15 +276,18 @@ function CfuInput({
 function DetectionToggle({
   sr,
   onUpdateIndicator,
+  highlightMissing,
 }: {
   sr: SampleResult;
   onUpdateIndicator: (
     sampleIndicatorId: number,
     patch: Record<string, any>
   ) => void;
+  highlightMissing: boolean;
 }) {
+  const isEmpty = highlightMissing && sr.is_detected === null;
   return (
-    <div className="inline-flex gap-10 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1">
+    <div className={`inline-flex gap-10 rounded-full border p-1 ${isEmpty ? "border-red-400 bg-red-50 dark:bg-red-950/20 dark:border-red-700" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"}`}>
       <button
         type="button"
         onClick={() =>

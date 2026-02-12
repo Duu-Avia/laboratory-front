@@ -52,6 +52,7 @@ export interface DeleteDialogProps {
   deleteDialogOpener: boolean;
   reportId: number | null;
   setDeleteDialogOpener: (open: boolean) => void;
+  onDeleted?: () => void;
 }
 
 export interface CreateReportModalProps {
