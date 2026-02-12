@@ -116,8 +116,8 @@ export default function ReportsPage() {
     const matchSearch =
       !search ||
       statusMatch.toLowerCase().includes(search.toLowerCase()) ||
-      r.report_title.toLowerCase().includes(search.toLowerCase()) ||
-      r.sample_names.toLowerCase().includes(search.toLowerCase());
+      String(r.id).includes(search) ||
+      (r.sample_names ?? "").toLowerCase().includes(search.toLowerCase());
 
     const matchStatus = status === "all" || r.status === status;
     const matchLabType =

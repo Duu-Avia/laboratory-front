@@ -18,8 +18,15 @@ export const ERROR_MESSAGES = {
 export function getErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
     switch (error.status) {
-      case 401:
+      case 401: {
+        // Try to get specific message from API response (e.g. wrong password)
+        if (error.data && typeof error.data === "object") {
+          const data = error.data as Record<string, unknown>;
+          if (typeof data.detail === "string") return data.detail;
+          if (typeof data.message === "string") return data.message;
+        }
         return ERROR_MESSAGES.UNAUTHORIZED;
+      }
       case 404:
         return ERROR_MESSAGES.NOT_FOUND;
       case 422:

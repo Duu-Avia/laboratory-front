@@ -34,15 +34,7 @@ import {
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
-import type { Employee } from "@/types";
-import { em } from "motion/react-client";
-
-const ROLE_OPTIONS = [
-  { value: "engineer", label: "Инженер" },
-  { value: "senior_engineer", label: "Ахлах инженер" },
-  { value: "admin", label: "Админ" },
-  { value: "superadmin", label: "Супер админ" },
-];
+import type { Employee, Roles } from "@/types";
 
 interface EditEmployeeDialogProps {
   open: boolean;
@@ -64,7 +56,8 @@ export function EditEmployeeDialog({
   const [emailSuccess, setEmailSuccess] = useState(false);
 
   // Role edit
-  const [role, setRole] = useState("");
+  const [roleId, setRoleId] = useState<number | null>(null);
+  const [roles, setRoles] = useState<Roles[]>([]);
   const [roleSaving, setRoleSaving] = useState(false);
   const [roleError, setRoleError] = useState<string | null>(null);
   const [roleSuccess, setRoleSuccess] = useState(false);
@@ -79,9 +72,16 @@ export function EditEmployeeDialog({
   const [deactivating, setDeactivating] = useState(false);
 
   useEffect(() => {
+    api
+      .get<Roles[]>(ENDPOINTS.USERS.ROLES)
+      .then(setRoles)
+      .catch((err) => logError(err, "Fetch roles"));
+  }, []);
+
+  useEffect(() => {
     if (open && employee) {
       setEmail(employee.email);
-      setRole(employee.role_name);
+      setRoleId(employee.role_id);
       setNewPassword("");
       setEmailError(null);
       setEmailSuccess(false);
@@ -122,7 +122,7 @@ export function EditEmployeeDialog({
       setRoleSuccess(false);
       setRoleSaving(true);
       await api.put(ENDPOINTS.USERS.CHANGE_ROLE(employee.id), {
-        role_name: role,
+        role_id: roleId,
       });
       setRoleSuccess(true);
       onUpdated?.();
@@ -227,9 +227,9 @@ export function EditEmployeeDialog({
             <div className="relative">
               <Key className="absolute left-3 top-3 h-3.5 w-3.5 text-slate-400 z-10" />
               <Select
-                value={role}
+                value={roleId ? String(roleId) : undefined}
                 onValueChange={(v) => {
-                  setRole(v);
+                  setRoleId(Number(v));
                   setRoleSuccess(false);
                 }}
               >
@@ -237,9 +237,9 @@ export function EditEmployeeDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {ROLE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                  {roles.map((r) => (
+                    <SelectItem key={r.id} value={String(r.id)}>
+                      {r.description || r.role_name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -260,7 +260,7 @@ export function EditEmployeeDialog({
               size="sm"
               variant="outline"
               onClick={handleRoleSave}
-              disabled={roleSaving || role === employee.role_name}
+              disabled={roleSaving || roleId === employee.role_id}
               className="text-xs"
             >
               {roleSaving ? "Хадгалж байна..." : "Эрх хадгалах"}

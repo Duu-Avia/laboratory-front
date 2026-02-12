@@ -34,28 +34,35 @@ const getHeaders = (customHeaders?: HeadersInit): HeadersInit => {
   };
 };
 
+interface FetchOptions extends RequestInit {
+  /** Skip the automatic redirect to /login on 401 responses */
+  skipAuthRedirect?: boolean;
+}
+
 /**
  * Base fetch wrapper with authentication and error handling
  */
 async function baseFetch<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: FetchOptions = {}
 ): Promise<T> {
+  const { skipAuthRedirect, ...requestInit } = options;
   const url = `${env.apiUrl}${endpoint}`;
 
   const response = await fetch(url, {
-    ...options,
-    headers: getHeaders(options.headers),
+    ...requestInit,
+    headers: getHeaders(requestInit.headers),
   });
 
-  // Handle unauthorized - redirect to login
+  // Handle unauthorized - redirect to login unless caller handles it
   if (response.status === 401) {
-    if (typeof window !== "undefined") {
+    if (!skipAuthRedirect && typeof window !== "undefined") {
       localStorage.removeItem("token");
       document.cookie = "token=; path=/; max-age=0";
       window.location.href = "/login";
     }
-    throw new ApiError(401, "Unauthorized");
+    const data = await response.json().catch(() => null);
+    throw new ApiError(401, "Unauthorized", data);
   }
 
   const data = await response.json();
@@ -71,31 +78,31 @@ async function baseFetch<T>(
  * API client with typed methods
  */
 export const api = {
-  get: <T>(endpoint: string, options?: RequestInit) =>
+  get: <T>(endpoint: string, options?: FetchOptions) =>
     baseFetch<T>(endpoint, { ...options, method: "GET" }),
 
-  post: <T>(endpoint: string, body?: unknown, options?: RequestInit) =>
+  post: <T>(endpoint: string, body?: unknown, options?: FetchOptions) =>
     baseFetch<T>(endpoint, {
       ...options,
       method: "POST",
       body: body ? JSON.stringify(body) : undefined,
     }),
 
-  put: <T>(endpoint: string, body?: unknown, options?: RequestInit) =>
+  put: <T>(endpoint: string, body?: unknown, options?: FetchOptions) =>
     baseFetch<T>(endpoint, {
       ...options,
       method: "PUT",
       body: body ? JSON.stringify(body) : undefined,
     }),
 
-  patch: <T>(endpoint: string, body?: unknown, options?: RequestInit) =>
+  patch: <T>(endpoint: string, body?: unknown, options?: FetchOptions) =>
     baseFetch<T>(endpoint, {
       ...options,
       method: "PATCH",
       body: body ? JSON.stringify(body) : undefined,
     }),
 
-  delete: <T>(endpoint: string, options?: RequestInit) =>
+  delete: <T>(endpoint: string, options?: FetchOptions) =>
     baseFetch<T>(endpoint, { ...options, method: "PUT" }),
 };
 

@@ -144,7 +144,6 @@ export function CreateReportModal({
       report_title: reportTitle || sampleGroup.location || "",
       test_start_date: sampleGroup.sample_date,
       test_end_date: calculateTestEndDate(sampleGroup.sample_date),
-      analyst: "",
       approved_by: "",
       samples,
     };

@@ -33,6 +33,7 @@ export type {
   UpdateProfilePayload,
   ChangePasswordPayload,
   Employee,
+  Roles,
 } from "./user";
 
 // Notification types

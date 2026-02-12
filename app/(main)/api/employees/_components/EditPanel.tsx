@@ -28,15 +28,8 @@ import {
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
-import type { Employee } from "@/types";
+import type { Employee, Roles } from "@/types";
 import { EmployeeCard } from "./EmployeeCard";
-
-const ROLE_OPTIONS = [
-  { value: "engineer", label: "Инженер" },
-  { value: "senior_engineer", label: "Ахлах инженер" },
-  { value: "admin", label: "Админ" },
-  { value: "superadmin", label: "Супер админ" },
-];
 
 interface EditPanelProps {
   employee: Employee | null;
@@ -46,16 +39,24 @@ interface EditPanelProps {
 
 export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
   const [editEmail, setEditEmail] = useState("");
-  const [editRole, setEditRole] = useState("");
+  const [editRoleId, setEditRoleId] = useState<number | null>(null);
   const [editPassword, setEditPassword] = useState("");
+  const [roles, setRoles] = useState<Roles[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
+    api
+      .get<Roles[]>(ENDPOINTS.USERS.ROLES)
+      .then(setRoles)
+      .catch((err) => logError(err, "Fetch roles"));
+  }, []);
+
+  useEffect(() => {
     if (employee) {
       setEditEmail(employee.email);
-      setEditRole(employee.role_name);
+      setEditRoleId(employee.role_id);
       setEditPassword("");
       setError(null);
       setSuccess(null);
@@ -88,7 +89,7 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
       setSuccess(null);
       setSaving(true);
       await api.put(ENDPOINTS.USERS.CHANGE_ROLE(employee.id), {
-        role_name: editRole,
+        role_id: editRoleId,
       });
       setSuccess("Эрх солигдлоо");
       onSaved?.();
@@ -218,9 +219,9 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
                 <div className="relative">
                   <Key className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400 z-10" />
                   <Select
-                    value={editRole}
+                    value={editRoleId ? String(editRoleId) : undefined}
                     onValueChange={(v) => {
-                      setEditRole(v);
+                      setEditRoleId(Number(v));
                       setSuccess(null);
                     }}
                   >
@@ -228,9 +229,9 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {ROLE_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
+                      {roles.map((r) => (
+                        <SelectItem key={r.id} value={String(r.id)}>
+                          {r.description || r.role_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -241,7 +242,7 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
                   variant="outline"
                   className="h-7 text-xs w-full"
                   onClick={handleUpdateRole}
-                  disabled={saving || editRole === employee.role_name}
+                  disabled={saving || editRoleId === employee.role_id}
                 >
                   {saving ? "..." : "Эрх хадгалах"}
                 </Button>

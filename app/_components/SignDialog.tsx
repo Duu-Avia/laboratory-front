@@ -77,10 +77,11 @@ export function SignDialog({
     try {
       setError(null);
       setLoading(true);
-      await api.put(ENDPOINTS.REPORTS.SIGN(reportId), {
-        password,
-        assigned_to: assignedTo,
-      });
+      await api.put(
+        ENDPOINTS.REPORTS.SIGN(reportId),
+        { password, assigned_to: assignedTo },
+        { skipAuthRedirect: true }
+      );
       setPassword("");
       setAssignedTo(null);
       onOpenChange(false);
