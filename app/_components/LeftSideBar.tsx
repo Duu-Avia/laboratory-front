@@ -91,15 +91,19 @@ export default function LeftSidebar() {
       {/* Header */}
       <div className="px-5 py-4">
         <div className="flex items-center gap-3">
-          <img src={"/logo-without-text.jpg"} alt="Лаборатори лого" className="h-9 w-9 rounded-xl object-cover shadow-lg" />
+          <img
+            src={"/logo-without-text.jpg"}
+            alt="Лаборатори лого"
+            className="h-9 w-9 rounded-xl object-cover shadow-lg"
+          />
 
-      <a href="/">
-        <div>
-        <div className="text-[15px] font-semibold">Лаборатори</div>
-        <div className="text-[11px] text-white/70">бүртгэлийн систем</div>
-        </div>
-        </a>
-      <NotificationBell/>
+          <a href="/">
+            <div>
+              <div className="text-[15px] font-semibold">Лаборатори</div>
+              <div className="text-[11px] text-white/70">бүртгэлийн систем</div>
+            </div>
+          </a>
+          <NotificationBell />
         </div>
       </div>
 
@@ -117,7 +121,7 @@ export default function LeftSidebar() {
             const hasActiveSubmenu = item.submenu.some((sub) =>
               pathname.startsWith(sub.href)
             );
-        
+
             return (
               <div key={item.label}>
                 <button

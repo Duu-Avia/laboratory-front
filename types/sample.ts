@@ -33,7 +33,7 @@ export type SampleColumn = {
   sample_amount: string;
   location?: string;
   indicators: SampleIndicatorItem[];
-  sampled_by:string;
+  sampled_by: string;
 };
 
 export type SampleGroup = {

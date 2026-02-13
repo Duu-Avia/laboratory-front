@@ -58,8 +58,7 @@ export function PdfViewModal({
     (reportStatus === "tested" || reportStatus === "rejected") && isOwner;
   const canApprove =
     reportStatus === "signed" && assignedTo !== undefined && isManagement;
-  const canReject =
-    reportStatus === "signed" && isManagement;
+  const canReject = reportStatus === "signed" && isManagement;
 
   const [deleteDialogOpener, setDeleteDialogOpener] = useState(false);
   const [editDialogOpener, setEditDialogOpener] = useState(false);
@@ -79,9 +78,13 @@ export function PdfViewModal({
       return;
     }
     api
-      .get<{ comments?: { comment: string; action_type: string; created_at: string }[] }>(
-        ENDPOINTS.REPORTS.DETAIL(reportId)
-      )
+      .get<{
+        comments?: {
+          comment: string;
+          action_type: string;
+          created_at: string;
+        }[];
+      }>(ENDPOINTS.REPORTS.DETAIL(reportId))
       .then((data) => setComments(data.comments ?? []))
       .catch((err) => logError(err, "Fetch report comments"));
   }, [open, reportId, reportStatus]);

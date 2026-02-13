@@ -240,7 +240,11 @@ export default function EmployeesPage() {
 
                 {unassigned.length > 0 && (
                   <LabTypeGroup
-                    labType={{ id: 0, type_name: "Хуваарилагдаагүй", standard: "" }}
+                    labType={{
+                      id: 0,
+                      type_name: "Хуваарилагдаагүй",
+                      standard: "",
+                    }}
                     employees={unassigned}
                     canCreate={false}
                   />

@@ -44,20 +44,17 @@ export function useNotifications() {
   }, []);
 
   // Mark single notification as read
-  const markAsRead = useCallback(
-    async (id: number) => {
-      try {
-        await api.put(ENDPOINTS.NOTIFICATIONS.READ(id));
-        setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-      } catch {
-        // silent fail
-      }
-    },
-    []
-  );
+  const markAsRead = useCallback(async (id: number) => {
+    try {
+      await api.put(ENDPOINTS.NOTIFICATIONS.READ(id));
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch {
+      // silent fail
+    }
+  }, []);
 
   // Mark all as read
   const markAllAsRead = useCallback(async () => {

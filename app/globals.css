@@ -55,8 +55,9 @@
   --color-modal-error: hsl(var(--modal-error));
   --color-modal-error-light: hsl(var(--modal-error-light));
   --color-modal-indicator-selected: hsl(var(--modal-indicator-selected));
-  --color-modal-indicator-selected-border: hsl(var(--modal-indicator-selected-border));
-
+  --color-modal-indicator-selected-border: hsl(
+    var(--modal-indicator-selected-border)
+  );
 }
 
 :root {

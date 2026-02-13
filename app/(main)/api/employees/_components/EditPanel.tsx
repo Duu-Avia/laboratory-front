@@ -134,7 +134,7 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
       logError(err, "Deactivate user");
     }
   };
-  console.log(employee?.id," songogdson empoyee id shvv");
+  console.log(employee?.id, " songogdson empoyee id shvv");
   return (
     <AnimatePresence>
       {employee && (

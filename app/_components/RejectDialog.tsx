@@ -50,9 +50,13 @@ export function RejectDialog({
     try {
       setError(null);
       setLoading(true);
-      await api.put(ENDPOINTS.REPORTS.REJECT(reportId), { password, comment }, {
-        skipAuthRedirect: true,
-      });
+      await api.put(
+        ENDPOINTS.REPORTS.REJECT(reportId),
+        { password, comment },
+        {
+          skipAuthRedirect: true,
+        }
+      );
       setPassword("");
       setComment("");
       onOpenChange(false);

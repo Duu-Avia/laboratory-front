@@ -21,8 +21,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
 
         // ✅ NEW: pill variant (base shape only)
-        pill:
-          "rounded-xl border ",
+        pill: "rounded-xl border ",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -77,4 +76,3 @@ function Button({
 }
 
 export { Button, buttonVariants };
-

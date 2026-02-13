@@ -79,7 +79,8 @@ export function ReactivateLabTypeDialog({
                 </div>
 
                 <p className="text-sm text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                  💡 Санамж: Шинжилгээнүүд нь автоматаар идэвхжихгүй, тусад нь идэвхжүүлэх шаардлагатай
+                  💡 Санамж: Шинжилгээнүүд нь автоматаар идэвхжихгүй, тусад нь
+                  идэвхжүүлэх шаардлагатай
                 </p>
               </div>
             )}

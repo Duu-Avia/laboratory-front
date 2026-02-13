@@ -48,7 +48,8 @@ export function HeaderSection({
 
   const openCreateModal = () => {
     setDraft({
-      lab_type_id: selectedLabTypeId === "all" ? null : Number(selectedLabTypeId),
+      lab_type_id:
+        selectedLabTypeId === "all" ? null : Number(selectedLabTypeId),
       indicator_name: "",
       unit: "",
       test_method: "",
@@ -138,7 +139,12 @@ export function HeaderSection({
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                   {labTypes
-                    .filter((t) => t.is_active === 1 || t.is_active === true || t.is_active === undefined)
+                    .filter(
+                      (t) =>
+                        t.is_active === 1 ||
+                        t.is_active === true ||
+                        t.is_active === undefined
+                    )
                     .map((t) => (
                       <SelectItem key={t.id} value={String(t.id)}>
                         {t.type_name}

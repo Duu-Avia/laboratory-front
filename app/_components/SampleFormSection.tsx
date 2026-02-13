@@ -67,8 +67,12 @@ export function SampleFormSection({
   setSampleGroup,
   labTypes,
 }: Props) {
-  const [locationPackages, setLocationPackages] = useState<LocationPackage[]>([]);
-  const [selectedPackageId, setSelectedPackageId] = useState<number | null>(null);
+  const [locationPackages, setLocationPackages] = useState<LocationPackage[]>(
+    []
+  );
+  const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     if (!sampleGroup.lab_type_id) {
@@ -207,7 +211,10 @@ export function SampleFormSection({
                 value={labTypes[0]?.type_name || ""}
                 readOnly
                 tabIndex={-1}
-                className={inputClasses + " bg-muted cursor-not-allowed !text-gray-900 dark:!text-gray-100 font-semibold"}
+                className={
+                  inputClasses +
+                  " bg-muted cursor-not-allowed !text-gray-900 dark:!text-gray-100 font-semibold"
+                }
               />
             )}
           </div>
@@ -220,7 +227,9 @@ export function SampleFormSection({
             <Select
               value={selectedPackageId ? String(selectedPackageId) : undefined}
               onValueChange={(v) => handlePackageSelect(Number(v))}
-              disabled={!sampleGroup.lab_type_id || locationPackages.length === 0}
+              disabled={
+                !sampleGroup.lab_type_id || locationPackages.length === 0
+              }
             >
               <SelectTrigger className={selectTriggerClasses}>
                 <SelectValue
@@ -379,14 +388,16 @@ export function SampleFormSection({
                 : "Сорьцын төрлөө эхлээд сонгоно уу"
             }
           />
-          {sampleGroup.lab_type_id && sampleGroup.availableIndicators.length > 0 && (
-            <Badge
-              variant="secondary"
-              className="bg-modal-accent/10 text-modal-accent border-0 text-xs"
-            >
-              {sampleGroup.indicators.length} / {sampleGroup.availableIndicators.length}
-            </Badge>
-          )}
+          {sampleGroup.lab_type_id &&
+            sampleGroup.availableIndicators.length > 0 && (
+              <Badge
+                variant="secondary"
+                className="bg-modal-accent/10 text-modal-accent border-0 text-xs"
+              >
+                {sampleGroup.indicators.length} /{" "}
+                {sampleGroup.availableIndicators.length}
+              </Badge>
+            )}
         </div>
 
         {sampleGroup.lab_type_id ? (
@@ -428,9 +439,7 @@ export function SampleFormSection({
           <div className="flex items-center justify-center rounded-lg border border-dashed border-modal-section-border py-8">
             <div className="text-center">
               <FlaskConical className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">
-                Шинжилгээний цэс
-              </p>
+              <p className="text-sm text-muted-foreground">Шинжилгээний цэс</p>
             </div>
           </div>
         )}

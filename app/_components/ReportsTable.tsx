@@ -67,32 +67,39 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
   // Apply column filters (partial match with .includes)
   const filtered = useMemo(() => {
     return data.filter((row) => {
-      if (filters.created_at && !row.created_at.slice(0, 10).includes(filters.created_at))
+      if (
+        filters.created_at &&
+        !row.created_at.slice(0, 10).includes(filters.created_at)
+      )
         return false;
 
-      if (filters.id && !String(row.id).includes(filters.id))
-        return false;
+      if (filters.id && !String(row.id).includes(filters.id)) return false;
 
       if (
         filters.sample_names &&
-        !row.sample_names?.toLowerCase().includes(filters.sample_names.toLowerCase())
+        !row.sample_names
+          ?.toLowerCase()
+          .includes(filters.sample_names.toLowerCase())
       )
         return false;
 
       if (
         filters.indicator_names &&
-        !row.indicator_names?.toLowerCase().includes(filters.indicator_names.toLowerCase())
+        !row.indicator_names
+          ?.toLowerCase()
+          .includes(filters.indicator_names.toLowerCase())
       )
         return false;
 
       if (
         filters.created_by_name &&
-        !row.created_by_name?.toLowerCase().includes(filters.created_by_name.toLowerCase())
+        !row.created_by_name
+          ?.toLowerCase()
+          .includes(filters.created_by_name.toLowerCase())
       )
         return false;
 
-      if (filters.status && row.status !== filters.status)
-        return false;
+      if (filters.status && row.status !== filters.status) return false;
 
       return true;
     });
@@ -160,7 +167,9 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
               className="hover:bg-muted/50 cursor-pointer"
               onClick={() => onRowClick(dataItem)}
             >
-              <TableCell className="text-gray-500 text-[11px]">{index + 1}</TableCell>
+              <TableCell className="text-gray-500 text-[11px]">
+                {index + 1}
+              </TableCell>
               <TableCell>{dataItem.created_at.slice(0, 10)}</TableCell>
               <TableCell>
                 <button className="dark:text-sky-400 font-semibold hover:underline text-left">
@@ -194,9 +203,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                   ))}
                 </div>
               </TableCell>
-              <TableCell>
-                {dataItem.created_by_name || "-"}
-              </TableCell>
+              <TableCell>{dataItem.created_by_name || "-"}</TableCell>
               <TableCell className="text-right">
                 <StatusBadge status={dataItem.status} />
               </TableCell>
@@ -208,7 +215,9 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                 colSpan={7}
                 className="py-10 text-center text-muted-foreground"
               >
-                {Object.values(filters).some((v) => v) ? "Шүүлтүүрт тохирох илэрц олдсонгүй" : "No reports"}
+                {Object.values(filters).some((v) => v)
+                  ? "Шүүлтүүрт тохирох илэрц олдсонгүй"
+                  : "No reports"}
               </TableCell>
             </TableRow>
           )}

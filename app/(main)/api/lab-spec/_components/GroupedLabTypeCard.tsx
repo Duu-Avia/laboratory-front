@@ -32,12 +32,18 @@ export function GroupedIndicatorsSection({
   // - If "all" filter: show ALL active lab types (even without indicators, so users can edit/delete)
   // - If specific filter: only show lab types that have indicators (respect the filter)
   const activeLabTypes = labTypes
-    .filter((lt) => lt.is_active === 1 || lt.is_active === true || lt.is_active === undefined)
+    .filter(
+      (lt) =>
+        lt.is_active === 1 ||
+        lt.is_active === true ||
+        lt.is_active === undefined
+    )
     .filter((lt) => selectedFilter === "all" || grouped.has(lt.id));
 
   // Inactive lab types: show ALL inactive lab types regardless of filter
-  const inactiveLabTypes = labTypes
-    .filter((lt) => lt.is_active === 0 || lt.is_active === false);
+  const inactiveLabTypes = labTypes.filter(
+    (lt) => lt.is_active === 0 || lt.is_active === false
+  );
 
   return (
     <div className="space-y-5">

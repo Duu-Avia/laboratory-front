@@ -9,12 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  FileText,
-  Calendar,
-  ChevronDown,
-} from "lucide-react";
-import { ReportsTableProps, ReportRow} from "@/types";
+import { FileText, Calendar, ChevronDown } from "lucide-react";
+import { ReportsTableProps, ReportRow } from "@/types";
 import { StatusBadge } from "@/app/_components/StatusBadge";
 import { ColumnFilter } from "@/app/_components/ColumnFilter";
 import { STATUS_OPTIONS } from "@/lib/constants";
@@ -30,7 +26,7 @@ const INITIAL_FILTERS: ColumnFiltersType = {
 };
 
 // Filter out "all" from STATUS_OPTIONS for column filter dropdown
-const STATUS_FILTER_OPTIONS = STATUS_OPTIONS.filter(opt => opt.key !== "all");
+const STATUS_FILTER_OPTIONS = STATUS_OPTIONS.filter((opt) => opt.key !== "all");
 
 const MONTH_NAMES = [
   "1-р сар",
@@ -94,27 +90,33 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
   }, [data]);
 
   // Apply column filters before grouping
-  const filtered = useMemo(() => { return data.filter((row) => {
-      if (filters.created_at && !row.created_at.slice(0, 10).includes(filters.created_at))
+  const filtered = useMemo(() => {
+    return data.filter((row) => {
+      if (
+        filters.created_at &&
+        !row.created_at.slice(0, 10).includes(filters.created_at)
+      )
         return false;
 
-      if (filters.id && !String(row.id).includes(filters.id))
-        return false;
+      if (filters.id && !String(row.id).includes(filters.id)) return false;
 
       if (
         filters.sample_names &&
-        !row.sample_names?.toLowerCase().includes(filters.sample_names.toLowerCase())
+        !row.sample_names
+          ?.toLowerCase()
+          .includes(filters.sample_names.toLowerCase())
       )
         return false;
 
       if (
         filters.indicator_names &&
-        !row.indicator_names?.toLowerCase().includes(filters.indicator_names.toLowerCase())
+        !row.indicator_names
+          ?.toLowerCase()
+          .includes(filters.indicator_names.toLowerCase())
       )
         return false;
 
-      if (filters.status && row.status !== filters.status)
-        return false;
+      if (filters.status && row.status !== filters.status) return false;
 
       return true;
     });
@@ -188,7 +190,7 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
               />
             </TableHead>
             <TableHead style={{ width: "14%" }} className="py-4 pr-6">
-            Төлөв
+              Төлөв
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -268,7 +270,7 @@ function MonthGroup({
                       onClick={() => onRowClick(dataItem)}
                       className="group cursor-pointer border-b border-slate-100 last:border-0 hover:bg-gradient-to-r hover:from-blue-200 hover:to-indigo-50/30 duration-500"
                     >
-                        <td style={{ width: "5%" }} className="py-5 pl-4">
+                      <td style={{ width: "5%" }} className="py-5 pl-4">
                         <span className="inline-flex items-center justify-center w-6 h-6 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-bold text-slate-600 group-hover:from-blue-100 group-hover:to-blue-200 group-hover:text-blue-400 transition-all shadow-sm">
                           {index + 1}
                         </span>

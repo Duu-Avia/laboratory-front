@@ -54,9 +54,15 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
         type="button"
         className="w-full flex items-center gap-3 px-4 py-4  transition cursor-pointer text-left"
       >
-  <img src={"/logo-without-text.jpg"} alt="User avatar" className="h-9 w-9 rounded-xl object-cover shrink-0 shadow-md" />
+        <img
+          src={"/logo-without-text.jpg"}
+          alt="User avatar"
+          className="h-9 w-9 rounded-xl object-cover shrink-0 shadow-md"
+        />
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold capitalize truncate text-white truncate">{displayName}</div>
+          <div className="text-sm font-semibold capitalize truncate text-white truncate">
+            {displayName}
+          </div>
           <div className="text-xs text-white/50">{roleLabel}</div>
         </div>
         <ChevronsUpDown className="h-4 w-4 text-white/40 shrink-0" />
@@ -81,8 +87,11 @@ export default function UserMenu({ variant = "default" }: UserMenuProps) {
           className="w-[100%] p-0"
         >
           <div className="flex items-center gap-3 px-4 py-3">
-           
-            <img src={"/logo-without-text.jpg"} alt="User avatar" className="h-9 w-9 rounded-xl object-cover shrink-0 shadow-md" />
+            <img
+              src={"/logo-without-text.jpg"}
+              alt="User avatar"
+              className="h-9 w-9 rounded-xl object-cover shrink-0 shadow-md"
+            />
             <div className="min-w-0">
               <div className="text-[14px] font-medium capitalize truncate">
                 {displayName}

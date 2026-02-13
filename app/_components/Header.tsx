@@ -69,7 +69,6 @@ export function Header({
         <Button
           className="cursor-pointer hover:bg-gray-300 active:bg-gray-400"
           variant="secondary"
-
           onClick={onExportClick}
         >
           Экселрүү хөрвүүлэх
@@ -81,11 +80,10 @@ export function Header({
       <div className="flex justify-between gap-6">
         {labTypes.length > 1 && (
           <div>
-            
-          <label className="py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-2 text-center">
-            <span className="h-1 w-1 rounded-full bg-blue-500" />
+            <label className="py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center justify-center gap-2 text-center">
+              <span className="h-1 w-1 rounded-full bg-blue-500" />
               Лаб төрлөөр шүүх
-          </label>
+            </label>
 
             <div className="flex flex-wrap items-center gap-2">
               <Button
@@ -96,7 +94,9 @@ export function Header({
                 onClick={() => onLabTypeChange("all")}
               >
                 Бүгд
-                <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-blue-100 text-[12px] font-semibold leading-none border-1 border-sky-500">{totalCount}</span>
+                <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-blue-100 text-[12px] font-semibold leading-none border-1 border-sky-500">
+                  {totalCount}
+                </span>
               </Button>
 
               {labTypes.map((type) => {
@@ -111,7 +111,9 @@ export function Header({
                     onClick={() => onLabTypeChange(type.type_name)}
                   >
                     {type.type_name}
-<span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-blue-100 text-[12px]  font-semibokd leading-none border-1 border-sky-500">{count}</span>
+                    <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-blue-100 text-[12px]  font-semibokd leading-none border-1 border-sky-500">
+                      {count}
+                    </span>
                   </Button>
                 );
               })}
@@ -120,11 +122,10 @@ export function Header({
         )}
 
         <div className="flex flex-col gap-1">
-          
-        <label className="w-fit mx-auto pl-1.5 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <div className="h-1 w-1 rounded-full bg-blue-500" />
-             Тайлангийн төлөвөөр хайх 
-        </label>
+          <label className="w-fit mx-auto pl-1.5 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <div className="h-1 w-1 rounded-full bg-blue-500" />
+            Тайлангийн төлөвөөр хайх
+          </label>
 
           <div className="flex flex-wrap gap-2">
             {statusOptions.map((s) => (

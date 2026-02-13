@@ -78,7 +78,10 @@ export function DeleteLabTypeDialog({
                     Энэ лаб төрлийг идэвхгүй болговол:
                   </p>
                   <ul className="text-sm text-orange-800 dark:text-orange-400 space-y-1 list-disc list-inside">
-                    <li>Ажилтнууд автоматаар &quot;Хуваарилагдаагүй&quot; группт шилжинэ</li>
+                    <li>
+                      Ажилтнууд автоматаар &quot;Хуваарилагдаагүй&quot; группт
+                      шилжинэ
+                    </li>
                     {indicatorCount > 0 && (
                       <li>{indicatorCount} шинжилгээ идэвхгүй болно</li>
                     )}
@@ -88,7 +91,8 @@ export function DeleteLabTypeDialog({
                 </div>
 
                 <p className="text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                  💡 Санамж: Дараа нь &quot;Идэвхжүүлэх&quot; товчоор сэргээх боломжтой
+                  💡 Санамж: Дараа нь &quot;Идэвхжүүлэх&quot; товчоор сэргээх
+                  боломжтой
                 </p>
               </div>
             )}

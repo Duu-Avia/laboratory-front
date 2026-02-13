@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 
 type ColumnDef = {
-  width: string;       // tailwind width class e.g. "w-24"
+  width: string; // tailwind width class e.g. "w-24"
   align?: "left" | "right";
 };
 

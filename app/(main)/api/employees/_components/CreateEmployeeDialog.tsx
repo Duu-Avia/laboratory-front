@@ -27,10 +27,7 @@ import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
 import type { LabType } from "@/types";
 import { Roles } from "@/types/user";
-import {
-  employeeValidation,
-  type EmployeeForm,
-} from "@/lib/validators";
+import { employeeValidation, type EmployeeForm } from "@/lib/validators";
 
 interface CreateEmployeeDialogProps {
   open: boolean;
@@ -62,7 +59,13 @@ export function CreateEmployeeDialog({
     formState: { errors, isSubmitting },
   } = useForm<EmployeeForm>({
     resolver: zodResolver(employeeValidation),
-    defaultValues: { email: "", password: "", fullName: "", roleId: 0, position_name: "" },
+    defaultValues: {
+      email: "",
+      password: "",
+      fullName: "",
+      roleId: 0,
+      position_name: "",
+    },
   });
 
   const roleId = watch("roleId");
@@ -198,7 +201,9 @@ export function CreateEmployeeDialog({
                 <Input
                   type="text"
                   className={`pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-colors ${
-                    errors.position_name ? "border-red-300 focus:border-red-400" : ""
+                    errors.position_name
+                      ? "border-red-300 focus:border-red-400"
+                      : ""
                   }`}
                   {...register("position_name")}
                   placeholder="Жишээ: Инженер, Лабораторийн эрхлэгч"
@@ -227,7 +232,6 @@ export function CreateEmployeeDialog({
                       {roles.map((role) => (
                         <SelectItem key={role.id} value={role.id.toString()}>
                           {role.role_name}
-                        
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -267,9 +271,7 @@ export function CreateEmployeeDialog({
               className="bg-slate-900 text-white hover:bg-slate-800"
             >
               {isSubmitting ? (
-                <span className="flex items-center gap-2">
-                  Уншиж байна...
-                </span>
+                <span className="flex items-center gap-2">Уншиж байна...</span>
               ) : (
                 "Нэмэх"
               )}

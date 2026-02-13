@@ -16,11 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FileText, AlertCircle, Loader2, Save, X } from "lucide-react";
 
 // Types - use @/types instead of relative path
-import type {
-  CreateReportModalProps,
-  Indicator,
-  SampleGroup,
-} from "@/types";
+import type { CreateReportModalProps, Indicator, SampleGroup } from "@/types";
 
 // Lib - use new API client and error handling
 import { api } from "@/lib/api";
@@ -167,7 +163,6 @@ export function CreateReportModal({
       <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 gap-0 overflow-hidden border-modal-section-border shadow-2xl">
         {/* Header */}
         <DialogHeader className="bg-modal-header-bg px-6 py-5 border-b border-modal-section-border">
-          
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-modal-accent/10">
               <FileText className="h-5 w-5 text-modal-accent" />
@@ -177,7 +172,7 @@ export function CreateReportModal({
                 Шинэ сорьц
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-0.5">
-               Үүсгэх сорьцын мэдээллийг бөглөнө үү
+                Үүсгэх сорьцын мэдээллийг бөглөнө үү
               </p>
             </div>
           </div>
@@ -185,7 +180,7 @@ export function CreateReportModal({
 
         {/* Body - scrollable */}
         <div className="overflow-y-auto modal-scrollbar px-6 py-5 space-y-5 max-h-[calc(90vh-160px)]">
-{nextId && (
+          {nextId && (
             <div className="flex justify-center mb-3">
               <span className="text-sm font-medium text-muted-foreground">
                 №: <span className="text-foreground">{nextId}</span>
@@ -204,7 +199,9 @@ export function CreateReportModal({
               >
                 <AlertCircle className="h-5 w-5 text-modal-error shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-modal-error">Алдаа гарлаа</p>
+                  <p className="text-sm font-medium text-modal-error">
+                    Алдаа гарлаа
+                  </p>
                   <p className="text-sm text-modal-error/80 mt-0.5">{error}</p>
                 </div>
                 <button
@@ -223,9 +220,7 @@ export function CreateReportModal({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.05 }}
             className="space-y-2"
-          >
-            
-          </motion.div>
+          ></motion.div>
 
           {/* Sample Form Section */}
           <motion.div
@@ -275,4 +270,3 @@ export function CreateReportModal({
     </Dialog>
   );
 }
-

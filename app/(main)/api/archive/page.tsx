@@ -12,7 +12,6 @@ import { logError } from "@/lib/errors";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 
-
 export default function ArchivePage() {
   const router = useRouter();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
@@ -55,7 +54,7 @@ export default function ArchivePage() {
       .get<ReportRow[]>(`${ENDPOINTS.REPORTS.LIST}/archive?mode=${status}`)
       .then((data) => setData(data))
       .catch((err) => logError(err, "Fetch archive reports"));
-      setLoading(false);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -129,7 +128,7 @@ export default function ArchivePage() {
   console.log(data);
   return (
     <div className="p-6 space-y-5">
-            <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait">
         {loading ? (
           <motion.div
             key="loader"
@@ -164,31 +163,29 @@ export default function ArchivePage() {
             transition={{ duration: 0.35 }}
             className="space-y-5"
           >
-       
- <ArchiveHeader
-        from={from}
-        to={to}
-        search={search}
-        selectedLabType={selectedLabType}
-        status={status}
-        labTypes={labTypes}
-        onFromChange={setFrom}
-        onToChange={setTo}
-        onSearchChange={setSearch}
-        onLabTypeChange={setSelectedLabType}
-        onStatusChange={setStatus}
-        onExportClick={handleExcelConvert}
-      />
+            <ArchiveHeader
+              from={from}
+              to={to}
+              search={search}
+              selectedLabType={selectedLabType}
+              status={status}
+              labTypes={labTypes}
+              onFromChange={setFrom}
+              onToChange={setTo}
+              onSearchChange={setSearch}
+              onLabTypeChange={setSelectedLabType}
+              onStatusChange={setStatus}
+              onExportClick={handleExcelConvert}
+            />
 
-      <ArchiveReportsTable data={archiveFiltered} onRowClick={handleRowClick} />
-
-
-
-           
+            <ArchiveReportsTable
+              data={archiveFiltered}
+              onRowClick={handleRowClick}
+            />
           </motion.div>
         )}
       </AnimatePresence>
-     
+
       <PdfViewModal
         open={pdfModalOpen}
         reportTitle={pdfReportTitle}

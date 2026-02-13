@@ -55,8 +55,10 @@ export const ENDPOINTS = {
     DELETE: (id: number) => `/locations/${id}/delete`,
     BY_LAB_TYPE: (labTypeId: number) => `/locations?lab_type_id=${labTypeId}`,
     SAMPLES: (packageId: number) => `/locations/samples/${packageId}`,
-    CREATE_SAMPLE: (packageId: number) => `/locations/samples/${packageId}/edit`,
-    DELETE_SAMPLE: (sampleId: number) => `/locations/samples/${sampleId}/delete`,
+    CREATE_SAMPLE: (packageId: number) =>
+      `/locations/samples/${packageId}/edit`,
+    DELETE_SAMPLE: (sampleId: number) =>
+      `/locations/samples/${sampleId}/delete`,
   },
 
   // Users
@@ -74,7 +76,8 @@ export const ENDPOINTS = {
     CHANGE_ROLE: (id: number) => `/users/${id}/role`,
     ASSIGN_LAB_TYPES: (userId: number) => `/users/${userId}/lab-types`,
     ROLES: "/users/roles/list",
-    ACTIVITY_LOGS: (page = 1, limit = 20) => `/users/logs?page=${page}&limit=${limit}`
+    ACTIVITY_LOGS: (page = 1, limit = 20) =>
+      `/users/logs?page=${page}&limit=${limit}`,
   },
   // Notifications
   NOTIFICATIONS: {

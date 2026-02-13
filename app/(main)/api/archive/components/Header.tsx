@@ -146,8 +146,7 @@ export function ArchiveHeader({
                   key={type.id}
                   onClick={() => onLabTypeChange(type.type_name)}
                   variant="pill"
-                  active={selectedLabType === type.type_name
-                  }
+                  active={selectedLabType === type.type_name}
                 >
                   {type.type_name}
                 </Button>

@@ -65,5 +65,5 @@ export const ACTIVITY_LOGS_LABELS = {
     approve: "Баталсан",
     reject: "Буцаасан",
     export: "Татсан",
-  }  
-} as const
+  },
+} as const;

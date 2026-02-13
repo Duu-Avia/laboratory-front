@@ -121,19 +121,31 @@ export default function ReportDetailPage() {
         const isCfu = ind.unit?.toLowerCase().includes("cfu") ?? false;
         if (isCfu) {
           if (!ind.result_value) {
-            missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+            missing.push({
+              indicatorName: ind.indicator_name,
+              sampleName: s.sample_name,
+            });
             continue;
           }
           try {
             const parsed = JSON.parse(ind.result_value);
             if (parsed.temp22 === "" || parsed.temp37 === "") {
-              missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+              missing.push({
+                indicatorName: ind.indicator_name,
+                sampleName: s.sample_name,
+              });
             }
           } catch {
-            missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+            missing.push({
+              indicatorName: ind.indicator_name,
+              sampleName: s.sample_name,
+            });
           }
         } else if (ind.is_detected === null || ind.is_detected === undefined) {
-          missing.push({ indicatorName: ind.indicator_name, sampleName: s.sample_name });
+          missing.push({
+            indicatorName: ind.indicator_name,
+            sampleName: s.sample_name,
+          });
         }
       }
     }
@@ -184,7 +196,10 @@ export default function ReportDetailPage() {
     try {
       setSaving(true);
       setShowConfirmDialog(false);
-      await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results, is_complete: isComplete });
+      await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), {
+        results,
+        is_complete: isComplete,
+      });
       setSaveSuccess(true);
 
       // Redirect to main page after 2 seconds
@@ -216,7 +231,8 @@ export default function ReportDetailPage() {
                   Амжилттай хадгалагдлаа!
                 </h3>
                 <p className="text-sm text-emerald-700 dark:text-emerald-500 mt-0.5">
-                  Шинжилгээний үр дүн амжилттай хадгалагдлаа. Үндсэн хуудас руу шилжиж байна...
+                  Шинжилгээний үр дүн амжилттай хадгалагдлаа. Үндсэн хуудас руу
+                  шилжиж байна...
                 </p>
               </div>
             </div>
@@ -224,20 +240,28 @@ export default function ReportDetailPage() {
         )}
 
         {/* Confirmation Dialog */}
-        <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <div className="flex items-center gap-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-full ${missingResults.length > 0 ? "bg-red-100 dark:bg-red-950/50" : "bg-amber-100 dark:bg-amber-950/50"}`}>
-                  <AlertTriangle className={`h-6 w-6 ${missingResults.length > 0 ? "text-red-600 dark:text-red-500" : "text-amber-600 dark:text-amber-500"}`} />
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-full ${missingResults.length > 0 ? "bg-red-100 dark:bg-red-950/50" : "bg-amber-100 dark:bg-amber-950/50"}`}
+                >
+                  <AlertTriangle
+                    className={`h-6 w-6 ${missingResults.length > 0 ? "text-red-600 dark:text-red-500" : "text-amber-600 dark:text-amber-500"}`}
+                  />
                 </div>
                 <AlertDialogTitle className="text-xl">
                   Шинжилгээний үр дүнг хадгалах уу?
                 </AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-base mt-4">
-                Та шинжилгээний үр дүнг зөв оруулсан эсэхээ шалгана уу. Хадгалсны дараа
-                энэ үйлдлийг буцаах боломжгүй болохыг анхаарна уу.
+                Та шинжилгээний үр дүнг зөв оруулсан эсэхээ шалгана уу.
+                Хадгалсны дараа энэ үйлдлийг буцаах боломжгүй болохыг анхаарна
+                уу.
               </AlertDialogDescription>
             </AlertDialogHeader>
 
@@ -248,10 +272,15 @@ export default function ReportDetailPage() {
                 </p>
                 <ul className="space-y-1">
                   {missingResults.map((m, i) => (
-                    <li key={i} className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                    <li
+                      key={i}
+                      className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2"
+                    >
                       <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
                       <span className="font-medium">{m.indicatorName}</span>
-                      <span className="text-red-400 dark:text-red-500">— {m.sampleName}</span>
+                      <span className="text-red-400 dark:text-red-500">
+                        — {m.sampleName}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -267,12 +296,15 @@ export default function ReportDetailPage() {
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmSave}
-                className={missingResults.length > 0
-                  ? "bg-amber-600 hover:bg-amber-700 text-white"
-                  : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                className={
+                  missingResults.length > 0
+                    ? "bg-amber-600 hover:bg-amber-700 text-white"
+                    : "bg-emerald-600 hover:bg-emerald-700 text-white"
                 }
               >
-                {missingResults.length > 0 ? "Дутуу хадгалах" : "Тийм, хадгалах"}
+                {missingResults.length > 0
+                  ? "Дутуу хадгалах"
+                  : "Тийм, хадгалах"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

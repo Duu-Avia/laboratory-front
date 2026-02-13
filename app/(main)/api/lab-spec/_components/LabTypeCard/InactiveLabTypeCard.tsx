@@ -29,7 +29,10 @@ export function InactiveLabTypeCard({
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 {typeName}
               </h3>
-              <Badge variant="outline" className="border-orange-300 dark:border-orange-700 text-orange-600 dark:text-orange-400 text-xs">
+              <Badge
+                variant="outline"
+                className="border-orange-300 dark:border-orange-700 text-orange-600 dark:text-orange-400 text-xs"
+              >
                 Идэвхгүй
               </Badge>
             </div>
@@ -64,7 +67,9 @@ export function InactiveLabTypeCard({
       {/* Compact view - just show message if no indicators */}
       {items.length === 0 && (
         <div className="px-4 py-3 text-center">
-          <p className="text-xs text-slate-500 dark:text-slate-600">Шинжилгээ байхгүй</p>
+          <p className="text-xs text-slate-500 dark:text-slate-600">
+            Шинжилгээ байхгүй
+          </p>
         </div>
       )}
     </div>

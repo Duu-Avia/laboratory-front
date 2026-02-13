@@ -65,7 +65,10 @@ export default function ApprovePage() {
       .get<ReportRow[]>(ENDPOINTS.REPORTS.ARCHIVE("signed"))
       .then((response) => {
         if (!Array.isArray(response)) {
-          logError("Expected array from /reports/archive", "Fetch tested reports");
+          logError(
+            "Expected array from /reports/archive",
+            "Fetch tested reports"
+          );
           setData([]);
           return;
         }
@@ -87,7 +90,10 @@ export default function ApprovePage() {
       .get<ReportRow[]>(ENDPOINTS.REPORTS.ARCHIVE("signed"))
       .then((response) => {
         if (!Array.isArray(response)) {
-          logError("Expected array from /reports/archive", "Fetch tested reports");
+          logError(
+            "Expected array from /reports/archive",
+            "Fetch tested reports"
+          );
           setData([]);
           return;
         }

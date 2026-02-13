@@ -44,9 +44,13 @@ export function ApproveDialog({
     try {
       setError(null);
       setLoading(true);
-      await api.put(ENDPOINTS.REPORTS.APPROVE(reportId), { password }, {
-        skipAuthRedirect: true,
-      });
+      await api.put(
+        ENDPOINTS.REPORTS.APPROVE(reportId),
+        { password },
+        {
+          skipAuthRedirect: true,
+        }
+      );
       setPassword("");
       onOpenChange(false);
       onApproved();

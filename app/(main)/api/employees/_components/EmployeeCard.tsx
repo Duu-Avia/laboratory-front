@@ -57,8 +57,9 @@ interface EmployeeCardProps {
 
 export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
   const initials = getInitials(employee.email);
-  const displayName = employee.full_name 
-  const roleLabel = ROLE_LABELS[employee.position_name] ?? employee.position_name
+  const displayName = employee.full_name;
+  const roleLabel =
+    ROLE_LABELS[employee.position_name] ?? employee.position_name;
 
   const bgColor = stringToColor(employee.email);
   const textColor = stringToTextColor(employee.email);
@@ -116,13 +117,16 @@ export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
           {initials}
         </div>
         {/* Active Status Dot */}
-        {employee.is_active ? (     <div
-          className={cn(
-            "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white",
-            employee.is_active ? "bg-emerald-500" : "bg-slate-300"
-          )}
-        />) : <MessageCircleX className="absolute -bottom-0.5 -right-0.5 h-3 w-3 text-slate-500" />}
-   
+        {employee.is_active ? (
+          <div
+            className={cn(
+              "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white",
+              employee.is_active ? "bg-emerald-500" : "bg-slate-300"
+            )}
+          />
+        ) : (
+          <MessageCircleX className="absolute -bottom-0.5 -right-0.5 h-3 w-3 text-slate-500" />
+        )}
       </div>
 
       {/* Info */}
@@ -145,7 +149,6 @@ export function EmployeeCard({ employee, compact, onEdit }: EmployeeCardProps) {
           {employee.email}
         </span>
       </div>
-
     </div>
   );
 }

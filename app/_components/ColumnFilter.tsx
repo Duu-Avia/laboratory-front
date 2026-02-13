@@ -28,7 +28,10 @@ export function ColumnFilter(props: ColumnFilterProps) {
 }
 
 // Compute fixed position for dropdown so it escapes table overflow
-function useDropdownPosition(ref: React.RefObject<HTMLDivElement | null>, isOpen: boolean) {
+function useDropdownPosition(
+  ref: React.RefObject<HTMLDivElement | null>,
+  isOpen: boolean
+) {
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
@@ -41,7 +44,12 @@ function useDropdownPosition(ref: React.RefObject<HTMLDivElement | null>, isOpen
 }
 
 // ─── Text filter: click icon → label becomes input ────────────────────
-function TextFilter({ label, value, onChange, suggestions }: ColumnFilterTextProps) {
+function TextFilter({
+  label,
+  value,
+  onChange,
+  suggestions,
+}: ColumnFilterTextProps) {
   const [editing, setEditing] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +66,10 @@ function TextFilter({ label, value, onChange, suggestions }: ColumnFilterTextPro
   useEffect(() => {
     if (!editing) return;
     function handleClickOutside(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setShowSuggestions(false);
         if (!value) setEditing(false);
       }
@@ -111,7 +122,9 @@ function TextFilter({ label, value, onChange, suggestions }: ColumnFilterTextPro
             onChange(e.target.value);
             if (suggestions) setShowSuggestions(true);
           }}
-          onFocus={() => { if (suggestions && value) setShowSuggestions(true); }}
+          onFocus={() => {
+            if (suggestions && value) setShowSuggestions(true);
+          }}
           onKeyDown={handleKeyDown}
           placeholder={label}
           className="w-full bg-sky-50 rounded-xl py-1 px-2 border-1 border-blue-200 text-sm font-medium outline-none placeholder:text-cyan-900"
@@ -129,7 +142,13 @@ function TextFilter({ label, value, onChange, suggestions }: ColumnFilterTextPro
 
       {showSuggestions && filtered.length > 0 && (
         <div
-          style={{ top: dropdownPos.top, left: dropdownPos.left, minWidth: 340, maxWidth: 420, whiteSpace: "normal" }}
+          style={{
+            top: dropdownPos.top,
+            left: dropdownPos.left,
+            minWidth: 340,
+            maxWidth: 420,
+            whiteSpace: "normal",
+          }}
           className="fixed bg-popover border rounded-md shadow-md z-50 max-h-65 overflow-y-auto overflow-x-hidden"
         >
           {filtered.map((item) => (
@@ -137,7 +156,10 @@ function TextFilter({ label, value, onChange, suggestions }: ColumnFilterTextPro
               type="button"
               key={item}
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => { onChange(item); setShowSuggestions(false); }}
+              onClick={() => {
+                onChange(item);
+                setShowSuggestions(false);
+              }}
               className="block w-full text-left px-3 py-2 text-xs hover:bg-slate-100 transition cursor-pointer border-b last:border-b-0 border-slate-100"
             >
               {item}
@@ -150,7 +172,12 @@ function TextFilter({ label, value, onChange, suggestions }: ColumnFilterTextPro
 }
 
 // ─── Select filter: dropdown only (for Төлөв) ────────────────────────
-function SelectFilter({ label, value, onChange, options }: ColumnFilterSelectProps) {
+function SelectFilter({
+  label,
+  value,
+  onChange,
+  options,
+}: ColumnFilterSelectProps) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dropdownPos = useDropdownPosition(wrapperRef, open);
@@ -160,7 +187,10 @@ function SelectFilter({ label, value, onChange, options }: ColumnFilterSelectPro
   useEffect(() => {
     if (!open) return;
     function handleClickOutside(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -181,19 +211,33 @@ function SelectFilter({ label, value, onChange, options }: ColumnFilterSelectPro
         <div className="flex items-center gap-0.5">
           {value && (
             <span
-              onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange("");
+                setOpen(false);
+              }}
               className="p-0.5 rounded hover:bg-slate-200 text-muted-foreground"
             >
               <X className="w-3.5 h-3.5" />
             </span>
           )}
-          <ChevronDown className={cn("w-3.5 h-3.5 text-muted-foreground/50 transition-transform", open && "rotate-180")} />
+          <ChevronDown
+            className={cn(
+              "w-3.5 h-3.5 text-muted-foreground/50 transition-transform",
+              open && "rotate-180"
+            )}
+          />
         </div>
       </button>
 
       {open && (
         <div
-          style={{ top: dropdownPos.top, left: dropdownPos.left, minWidth: 180, whiteSpace: "normal" }}
+          style={{
+            top: dropdownPos.top,
+            left: dropdownPos.left,
+            minWidth: 180,
+            whiteSpace: "normal",
+          }}
           className="fixed bg-popover border rounded-md shadow-md z-50 overflow-y-auto overflow-x-hidden"
         >
           {options.map((opt) => (
@@ -201,7 +245,10 @@ function SelectFilter({ label, value, onChange, options }: ColumnFilterSelectPro
               type="button"
               key={opt.key}
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => { onChange(opt.key === value ? "" : opt.key); setOpen(false); }}
+              onClick={() => {
+                onChange(opt.key === value ? "" : opt.key);
+                setOpen(false);
+              }}
               className={cn(
                 "block w-full text-left px-3 py-2 text-xs hover:bg-slate-100 transition cursor-pointer",
                 opt.key === value && "bg-blue-50 text-blue-700"

@@ -86,7 +86,8 @@ export default function LabPage() {
   const typeButtons = useMemo(() => {
     // Only show active lab types in filter pills
     const activeLabTypes = labTypes.filter(
-      (t) => t.is_active === 1 || t.is_active === true || t.is_active === undefined
+      (t) =>
+        t.is_active === 1 || t.is_active === true || t.is_active === undefined
     );
     return [
       { key: "all", label: "Бүгд" },
@@ -137,7 +138,7 @@ export default function LabPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-          <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait">
         {loading ? (
           <motion.div
             key="loader"
@@ -172,81 +173,81 @@ export default function LabPage() {
             transition={{ duration: 0.35 }}
             className="space-y-5"
           >
- 
-     {/* Hero Header */}
-      <HeaderSection
-        onCreateLabType={() => setCreateLabTypeOpen(true)}
-        labTypes={labTypes}
-        selectedLabTypeId={selectedType}
-        onIndicatorCreated={fetchIndicators}
-      />
+            {/* Hero Header */}
+            <HeaderSection
+              onCreateLabType={() => setCreateLabTypeOpen(true)}
+              labTypes={labTypes}
+              selectedLabTypeId={selectedType}
+              onIndicatorCreated={fetchIndicators}
+            />
 
-      {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-2 py-8 space-y-6">
-        {/* Filters Card */}
-        <FilterSection
-          typeButtons={typeButtons}
-          selectedType={selectedType}
-          onTypeChange={setSelectedType}
-          search={search}
-          onSearchChange={setSearch}
-          filteredCount={filteredIndicators.length}
-        />
+            {/* Main Content */}
+            <div className="mx-auto max-w-7xl px-2 py-8 space-y-6">
+              {/* Filters Card */}
+              <FilterSection
+                typeButtons={typeButtons}
+                selectedType={selectedType}
+                onTypeChange={setSelectedType}
+                search={search}
+                onSearchChange={setSearch}
+                filteredCount={filteredIndicators.length}
+              />
 
-        {/* Grouped Indicator Cards */}
-        <GroupedIndicatorsSection
-          grouped={grouped}
-          labTypes={labTypes}
-          filteredIndicatorsCount={filteredIndicators.length}
-          selectedFilter={selectedType}
-          onReactivateClick={(labType) => {
-            setSelectedLabType(labType);
-            setReactivateLabTypeOpen(true);
-          }}
-          onEditClick={(labType) => {
-            setSelectedLabType(labType);
-            setEditLabTypeOpen(true);
-          }}
-          onDeleteClick={(labType) => {
-            setSelectedLabType(labType);
-            setDeleteLabTypeOpen(true);
-          }}
-        />
-      </div>
+              {/* Grouped Indicator Cards */}
+              <GroupedIndicatorsSection
+                grouped={grouped}
+                labTypes={labTypes}
+                filteredIndicatorsCount={filteredIndicators.length}
+                selectedFilter={selectedType}
+                onReactivateClick={(labType) => {
+                  setSelectedLabType(labType);
+                  setReactivateLabTypeOpen(true);
+                }}
+                onEditClick={(labType) => {
+                  setSelectedLabType(labType);
+                  setEditLabTypeOpen(true);
+                }}
+                onDeleteClick={(labType) => {
+                  setSelectedLabType(labType);
+                  setDeleteLabTypeOpen(true);
+                }}
+              />
+            </div>
 
-      {/* Lab Type Dialogs */}
-      <CreateLabTypeDialog
-        open={createLabTypeOpen}
-        onOpenChange={setCreateLabTypeOpen}
-        onCreated={fetchLabTypes}
-      />
+            {/* Lab Type Dialogs */}
+            <CreateLabTypeDialog
+              open={createLabTypeOpen}
+              onOpenChange={setCreateLabTypeOpen}
+              onCreated={fetchLabTypes}
+            />
 
-      <EditLabTypeDialog
-        open={editLabTypeOpen}
-        onOpenChange={setEditLabTypeOpen}
-        labType={selectedLabType}
-        onUpdated={fetchLabTypes}
-      />
+            <EditLabTypeDialog
+              open={editLabTypeOpen}
+              onOpenChange={setEditLabTypeOpen}
+              labType={selectedLabType}
+              onUpdated={fetchLabTypes}
+            />
 
-      <DeleteLabTypeDialog
-        open={deleteLabTypeOpen}
-        onOpenChange={setDeleteLabTypeOpen}
-        labType={selectedLabType}
-        indicatorCount={
-          selectedLabType
-            ? indicators.filter((i) => i.lab_type_id === selectedLabType.id).length
-            : 0
-        }
-        onDeleted={fetchLabTypes}
-      />
+            <DeleteLabTypeDialog
+              open={deleteLabTypeOpen}
+              onOpenChange={setDeleteLabTypeOpen}
+              labType={selectedLabType}
+              indicatorCount={
+                selectedLabType
+                  ? indicators.filter(
+                      (i) => i.lab_type_id === selectedLabType.id
+                    ).length
+                  : 0
+              }
+              onDeleted={fetchLabTypes}
+            />
 
-      <ReactivateLabTypeDialog
-        open={reactivateLabTypeOpen}
-        onOpenChange={setReactivateLabTypeOpen}
-        labType={selectedLabType}
-        onReactivated={fetchLabTypes}
-      />
-
+            <ReactivateLabTypeDialog
+              open={reactivateLabTypeOpen}
+              onOpenChange={setReactivateLabTypeOpen}
+              labType={selectedLabType}
+              onReactivated={fetchLabTypes}
+            />
           </motion.div>
         )}
       </AnimatePresence>

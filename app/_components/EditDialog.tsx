@@ -115,7 +115,10 @@ export function EditReport({
   const [rawSamples, setRawSamples] = useState<SampleColumn[]>([]);
 
   // Indicator-grouped view for results table
-  const indicatorGroups = useMemo(() => groupByIndicator(rawSamples), [rawSamples]);
+  const indicatorGroups = useMemo(
+    () => groupByIndicator(rawSamples),
+    [rawSamples]
+  );
   const hasResults = indicatorGroups.length > 0;
 
   // Reset state when dialog closes so indicators fetch properly on next open
@@ -272,7 +275,10 @@ export function EditReport({
 
       // Save results if there are any
       if (results.length > 0) {
-        await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results, is_complete: checkIsComplete() });
+        await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), {
+          results,
+          is_complete: checkIsComplete(),
+        });
       }
 
       setSaveSuccess(true);
@@ -333,8 +339,18 @@ export function EditReport({
                 <div className="rounded-xl border border-modal-section-border bg-modal-section-bg/50 p-5">
                   <div className="flex items-center gap-2.5 mb-4">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-modal-accent/10">
-                      <svg className="h-4 w-4 text-modal-accent" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 20h9" /><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.855z" />
+                      <svg
+                        className="h-4 w-4 text-modal-accent"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.855z" />
                       </svg>
                     </div>
                     <div>
@@ -394,12 +410,19 @@ export function EditReport({
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={showIncompleteWarning} onOpenChange={setShowIncompleteWarning}>
+      <AlertDialog
+        open={showIncompleteWarning}
+        onOpenChange={setShowIncompleteWarning}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Шинжилгээний үр дүн дутуу байна!</AlertDialogTitle>
+            <AlertDialogTitle>
+              Шинжилгээний үр дүн дутуу байна!
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Зарим шинжилгээний үр дүн бөглөгдөөгүй байна. Хадгалбал тайлангийн төлөв <strong>&quot;дутуу&quot;</strong> болж өөрчлөгдөнө. Үргэлжлүүлэх үү?
+              Зарим шинжилгээний үр дүн бөглөгдөөгүй байна. Хадгалбал тайлангийн
+              төлөв <strong>&quot;дутуу&quot;</strong> болж өөрчлөгдөнө.
+              Үргэлжлүүлэх үү?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

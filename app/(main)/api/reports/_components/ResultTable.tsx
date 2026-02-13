@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 
-
 function parseCfuValue(resultValue: string | null | undefined) {
   if (!resultValue) return { temp22: "", temp37: "", average: "" };
   try {
@@ -136,10 +135,7 @@ function IndicatorGroupRows({
     <>
       {/* Indicator group header row */}
       <tr className="border-t-2 border-t-gray-400 dark:border-t-slate-700 bg-gray-300 dark:bg-slate-950/30">
-        <td
-          colSpan={4}
-          className="px-4 py-3"
-        >
+        <td colSpan={4} className="px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-900 dark:bg-white shrink-0" />
             <span className="font-bold text-slate-900 dark:text-white">
@@ -182,7 +178,11 @@ function IndicatorGroupRows({
           )}
           <td className="px-4 py-3">
             {isCfu ? (
-              <CfuInput sr={sr} onCfuChange={onCfuChange} highlightMissing={highlightMissing} />
+              <CfuInput
+                sr={sr}
+                onCfuChange={onCfuChange}
+                highlightMissing={highlightMissing}
+              />
             ) : (
               <DetectionToggle
                 sr={sr}
@@ -214,13 +214,17 @@ function CfuInput({
   const cfuData = parseCfuValue(sr.result_value);
   const emptyT22 = highlightMissing && cfuData.temp22 === "";
   const emptyT37 = highlightMissing && cfuData.temp37 === "";
-  const missingStyle = "border-red-400 bg-red-50 dark:bg-red-950/20 dark:border-red-700";
-  const normalStyle = "bg-slate-50 dark:bg-slate-950/50 border-gray-300 dark:border-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20";
+  const missingStyle =
+    "border-red-400 bg-red-50 dark:bg-red-950/20 dark:border-red-700";
+  const normalStyle =
+    "bg-slate-50 dark:bg-slate-950/50 border-gray-300 dark:border-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20";
 
   return (
     <div className="flex gap-3 items-center">
       <div className="flex  gap-2 items-center">
-        <label className={`text-xs font-semibold ${emptyT22 ? "text-red-500" : "text-slate-500 dark:text-slate-400"}`}>
+        <label
+          className={`text-xs font-semibold ${emptyT22 ? "text-red-500" : "text-slate-500 dark:text-slate-400"}`}
+        >
           22°C
         </label>
         <Input
@@ -239,7 +243,9 @@ function CfuInput({
         />
       </div>
       <div className="flex gap-2 items-center ">
-        <label className={`text-xs font-semibold ${emptyT37 ? "text-red-500" : "text-slate-500 dark:text-slate-400"}`}>
+        <label
+          className={`text-xs font-semibold ${emptyT37 ? "text-red-500" : "text-slate-500 dark:text-slate-400"}`}
+        >
           37°C
         </label>
         <Input
@@ -287,7 +293,9 @@ function DetectionToggle({
 }) {
   const isEmpty = highlightMissing && sr.is_detected === null;
   return (
-    <div className={`inline-flex gap-10 rounded-full border p-1 ${isEmpty ? "border-red-400 bg-red-50 dark:bg-red-950/20 dark:border-red-700" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"}`}>
+    <div
+      className={`inline-flex gap-10 rounded-full border p-1 ${isEmpty ? "border-red-400 bg-red-50 dark:bg-red-950/20 dark:border-red-700" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"}`}
+    >
       <button
         type="button"
         onClick={() =>

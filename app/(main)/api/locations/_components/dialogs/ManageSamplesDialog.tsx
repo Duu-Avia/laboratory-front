@@ -40,9 +40,10 @@ export function ManageSamplesDialog({
     try {
       setError(null);
       setAdding(true);
-      const nextSortOrder = samples.length > 0
-        ? Math.max(...samples.map((s) => s.sort_order)) + 1
-        : 1;
+      const nextSortOrder =
+        samples.length > 0
+          ? Math.max(...samples.map((s) => s.sort_order)) + 1
+          : 1;
 
       await api.post(ENDPOINTS.LOCATIONS.CREATE_SAMPLE(location.id), {
         location_name: newSampleName.trim(),

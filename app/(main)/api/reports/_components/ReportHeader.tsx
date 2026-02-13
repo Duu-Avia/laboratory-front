@@ -1,9 +1,20 @@
 import { ReportHeaderSaveProps } from "@/types";
 import { Button } from "@/components/ui/button";
-import { FileText, Save, FileDown, ChevronRight, Loader2, ClipboardList } from "lucide-react";
+import {
+  FileText,
+  Save,
+  FileDown,
+  ChevronRight,
+  Loader2,
+  ClipboardList,
+} from "lucide-react";
 import Link from "next/link";
 
-export const ReportHeader = ({ reportId, onSave, saving }: ReportHeaderSaveProps & { saving?: boolean }) => {
+export const ReportHeader = ({
+  reportId,
+  onSave,
+  saving,
+}: ReportHeaderSaveProps & { saving?: boolean }) => {
   return (
     <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 p-6 shadow-sm">
       {/* Breadcrumb */}
@@ -37,7 +48,7 @@ export const ReportHeader = ({ reportId, onSave, saving }: ReportHeaderSaveProps
         </div>
 
         <div className="flex gap-3">
-         <Button
+          <Button
             onClick={onSave}
             disabled={saving}
             className="gap-2 text-emerald-700 bg-emerald-50 border border-emerald-400 hover:bg-emerald-100 ring-emerald-500/20"
@@ -48,7 +59,8 @@ export const ReportHeader = ({ reportId, onSave, saving }: ReportHeaderSaveProps
               <Save className="h-4 w-4" />
             )}
             {saving ? "Хадгалж байна..." : "Хадгалах"}
-          </Button>.
+          </Button>
+          .
         </div>
       </div>
     </div>

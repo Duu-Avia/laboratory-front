@@ -32,7 +32,6 @@ export type ReportRow = {
   created_by_name?: string;
 };
 
-
 export type ColumnFilters = {
   created_at: string;
   id: string;

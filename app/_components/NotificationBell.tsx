@@ -54,9 +54,9 @@ function NotificationItem({
         )}
         <div className={`flex-1 min-w-0 ${notification.is_read ? "ml-5" : ""}`}>
           <div className="flex justify-between items-center">
-          <p className="text-sm font-medium text-foreground truncate">
-          {typeLabel}
-          </p>
+            <p className="text-sm font-medium text-foreground truncate">
+              {typeLabel}
+            </p>
             <span className="text-[11px] text-muted-foreground/70">
               {timeAgo(notification.created_at)}
             </span>
@@ -65,7 +65,7 @@ function NotificationItem({
           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
             {notification.message}
           </p>
-                  </div>
+        </div>
       </div>
     </button>
   );
@@ -73,21 +73,16 @@ function NotificationItem({
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const userRole = useAuth().getUser()
+  const userRole = useAuth().getUser();
   const router = useRouter();
-  const {
-    notifications,
-    unreadCount,
-    loading,
-    markAsRead,
-    markAllAsRead,
-  } = useNotifications();
+  const { notifications, unreadCount, loading, markAsRead, markAllAsRead } =
+    useNotifications();
 
   const handleNavigate = () => {
     setOpen(false);
-   if(userRole?.roleId === 2){ 
-    router.push(`/api/approve`);
-   }else return;
+    if (userRole?.roleId === 2) {
+      router.push(`/api/approve`);
+    } else return;
   };
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -105,11 +100,7 @@ export default function NotificationBell() {
         </button>
       </PopoverTrigger>
 
-      <PopoverContent
-        side="bottom"
-        align="end"
-        className="w-[360px] p-0"
-      >
+      <PopoverContent side="bottom" align="end" className="w-[360px] p-0">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
           <h3 className="text-sm font-semibold">Мэдэгдэл</h3>
@@ -136,9 +127,7 @@ export default function NotificationBell() {
           ) : notifications.length === 0 ? (
             <div className="px-4 py-8 text-center">
               <Bell className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">
-                Мэдэгдэл байхгүй
-              </p>
+              <p className="text-sm text-muted-foreground">Мэдэгдэл байхгүй</p>
             </div>
           ) : (
             <div className="divide-y">
