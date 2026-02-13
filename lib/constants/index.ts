@@ -44,3 +44,26 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   report_approved: "Тайлан батлагдсан",
   report_rejected: "Тайлан буцаагдсан",
 };
+
+export const ACTIVITY_LOGS_LABELS = {
+  targetNames: {
+    report: "Тайлан",
+    user: "Хэрэглэгч",
+    result: "Үр дүн",
+    lab_type: "Лабораторийн төрөл",
+    indicator: "Үзүүлэлт",
+    location: "Байршил",
+  },
+
+  actionNames: {
+    login: "Нэвтэрсэн",
+    create: "Үүсгэсэн",
+    update: "Засварласан",
+    delete: "Устгасан",
+    view: "Үзсэн",
+    sign: "Гарын үсэг зурсан",
+    approve: "Баталсан",
+    reject: "Буцаасан",
+    export: "Татсан",
+  }  
+} as const

@@ -18,7 +18,7 @@ export const ENDPOINTS = {
     CREATE: "/reports/create",
     DETAIL: (id: number | string) => `/reports/${id}`,
     EDIT: (id: number | string) => `/reports/edit/${id}`,
-    DELETE: (id: number | string) => `/reports/delete/${id}`,
+    DELETE: (id: number | string) => `/reports/${id}/delete`,
     EXCEL: (status?: string) =>
       status ? `/reports/excel?status=${status}` : "/reports/excel",
     PDF: (id: number | string) => `/reports/${id}/pdf`,
@@ -74,6 +74,7 @@ export const ENDPOINTS = {
     CHANGE_ROLE: (id: number) => `/users/${id}/role`,
     ASSIGN_LAB_TYPES: (userId: number) => `/users/${userId}/lab-types`,
     ROLES: "/users/roles/list",
+    ACTIVITY_LOGS: (page = 1, limit = 20) => `/users/logs?page=${page}&limit=${limit}`
   },
   // Notifications
   NOTIFICATIONS: {

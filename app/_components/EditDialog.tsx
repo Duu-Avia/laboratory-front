@@ -109,6 +109,7 @@ export function EditReport({
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showIncompleteWarning, setShowIncompleteWarning] = useState(false);
   const [reportTitle, setReportTitle] = useState("");
   const [sampleGroup, setSampleGroup] = useState<SampleGroup>(emptySampleGroup);
   const [rawSamples, setRawSamples] = useState<SampleColumn[]>([]);
@@ -204,8 +205,30 @@ export function EditReport({
     );
   }
 
+  const checkIsComplete = () => {
+    return rawSamples.every((s: any) =>
+      (s.indicators ?? []).every((ind: any) => {
+        const isCfu = ind.unit?.toLowerCase().includes("cfu") ?? false;
+        if (isCfu) {
+          if (!ind.result_value) return false;
+          try {
+            const parsed = JSON.parse(ind.result_value);
+            return parsed.temp22 !== "" && parsed.temp37 !== "";
+          } catch {
+            return false;
+          }
+        }
+        return ind.is_detected !== null && ind.is_detected !== undefined;
+      })
+    );
+  };
+
   const handleSaveClick = () => {
-    setShowConfirmDialog(true);
+    if (hasResults && !checkIsComplete()) {
+      setShowIncompleteWarning(true);
+    } else {
+      setShowConfirmDialog(true);
+    }
   };
 
   const handleSave = async () => {
@@ -249,7 +272,7 @@ export function EditReport({
 
       // Save results if there are any
       if (results.length > 0) {
-        await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results });
+        await api.put(ENDPOINTS.REPORTS.RESULTS(reportId!), { results, is_complete: checkIsComplete() });
       }
 
       setSaveSuccess(true);
@@ -364,6 +387,29 @@ export function EditReport({
                 handleSave();
               }}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              Тийм, хадгалах
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showIncompleteWarning} onOpenChange={setShowIncompleteWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Шинжилгээний үр дүн дутуу байна!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Зарим шинжилгээний үр дүн бөглөгдөөгүй байна. Хадгалбал тайлангийн төлөв <strong>&quot;дутуу&quot;</strong> болж өөрчлөгдөнө. Үргэлжлүүлэх үү?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Болих</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowIncompleteWarning(false);
+                handleSave();
+              }}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
             >
               Тийм, хадгалах
             </AlertDialogAction>
