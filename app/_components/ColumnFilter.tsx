@@ -99,7 +99,7 @@ function TextFilter({
 
   if (!editing && !value) {
     return (
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center h-7">
         <span>{label}</span>
         <button
           type="button"
@@ -114,7 +114,7 @@ function TextFilter({
 
   return (
     <div ref={wrapperRef} className="w-full">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 h-7">
         <input
           ref={inputRef}
           value={value}
@@ -127,7 +127,7 @@ function TextFilter({
           }}
           onKeyDown={handleKeyDown}
           placeholder={label}
-          className="w-full bg-sky-50 rounded-xl py-1 px-2 border-1 border-blue-200 text-sm font-medium outline-none placeholder:text-cyan-900"
+          className="w-full h-full bg-sky-50 rounded-xl px-2 border border-blue-200 text-sm font-medium outline-none placeholder:text-cyan-900"
         />
         {value && (
           <button

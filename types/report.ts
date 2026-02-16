@@ -27,7 +27,10 @@ export type ReportRow = {
   status: ReportStatus;
   lab_type?: string;
   assigned_to?: number;
+  approved_by:string;
+  signed_by:string;
   assigned_to_name?: string;
+  approved_at:string;
   created_by?: number;
   created_by_name?: string;
 };
@@ -38,5 +41,7 @@ export type ColumnFilters = {
   sample_names: string;
   indicator_names: string;
   created_by_name: string;
+  approved_by:string;
+  signed_by:string;
   status: string;
 };

@@ -47,7 +47,7 @@ export function EditLabTypeDialog({
   useEffect(() => {
     if (open && labType) {
       setTypeName(labType.type_name);
-      setStandard(labType.standard);
+      setStandard(labType.standard ?? "");
       // Reset all success/error states
       setTypeNameError(null);
       setTypeNameSuccess(false);
@@ -70,6 +70,7 @@ export function EditLabTypeDialog({
       setTypeNameSaving(true);
       await api.put(ENDPOINTS.LAB_TYPES.UPDATE(labType.id), {
         type_name: typeName.trim(),
+        standard: standard.trim(),
       });
       setTypeNameSuccess(true);
       onUpdated();
@@ -94,6 +95,7 @@ export function EditLabTypeDialog({
       setStandardSuccess(false);
       setStandardSaving(true);
       await api.put(ENDPOINTS.LAB_TYPES.UPDATE(labType.id), {
+        type_name: typeName.trim(),
         standard: standard.trim(),
       });
       setStandardSuccess(true);

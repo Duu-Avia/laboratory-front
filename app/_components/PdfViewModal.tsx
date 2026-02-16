@@ -166,7 +166,7 @@ export function PdfViewModal({
           </div>
 
           <div className="shrink-0 border-t bg-background p-4 flex justify-end gap-2">
-            {canEdit && (
+            {canEdit && onDeleted && (
               <Button
                 className="text-black bg-gray-200/75 hover:bg-gray-500 hover:text-white border-1 border-cyan-200 h-[28px]"
                 onClick={onEditClick}
@@ -202,7 +202,7 @@ export function PdfViewModal({
               </Button>
             )}
 
-            {canDelete && (
+            {canDelete && onDeleted && (
               <Button
                 className="text-black bg-gray-200/75 hover:bg-red-200 border-1 border-red-500 h-[28px]"
                 onClick={onDeleteClick}

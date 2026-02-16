@@ -31,8 +31,13 @@ export function ManageSamplesDialog({
   const [adding, setAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
+  const [addedSamples, setAddedSamples] = useState<LocationSample[]>([]);
 
-  const samples = location?.samples ?? [];
+  const samples = [
+    ...(location?.samples ?? []).filter((s) => !deletedIds.has(s.id)),
+    ...addedSamples,
+  ];
 
   const handleAddSample = async () => {
     if (!location || !newSampleName.trim()) return;
@@ -40,16 +45,28 @@ export function ManageSamplesDialog({
     try {
       setError(null);
       setAdding(true);
+      const allSamples = location?.samples ?? [];
       const nextSortOrder =
-        samples.length > 0
-          ? Math.max(...samples.map((s) => s.sort_order)) + 1
+        allSamples.length > 0
+          ? Math.max(...allSamples.map((s) => s.sort_order)) + 1
           : 1;
 
-      await api.post(ENDPOINTS.LOCATIONS.CREATE_SAMPLE(location.id), {
-        location_name: newSampleName.trim(),
-        sort_order: nextSortOrder,
-      });
+      const created = await api.post<LocationSample>(
+        ENDPOINTS.LOCATIONS.CREATE_SAMPLE(location.id),
+        {
+          location_name: newSampleName.trim(),
+          sort_order: nextSortOrder,
+        }
+      );
 
+      setAddedSamples((prev) => [
+        ...prev,
+        {
+          id: created.id ?? Date.now(),
+          location_name: newSampleName.trim(),
+          sort_order: nextSortOrder,
+        },
+      ]);
       setNewSampleName("");
       onUpdated();
     } catch (err) {
@@ -67,6 +84,7 @@ export function ManageSamplesDialog({
       setError(null);
       setDeletingId(sampleId);
       await api.put(ENDPOINTS.LOCATIONS.DELETE_SAMPLE(sampleId));
+      setDeletedIds((prev) => new Set(prev).add(sampleId));
       onUpdated();
     } catch (err) {
       logError(err, "Delete sample");
@@ -84,6 +102,8 @@ export function ManageSamplesDialog({
         if (!isOpen) {
           setNewSampleName("");
           setError(null);
+          setDeletedIds(new Set());
+          setAddedSamples([]);
         }
       }}
     >

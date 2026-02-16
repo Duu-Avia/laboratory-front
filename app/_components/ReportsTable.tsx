@@ -30,6 +30,8 @@ const INITIAL_FILTERS: ColumnFilters = {
   sample_names: "",
   indicator_names: "",
   created_by_name: "",
+  approved_by:"",
+  signed_by:"",
   status: "",
 };
 
@@ -104,7 +106,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
       return true;
     });
   }, [data, filters]);
-
+console.log(data, "this from main table")
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">
       <Table>
@@ -203,7 +205,7 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
                   ))}
                 </div>
               </TableCell>
-              <TableCell>{dataItem.created_by_name || "-"}</TableCell>
+              <TableCell><div className="text-[12px] font-semibold">{dataItem.created_by_name || "-"}</div></TableCell>
               <TableCell className="text-right">
                 <StatusBadge status={dataItem.status} />
               </TableCell>

@@ -22,6 +22,8 @@ const INITIAL_FILTERS: ColumnFilters = {
   sample_names: "",
   indicator_names: "",
   created_by_name: "",
+  approved_by:"",
+  signed_by:"",
   status: "",
 };
 
@@ -46,7 +48,7 @@ const MONTH_NAMES = [
 function groupByMonth(data: ReportRow[]) {
   const groups: Record<string, ReportRow[]> = {};
   for (const item of data) {
-    const key = item.created_at.slice(0, 7); // "YYYY-MM"
+    const key = item.approved_at.slice(0, 7); // "YYYY-MM"
     if (!groups[key]) groups[key] = [];
     groups[key].push(item);
   }
@@ -71,6 +73,7 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
   const suggestions = useMemo(() => {
     const samples = new Set<string>();
     const indicators = new Set<string>();
+    const creators = new Set<string>();
 
     for (const row of data) {
       row.sample_names?.split(",").forEach((s) => {
@@ -81,11 +84,13 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
         const trimmed = s.trim();
         if (trimmed) indicators.add(trimmed);
       });
+      if(row.signed_by) creators.add(row.signed_by);
     }
 
     return {
       samples: Array.from(samples).sort(),
       indicators: Array.from(indicators).sort(),
+      creators:Array.from(creators).sort(),
     };
   }, [data]);
 
@@ -94,7 +99,7 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
     return data.filter((row) => {
       if (
         filters.created_at &&
-        !row.created_at.slice(0, 10).includes(filters.created_at)
+        !row.approved_at.slice(0, 10).includes(filters.created_at)
       )
         return false;
 
@@ -115,7 +120,20 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
           .includes(filters.indicator_names.toLowerCase())
       )
         return false;
-
+      if (
+        filters.indicator_names &&
+        !row.indicator_names
+          ?.toLowerCase()
+          .includes(filters.indicator_names.toLowerCase())
+      )
+        return false;
+if (
+        filters.signed_by &&
+        !row.signed_by
+          ?.toLowerCase()
+          .includes(filters.signed_by.toLowerCase())
+      )
+        return false;
       if (filters.status && row.status !== filters.status) return false;
 
       return true;
@@ -148,7 +166,8 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
       </div>
     );
   }
-
+console.log(data,"from archive")
+console.log(filters, "from archive filters")
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <Table className="table-fixed">
@@ -159,21 +178,21 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
                 №
               </div>
             </TableHead>
-            <TableHead style={{ width: "13%" }} className="py-4">
+            <TableHead style={{ width: "12%" }} className="py-4">
               <ColumnFilter
                 label="Он сар"
                 value={filters.created_at}
                 onChange={(val) => setFilter("created_at", val)}
               />
             </TableHead>
-            <TableHead style={{ width: "8%" }} className="py-4">
+            <TableHead style={{ width: "7%" }} className="py-4">
               <ColumnFilter
                 label="Дугаар"
                 value={filters.id}
                 onChange={(val) => setFilter("id", val)}
               />
             </TableHead>
-            <TableHead style={{ width: "28%" }} className="py-4">
+            <TableHead style={{ width: "27%" }} className="py-4">
               <ColumnFilter
                 label="Сорьцын нэр"
                 value={filters.sample_names}
@@ -181,7 +200,7 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
                 suggestions={suggestions.samples}
               />
             </TableHead>
-            <TableHead style={{ width: "32%" }} className="py-4">
+            <TableHead style={{ width: "21%" }} className="py-4">
               <ColumnFilter
                 label="Сонгосон шинжилгээ"
                 value={filters.indicator_names}
@@ -189,7 +208,15 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
                 suggestions={suggestions.indicators}
               />
             </TableHead>
-            <TableHead style={{ width: "14%" }} className="py-4 pr-6">
+            <TableHead style={{ width: "17%" }} className="py-4">
+              <ColumnFilter
+                label="Үүсгэсэн / Батласан"
+                value={filters.signed_by}
+                onChange={(val) => setFilter("signed_by", val)}
+                suggestions={suggestions.creators}
+              />
+            </TableHead>
+            <TableHead style={{ width: "11%" }} className="py-4 pr-6">
               Төлөв
             </TableHead>
           </TableRow>
@@ -232,11 +259,11 @@ function MonthGroup({
       {/* Month header row */}
       <TableRow
         onClick={onToggle}
-        className="cursor-pointer border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white hover:from-blue-50 hover:to-indigo-50/30 transition-colors duration-300"
+        className="cursor-pointer border-b border-slate-200 bg-gradient-to-r from-slate-200 to-white hover:from-blue-50 hover:to-indigo-50/30 transition-colors duration-300"
       >
-        <TableCell colSpan={6} className="py-4 pl-6">
+        <TableCell colSpan={7} className="py-2 pl-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-200 to-indigo-100 flex items-center justify-center shadow-sm">
               <Calendar className="w-4.5 h-4.5 text-blue-500" />
             </div>
             <span className="text-sm font-semibold text-slate-800">
@@ -254,7 +281,7 @@ function MonthGroup({
 
       {/* Expandable report rows */}
       <tr>
-        <td colSpan={6} className="p-0">
+        <td colSpan={7} className="p-0">
           <div
             className="grid transition-[grid-template-rows] duration-300 ease-in-out"
             style={{
@@ -270,27 +297,27 @@ function MonthGroup({
                       onClick={() => onRowClick(dataItem)}
                       className="group cursor-pointer border-b border-slate-100 last:border-0 hover:bg-gradient-to-r hover:from-blue-200 hover:to-indigo-50/30 duration-500"
                     >
-                      <td style={{ width: "5%" }} className="py-5 pl-4">
+                      <td style={{ width: "5%" }} className="py-4 pl-4">
                         <span className="inline-flex items-center justify-center w-6 h-6 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-bold text-slate-600 group-hover:from-blue-100 group-hover:to-blue-200 group-hover:text-blue-400 transition-all shadow-sm">
                           {index + 1}
                         </span>
                       </td>
-                      <td style={{ width: "13%" }} className="py-5">
+                      <td style={{ width: "12%" }} className="py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                            <Calendar className="w-4 h-4 text-slate-500 group-hover:text-blue-400" />
+                            <Calendar className="w-3 h-3 text-slate-500 group-hover:text-blue-400" />
                           </div>
                           <span className="text-sm font-medium text-slate-700">
-                            {dataItem.created_at.slice(0, 10)}
+                            {dataItem.approved_at.slice(0, 10)}
                           </span>
                         </div>
                       </td>
-                      <td style={{ width: "8%" }} className="py-5">
+                      <td style={{ width: "7%" }} className="py-4">
                         <span className="font-semibold text-slate-800 group-hover:text-blue-400 transition-colors text-base">
                           {dataItem.id}
                         </span>
                       </td>
-                      <td style={{ width: "28%" }} className="py-5">
+                      <td style={{ width: "27%" }} className="py-4">
                         <div className="flex flex-col gap-1.5">
                           {dataItem.sample_names?.split(",").map((name, i) => (
                             <div
@@ -307,21 +334,26 @@ function MonthGroup({
                           ))}
                         </div>
                       </td>
-                      <td style={{ width: "32%" }} className="py-5">
+                      <td style={{ width: "21%" }} className="py-4">
                         <div className="flex flex-wrap gap-1.5">
                           {dataItem.indicator_names
                             ?.split(",")
                             .map((name, i) => (
                               <span
                                 key={i}
-                                className="inline-block px-2.5 py-1 bg-gradient-to-r from-slate-100 to-slate-50 text-slate-600 rounded-lg text-xs font-medium border border-slate-200 group-hover:from-blue-50 group-hover:to-indigo-50 group-hover:text-blue-400 group-hover:border-blue-200 transition-all"
+                                className="inline-block px-2.5 py-0.5 bg-gradient-to-r from-slate-100 to-slate-50 text-slate-600 rounded-lg text-xs font-medium border border-slate-200 group-hover:from-blue-50 group-hover:to-indigo-50 group-hover:text-blue-400 group-hover:border-blue-200 transition-all"
                               >
                                 {name.trim()}
                               </span>
                             ))}
                         </div>
                       </td>
-                      <td style={{ width: "14%" }} className="py-5 pr-6">
+                      <td style={{ width: "17%" }} className="py-4">
+                          <div className="flex flex-wrap gap-1.5">
+                          <span className="text-[12px] font-medium">{dataItem.signed_by} / {dataItem.approved_by}</span>
+                          </div>
+                      </td>
+                      <td style={{ width: "11%" }} className="py-4 pr-6">
                         <StatusBadge status={dataItem.status} />
                       </td>
                     </tr>
