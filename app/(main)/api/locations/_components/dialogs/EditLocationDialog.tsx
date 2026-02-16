@@ -73,7 +73,7 @@ export function EditLocationDialog({
       setPackageNameError(null);
       setPackageNameSuccess(false);
       setPackageNameSaving(true);
-      await api.put(ENDPOINTS.LOCATIONS.UPDATE(location.id), {
+      await api.put(ENDPOINTS.LOCATIONS.DETAIL(location.id), {
         package_name: packageName.trim(),
       });
       setPackageNameSuccess(true);
@@ -99,7 +99,7 @@ export function EditLocationDialog({
       setLabTypeError(null);
       setLabTypeSuccess(false);
       setLabTypeSaving(true);
-      await api.put(ENDPOINTS.LOCATIONS.UPDATE(location.id), {
+      await api.put(ENDPOINTS.LOCATIONS.DETAIL(location.id), {
         lab_type_id: labTypeId,
       });
       setLabTypeSuccess(true);

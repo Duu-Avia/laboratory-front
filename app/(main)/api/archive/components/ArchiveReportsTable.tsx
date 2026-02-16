@@ -14,9 +14,9 @@ import { ReportsTableProps, ReportRow } from "@/types";
 import { StatusBadge } from "@/app/_components/StatusBadge";
 import { ColumnFilter } from "@/app/_components/ColumnFilter";
 import { STATUS_OPTIONS } from "@/lib/constants";
-import { ColumnFiltersType } from "@/types/report";
+import { ColumnFilters } from "@/types/report";
 
-const INITIAL_FILTERS: ColumnFiltersType = {
+const INITIAL_FILTERS: ColumnFilters = {
   created_at: "",
   id: "",
   sample_names: "",
@@ -62,10 +62,10 @@ function formatMonthLabel(key: string) {
 
 export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
-  const [filters, setFilters] = useState<ColumnFiltersType>(INITIAL_FILTERS);
+  const [filters, setFilters] = useState<ColumnFilters>(INITIAL_FILTERS);
 
-  const setFilter = (key: keyof ColumnFiltersType, value: string) =>
-    setFilters((prev: ColumnFiltersType) => ({ ...prev, [key]: value }));
+  const setFilter = (key: keyof ColumnFilters, value: string) =>
+    setFilters((prev: ColumnFilters) => ({ ...prev, [key]: value }));
 
   // Extract unique suggestions for autocomplete columns
   const suggestions = useMemo(() => {

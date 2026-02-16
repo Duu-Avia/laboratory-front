@@ -13,7 +13,7 @@ import {
 import type { ReportsTableProps } from "@/types";
 import { StatusBadge } from "@/app/_components/StatusBadge";
 import { ColumnFilter } from "@/app/_components/ColumnFilter";
-import { ColumnFiltersType } from "@/types/report";
+import { ColumnFilters } from "@/types/report";
 
 const STATUS_OPTIONS = [
   { key: "draft", label: "Draft" },
@@ -24,7 +24,7 @@ const STATUS_OPTIONS = [
   { key: "rejected", label: "Буцаагдсан" },
 ];
 
-const INITIAL_FILTERS: ColumnFiltersType = {
+const INITIAL_FILTERS: ColumnFilters = {
   created_at: "",
   id: "",
   sample_names: "",
@@ -34,9 +34,9 @@ const INITIAL_FILTERS: ColumnFiltersType = {
 };
 
 export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
-  const [filters, setFilters] = useState<ColumnFiltersType>(INITIAL_FILTERS);
+  const [filters, setFilters] = useState<ColumnFilters>(INITIAL_FILTERS);
 
-  const setFilter = (key: keyof ColumnFiltersType, value: string) =>
+  const setFilter = (key: keyof ColumnFilters, value: string) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
 
   // Extract unique suggestions for autocomplete columns
