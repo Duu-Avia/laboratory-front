@@ -6,7 +6,7 @@ import { PdfViewModal } from "@/app/_components/PdfViewModal";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useUser } from "@/lib/hooks/useUser";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar, Search, Filter } from "lucide-react";
@@ -16,7 +16,7 @@ import { AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 
 export default function ApprovePage() {
-  const { getUser } = useAuth();
+  const { user } = useUser();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
   const today = RecentDay().today;
 
@@ -48,18 +48,15 @@ export default function ApprovePage() {
 
   // Fetch lab types + reports in parallel
   useEffect(() => {
-    const user = getUser();
-    const isSuperAdmin = user?.roleName === "superadmin";
+    if (!user) return;
+    const isSuperAdmin = user.role === "superadmin";
 
     const labTypesPromise = isSuperAdmin
       ? api
           .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
           .then((data) => setSampleTypes(data))
           .catch((err) => logError(err, "Fetch lab types"))
-      : api
-          .get<{ lab_types: LabType[] }>(ENDPOINTS.AUTH.ME)
-          .then((data) => setSampleTypes(data.lab_types ?? []))
-          .catch((err) => logError(err, "Fetch user lab types"));
+      : Promise.resolve(setSampleTypes(user.lab_types ?? []));
 
     const reportsPromise = api
       .get<ReportRow[]>(ENDPOINTS.REPORTS.ARCHIVE("signed"))
@@ -82,7 +79,7 @@ export default function ApprovePage() {
     Promise.all([labTypesPromise, reportsPromise]).finally(() =>
       setLoading(false)
     );
-  }, [getUser]);
+  }, [user]);
 
   // Fetch reports (for refresh after approve etc)
   const fetchReports = () => {

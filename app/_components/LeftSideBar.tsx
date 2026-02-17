@@ -12,19 +12,23 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useUser } from "@/lib/hooks/useUser";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
-import NotificationBell from "./NotificationBell";
+import dynamic from "next/dynamic";
 
-const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
+const NotificationBell = dynamic(() => import("./NotificationBell"), {
+  ssr: false,
+});
+
+const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"] as const;
 
 type MenuItem = {
   href?: string;
   label: string;
-  icon: any;
-  roles?: string[];
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: readonly string[];
   submenu?: { href: string; label: string }[];
 };
 
@@ -51,40 +55,35 @@ const menu: MenuItem[] = [
 
 export default function LeftSidebar() {
   const pathname = usePathname();
-  const { getUser } = useAuth();
-  const [userRole, setUserRole] = useState("");
+  const { user, loading } = useUser();
+  const userRole = user?.role ?? "";
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
-
-  useEffect(() => {
-    const user = getUser();
-    setUserRole(user?.roleName ?? "");
-  }, [getUser]);
 
   // Auto-open dropdown if current path matches a submenu item
   useEffect(() => {
+    // While loading, don't try to compute open dropdowns yet
+    if (loading) return;
+
     const dropdownsToOpen: string[] = [];
     menu.forEach((item) => {
-      if (item.submenu) {
-        const hasActiveSubmenu = item.submenu.some((sub) =>
-          pathname.startsWith(sub.href)
-        );
-        if (hasActiveSubmenu) {
-          dropdownsToOpen.push(item.label);
-        }
-      }
+      if (!item.submenu) return;
+      const hasActiveSubmenu = item.submenu.some((sub) =>
+        pathname.startsWith(sub.href)
+      );
+      if (hasActiveSubmenu) dropdownsToOpen.push(item.label);
     });
     setOpenDropdowns(dropdownsToOpen);
-  }, [pathname]);
-
-  const visibleMenu = menu.filter(
-    (item) => !item.roles || item.roles.includes(userRole)
-  );
+  }, [pathname, loading]);
 
   const toggleDropdown = (label: string) => {
     setOpenDropdowns((prev) =>
       prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
     );
   };
+
+  const visibleMenu = menu.filter(
+    (item) => !item.roles || item.roles.includes(userRole)
+  );
 
   return (
     <aside className="w-[240px] bg-cyan-950 text-white flex flex-col">
@@ -97,100 +96,126 @@ export default function LeftSidebar() {
             className="h-9 w-9 rounded-xl object-cover shadow-lg"
           />
 
-          <a href="/">
+          <Link href="/" className="block">
             <div>
               <div className="text-[15px] font-semibold">Лаборатори</div>
-              <div className="text-[11px] text-white/70">бүртгэлийн систем</div>
+              <div className="text-[11px] text-white/70">
+                бүртгэлийн систем
+              </div>
             </div>
-          </a>
+          </Link>
+
           <NotificationBell />
         </div>
       </div>
 
-      {/* huwaaj baigaa heseg*/}
       <div className="mx-4 h-px bg-white" />
 
       {/* Menu */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {visibleMenu.map((item) => {
-          const Icon = item.icon;
+        {loading ? (
+          <div className="space-y-2 opacity-60">
+            <div className="h-9 rounded-lg bg-white/10" />
+            <div className="h-9 rounded-lg bg-white/10" />
+            <div className="h-9 rounded-lg bg-white/10" />
+            <div className="h-9 rounded-lg bg-white/10" />
+          </div>
+        ) : (
+          visibleMenu.map((item) => {
+            const Icon = item.icon;
 
-          // If item has submenu (dropdown)
-          if (item.submenu) {
-            const isOpen = openDropdowns.includes(item.label);
-            const hasActiveSubmenu = item.submenu.some((sub) =>
-              pathname.startsWith(sub.href)
-            );
+            // Dropdown
+            if (item.submenu) {
+              const isOpen = openDropdowns.includes(item.label);
+              const hasActiveSubmenu = item.submenu.some((sub) =>
+                pathname.startsWith(sub.href)
+              );
+
+              return (
+                <div key={item.label}>
+                  <button
+                    type="button"
+                    onClick={() => toggleDropdown(item.label)}
+                    className={`w-full flex items-start justify-between gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                      hasActiveSubmenu
+                        ? "bg-white/10 text-white"
+                        : "text-white/70 hover:bg-white/5"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3 flex-1">
+                      <Icon className="h-4 w-4 mt-0.5 shrink-0" />
+                      <span className="text-left leading-snug">
+                        {item.label}
+                      </span>
+                    </div>
+                    {isOpen ? (
+                      <ChevronUp className="h-4 w-4 mt-0.5 shrink-0" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 mt-0.5 shrink-0" />
+                    )}
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="ml-7 mt-1 space-y-1 pl-2 pb-1 border-l border-white/20">
+                          {item.submenu.map((subItem) => {
+                            const subActive = pathname.startsWith(subItem.href);
+                            return (
+                              <Link
+                                key={subItem.href}
+                                href={subItem.href}
+                                className={`block rounded-lg px-3 py-2 text-sm transition ${
+                                  subActive
+                                    ? "bg-white/10 text-white"
+                                    : "text-white/70 hover:bg-white/5"
+                                }`}
+                              >
+                                {subItem.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+
+            // Regular item
+            const active = item.href
+              ? item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href)
+              : false;
 
             return (
-              <div key={item.label}>
-                <button
-                  onClick={() => toggleDropdown(item.label)}
-                  className={`w-full flex items-start justify-between gap-3 rounded-lg px-3 py-2 text-sm transition ${hasActiveSubmenu ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/5"}`}
-                >
-                  <div className="flex items-start gap-3 flex-1">
-                    <Icon className="h-4 w-4 mt-0.5 shrink-0" />
-                    <span className="text-left leading-snug">{item.label}</span>
-                  </div>
-                  {isOpen ? (
-                    <ChevronUp className="h-4 w-4 mt-0.5 shrink-0" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 mt-0.5 shrink-0" />
-                  )}
-                </button>
-
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <div className="ml-7 mt-1 space-y-1 pl-2 pb-1 border-l-1">
-                        {item.submenu.map((subItem) => {
-                          const subActive = pathname.startsWith(subItem.href);
-                          return (
-                            <Link
-                              key={subItem.href}
-                              href={subItem.href}
-                              className={`block rounded-lg px-3 py-2 text-sm transition ${subActive ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/5"}`}
-                            >
-                              {subItem.label}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <Link
+                key={item.href ?? item.label}
+                href={item.href!}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                  active
+                    ? "bg-white/10 text-white"
+                    : "text-white/70 hover:bg-white/5"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </Link>
             );
-          }
-
-          // Regular menu item
-          const active = item.href
-            ? item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href)
-            : false;
-          return (
-            <Link
-              key={item.href}
-              href={item.href!}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition
-                ${active ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/5"}
-              `}
-            >
-              <Icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          );
-        })}
+          })
+        )}
       </nav>
 
       <div className="mx-4 h-px bg-white" />
+
       {/* User Menu */}
       <UserMenu variant="sidebar" />
     </aside>

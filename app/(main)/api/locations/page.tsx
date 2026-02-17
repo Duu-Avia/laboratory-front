@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useUser } from "@/lib/hooks/useUser";
 import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,20 +23,15 @@ const ELEVATED_ROLES = ["senior_engineer", "admin", "superadmin"];
 
 export default function LocationsPage() {
   const router = useRouter();
-  const { getUser } = useAuth();
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { user } = useUser();
+  const userRole = user?.role ?? "";
+  const isAuthorized = ELEVATED_ROLES.includes(userRole);
 
-  // Role-based access control
   useEffect(() => {
-    const user = getUser();
-    const userRole = user?.roleName ?? "";
-
-    if (!ELEVATED_ROLES.includes(userRole)) {
+    if (user && !isAuthorized) {
       router.push("/");
-    } else {
-      setIsAuthorized(true);
     }
-  }, [getUser, router]);
+  }, [user, isAuthorized, router]);
 
   // Data
   const [locations, setLocations] = useState<LocationPackage[]>([]);

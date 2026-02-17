@@ -13,7 +13,7 @@ import { ENDPOINTS } from "@/lib/api/endpoints";
 import { STATUS_LABELS } from "@/lib/constants";
 import { logError } from "@/lib/errors";
 import { countByLabType } from "@/lib/counterLab";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useUser } from "@/lib/hooks/useUser";
 import { RecentDay } from "../utils/GetRecentDays";
 import { Header } from "../_components/Header";
 import { ReportsTable } from "../_components/ReportsTable";
@@ -27,7 +27,7 @@ const ADMIN_ROLES = ["superadmin"];
 
 export default function ReportsPage() {
   const router = useRouter();
-  const { getUser } = useAuth();
+  const { user } = useUser();
   const thirtyDaysAgo = RecentDay().thirtyDayAgo;
   const today = RecentDay().today;
 
@@ -59,18 +59,15 @@ export default function ReportsPage() {
 
   // Fetch lab types — super admin, others get their assigned types from /auth/me
   useEffect(() => {
-    const user = getUser();
-    const isAdmin = ADMIN_ROLES.includes(user?.roleName ?? "");
+    if (!user) return;
+    const isAdmin = ADMIN_ROLES.includes(user.role ?? "");
 
     const labTypesPromise = isAdmin
       ? api
           .get<LabType[]>(ENDPOINTS.LAB_TYPES.LIST)
           .then((data) => setLabTypes(data))
           .catch((err) => logError(err, "Fetch lab types"))
-      : api
-          .get<{ lab_types: LabType[] }>(ENDPOINTS.AUTH.ME)
-          .then((data) => setLabTypes(data.lab_types ?? []))
-          .catch((err) => logError(err, "Fetch user lab types"));
+      : Promise.resolve(setLabTypes(user.lab_types ?? []));
 
     const reportsPromise = api
       .get<ReportRow[]>(ENDPOINTS.REPORTS.LIST)
@@ -90,7 +87,7 @@ export default function ReportsPage() {
     Promise.all([labTypesPromise, reportsPromise]).finally(() =>
       setLoading(false)
     );
-  }, [getUser]);
+  }, [user]);
 
   // Fetch reports (for refresh after create/approve/etc)
   const fetchReports = () => {
@@ -134,11 +131,10 @@ export default function ReportsPage() {
   });
 
   function handleRowClick(report: ReportRow) {
-    const user = getUser();
     const isOwner =
-      user?.userId != null &&
+      user?.id != null &&
       report.created_by != null &&
-      user.userId === report.created_by;
+      user.id === report.created_by;
 
     if (
       report.status === "tested" ||
@@ -182,7 +178,6 @@ export default function ReportsPage() {
       setDeleteSuccess(false);
     }, 3000);
   };
-
   return (
     <div className="p-4 space-y-5">
       {/* Delete Success Banner */}

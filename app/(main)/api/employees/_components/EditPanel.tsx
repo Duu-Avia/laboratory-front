@@ -124,7 +124,7 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
   };
 
   const handleDeactivate = async () => {
-    if (!employee) return console.log("sonogoson employee id algaa");
+    if (!employee) return console.log("songoson employee id algaa");
     try {
       const id = employee.id;
       await api.put(ENDPOINTS.USERS.DEACTIVATE(id));
@@ -134,7 +134,6 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
       logError(err, "Deactivate user");
     }
   };
-  console.log(employee?.id, " songogdson empoyee id shvv");
   return (
     <AnimatePresence>
       {employee && (

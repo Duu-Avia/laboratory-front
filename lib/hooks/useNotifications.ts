@@ -67,14 +67,10 @@ export function useNotifications() {
     }
   }, []);
 
-  // SSE connection
+  // SSE connection — cookie is sent automatically via withCredentials
   useEffect(() => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    if (!token) return;
-
-    const url = `${env.apiUrl}${ENDPOINTS.NOTIFICATIONS.STREAM}?token=${encodeURIComponent(token)}`;
-    const es = new EventSource(url);
+    const url = `${env.apiUrl}${ENDPOINTS.NOTIFICATIONS.STREAM}`;
+    const es = new EventSource(url, { withCredentials: true });
     eventSourceRef.current = es;
 
     es.addEventListener("notification", (event) => {

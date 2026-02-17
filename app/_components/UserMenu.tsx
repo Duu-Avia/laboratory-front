@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LogOut, User, ChevronsUpDown } from "lucide-react";
 import { ProfileDialog } from "./ProfileDialog";
-import { useAuth, type TokenPayload } from "@/lib/hooks/useAuth";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useUser } from "@/lib/hooks/useUser";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -34,19 +35,15 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ variant = "default" }: UserMenuProps) {
-  const { getUser, logout } = useAuth();
-  const [user, setUser] = useState<TokenPayload | null>(null);
+  const { logout } = useAuth();
+  const { user } = useUser();
   const [profileOpen, setProfileOpen] = useState(false);
-
-  useEffect(() => {
-    setUser(getUser());
-  }, [getUser]);
 
   if (!user) return null;
 
   const initials = getInitials(user.email);
   const displayName = user.email.split("@")[0].replace(/[._-]/g, " ");
-  const roleLabel = ROLE_LABELS[user.roleName] ?? user.roleName;
+  const roleLabel = ROLE_LABELS[user.role] ?? user.role;
 
   const trigger =
     variant === "sidebar" ? (

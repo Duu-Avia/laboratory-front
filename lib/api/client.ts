@@ -15,21 +15,11 @@ export class ApiError extends Error {
 }
 
 /**
- * Get authentication token from localStorage
- */
-const getToken = (): string | null => {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("token");
-};
-
-/**
  * Get default headers for API requests
  */
 const getHeaders = (customHeaders?: HeadersInit): HeadersInit => {
-  const token = getToken();
   return {
     "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
     ...customHeaders,
   };
 };
@@ -51,14 +41,13 @@ async function baseFetch<T>(
 
   const response = await fetch(url, {
     ...requestInit,
+    credentials: "include",
     headers: getHeaders(requestInit.headers),
   });
 
   // Handle unauthorized - redirect to login unless caller handles it
   if (response.status === 401) {
     if (!skipAuthRedirect && typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      document.cookie = "token=; path=/; max-age=0";
       window.location.href = "/login";
     }
     const data = await response.json().catch(() => null);
@@ -103,7 +92,7 @@ export const api = {
     }),
 
   delete: <T>(endpoint: string, options?: FetchOptions) =>
-    baseFetch<T>(endpoint, { ...options, method: "PUT" }),
+    baseFetch<T>(endpoint, { ...options, method: "DELETE" }),
 };
 
 /**
@@ -111,12 +100,9 @@ export const api = {
  */
 export async function fetchBlob(endpoint: string): Promise<Blob> {
   const url = `${env.apiUrl}${endpoint}`;
-  const token = getToken();
 
   const response = await fetch(url, {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
+    credentials: "include",
   });
 
   if (!response.ok) {

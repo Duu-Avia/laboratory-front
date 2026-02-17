@@ -87,7 +87,6 @@ export default function ArchivePage() {
       matchSearch && matchStatus && matchLabType && matchDateFrom && matchDateTo
     );
   });
-  console.log(selectedLabType);
   function handleRowClick(report: ReportRow) {
     if (report.status === "tested" || report.status === "approved") {
       setPdfReportId(report.id);
@@ -103,7 +102,8 @@ export default function ArchivePage() {
   const handleExcelConvert = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/reports/excel?status=${status}`
+        `http://localhost:8000/reports/excel?status=${status}`,
+        { credentials: "include" }
       );
       if (!response.ok) {
         console.log("export failed");
@@ -111,7 +111,6 @@ export default function ArchivePage() {
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      console.log(blob);
 
       const a = document.createElement("a");
       a.href = url;
@@ -123,9 +122,7 @@ export default function ArchivePage() {
     } catch (err) {
       console.log("error while download excel ", err);
     }
-    console.log("excel export daragdsan shvv");
   };
-  console.log(data);
   return (
     <div className="p-6 space-y-5">
       <AnimatePresence mode="wait">

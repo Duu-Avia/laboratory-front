@@ -33,6 +33,7 @@ export default function LoginPage() {
       const res = await fetch("http://localhost:8000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(data),
       });
 
@@ -41,12 +42,6 @@ export default function LoginPage() {
       if (!res.ok) {
         setServerError(json.detail || json.message || "Нэвтрэхэд алдаа гарлаа");
         return;
-      }
-
-      const token = json.access_token || json.token;
-      if (token) {
-        document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-        localStorage.setItem("token", token);
       }
 
       router.push("/");

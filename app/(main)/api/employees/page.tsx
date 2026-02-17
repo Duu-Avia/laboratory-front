@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
-import { useAuth, type TokenPayload } from "@/lib/hooks/useAuth";
+import { useUser } from "@/lib/hooks/useUser";
 import type { Employee, LabType } from "@/types";
 import { LabTypeGroup } from "./_components/LabTypeGroup";
 import { CreateEmployeeDialog } from "./_components/CreateEmployeeDialog";
@@ -32,10 +32,9 @@ const ReassignDialog = dynamic(
 );
 
 export default function EmployeesPage() {
-  const { getUser } = useAuth();
+  const { user } = useUser();
 
   const [mounted, setMounted] = useState(false);
-  const [user, setUser] = useState<TokenPayload | null>(null);
   const [roleId, setRoleId] = useState<Roles[]>([]);
 
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -51,11 +50,10 @@ export default function EmployeesPage() {
 
   useEffect(() => {
     setMounted(true);
-    setUser(getUser());
-  }, [getUser]);
+  }, []);
 
-  const canCreate = CAN_CREATE_ROLES.includes((user?.roleName ?? "") as any);
-  const isSuperAdmin = user?.roleName === "superadmin";
+  const canCreate = CAN_CREATE_ROLES.includes((user?.role ?? "") as any);
+  const isSuperAdmin = user?.role === "superadmin";
 
   const fetchData = () => {
     setLoading(true);

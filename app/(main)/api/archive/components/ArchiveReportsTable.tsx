@@ -166,8 +166,6 @@ if (
       </div>
     );
   }
-console.log(data,"from archive")
-console.log(filters, "from archive filters")
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <Table className="table-fixed">

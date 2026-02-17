@@ -106,7 +106,6 @@ export function ReportsTable({ data, onRowClick }: ReportsTableProps) {
       return true;
     });
   }, [data, filters]);
-console.log(data, "this from main table")
   return (
     <div className="rounded-xl border bg-background text-left mt-[-15px]">
       <Table>

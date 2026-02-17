@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useNotifications } from "@/lib/hooks/useNotifications";
 import { NOTIFICATION_TYPE_LABELS } from "@/lib/constants";
 import type { Notification } from "@/types/notification";
-import { useAuth } from "@/lib/hooks";
+import { useUser } from "@/lib/hooks/useUser";
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -73,14 +73,14 @@ function NotificationItem({
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const userRole = useAuth().getUser();
+  const { user: userRole } = useUser();
   const router = useRouter();
   const { notifications, unreadCount, loading, markAsRead, markAllAsRead } =
     useNotifications();
 
   const handleNavigate = () => {
     setOpen(false);
-    if (userRole?.roleId === 2) {
+    if (["senior_engineer", "admin", "superadmin"].includes(userRole?.role ?? "")) {
       router.push(`/api/approve`);
     } else return;
   };

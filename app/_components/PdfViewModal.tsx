@@ -11,7 +11,7 @@ import { SignDialog } from "./SignDialog";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { api, fetchBlob } from "@/lib/api";
 import { logError } from "@/lib/errors";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useUser } from "@/lib/hooks/useUser";
 import type { ReportStatus, LabType } from "@/types";
 
 export interface PdfViewModalProps {
@@ -41,13 +41,12 @@ export function PdfViewModal({
   onDeleted,
   labTypes,
 }: PdfViewModalProps) {
-  const { getUser } = useAuth();
-  const user = getUser();
+  const { user } = useUser();
 
   const MANAGEMENT_ROLES = ["superadmin", "admin", "senior_engineer"];
-  const isManagement = MANAGEMENT_ROLES.includes(user?.roleName ?? "");
+  const isManagement = MANAGEMENT_ROLES.includes(user?.role ?? "");
   const isOwner =
-    user?.userId != null && createdBy != null && user.userId === createdBy;
+    user?.id != null && createdBy != null && user.id === createdBy;
 
   const labTypeId =
     labTypes.find((lt) => lt.type_name === reportLabType)?.id ?? null;
