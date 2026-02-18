@@ -32,7 +32,7 @@ export function DeleteDialog({
     try {
       setError(null);
       setLoading(true);
-      await api.delete(ENDPOINTS.REPORTS.DELETE(reportId));
+      await api.put(ENDPOINTS.REPORTS.DELETE(reportId));
       setDeleteDialogOpener(false);
       onDeleted?.();
     } catch (err) {

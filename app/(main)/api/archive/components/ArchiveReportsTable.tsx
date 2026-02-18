@@ -48,7 +48,7 @@ const MONTH_NAMES = [
 function groupByMonth(data: ReportRow[]) {
   const groups: Record<string, ReportRow[]> = {};
   for (const item of data) {
-    const key = item.approved_at.slice(0, 7); // "YYYY-MM"
+    const key = (item.approved_at ?? item.created_at).slice(0, 7); // "YYYY-MM"
     if (!groups[key]) groups[key] = [];
     groups[key].push(item);
   }
@@ -99,7 +99,7 @@ export function ArchiveReportsTable({ data, onRowClick }: ReportsTableProps) {
     return data.filter((row) => {
       if (
         filters.created_at &&
-        !row.approved_at.slice(0, 10).includes(filters.created_at)
+        !row.approved_at?.slice(0, 10).includes(filters.created_at)
       )
         return false;
 
@@ -306,7 +306,7 @@ function MonthGroup({
                             <Calendar className="w-3 h-3 text-slate-500 group-hover:text-blue-400" />
                           </div>
                           <span className="text-sm font-medium text-slate-700">
-                            {dataItem.approved_at.slice(0, 10)}
+                            {dataItem.approved_at?.slice(0, 10)}
                           </span>
                         </div>
                       </td>
