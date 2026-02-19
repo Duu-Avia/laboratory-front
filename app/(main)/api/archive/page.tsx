@@ -102,7 +102,7 @@ export default function ArchivePage() {
   const handleExcelConvert = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/reports/excel?status=${status}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/reports/excel?status=${status}`,
         { credentials: "include" }
       );
       if (!response.ok) {
