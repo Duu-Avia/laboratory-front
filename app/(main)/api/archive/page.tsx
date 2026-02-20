@@ -6,7 +6,7 @@ import { ArchiveHeader } from "./components/Header";
 import { RecentDay } from "@/app/utils/GetRecentDays";
 import { ReportRow, LabType, StatusFilter } from "@/types";
 import { PdfViewModal } from "@/app/_components/PdfViewModal";
-import { api } from "@/lib/api";
+import { api, fetchBlob } from "@/lib/api/client";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
 import * as motion from "motion/react-client";
@@ -101,15 +101,7 @@ export default function ArchivePage() {
   }
   const handleExcelConvert = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/reports/excel?status=${status}`,
-        { credentials: "include" }
-      );
-      if (!response.ok) {
-        console.log("export failed");
-        return;
-      }
-      const blob = await response.blob();
+      const blob = await fetchBlob(ENDPOINTS.REPORTS.EXCEL(status));
       const url = window.URL.createObjectURL(blob);
 
       const a = document.createElement("a");

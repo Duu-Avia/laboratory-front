@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FlaskConical, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { loginValidation, type LoginForm } from "@/lib/validators";
+import { api, ApiError } from "@/lib/api/client";
+import { ENDPOINTS } from "@/lib/api/endpoints";
 const loginBg = "/earth.jpg";
 
 export default function LoginPage() {
@@ -30,23 +32,15 @@ export default function LoginPage() {
     setServerError("");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        setServerError(json.detail || json.message || "Нэвтрэхэд алдаа гарлаа");
-        return;
-      }
-
+      await api.post(ENDPOINTS.AUTH.LOGIN, data, { skipAuthRedirect: true });
       router.push("/");
-    } catch {
-      setServerError("Нэвтрэхэд алдаа гарлаа");
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const d = err.data as Record<string, string> | undefined;
+        setServerError(d?.detail || d?.message || "Нэвтрэхэд алдаа гарлаа");
+      } else {
+        setServerError("Нэвтрэхэд алдаа гарлаа");
+      }
     }
   };
 
