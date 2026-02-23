@@ -24,6 +24,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+
+COPY .env.production .env.production
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
