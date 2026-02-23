@@ -43,6 +43,8 @@ export const ENDPOINTS = {
     BY_LAB_TYPE: (labTypeId: number) => `/indicators/indicators/${labTypeId}`,
     LIST: "/indicators",
     CREATE: "/indicators/create-indicator",
+    UPDATE: (id: number) => `/indicators/update/${id}`,
+    DELETE: (id: number) => `/indicators/deactive/${id}`,
   },
 
   // Locations

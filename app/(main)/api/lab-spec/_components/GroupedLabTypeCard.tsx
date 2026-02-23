@@ -14,6 +14,8 @@ interface GroupedIndicatorsSectionProps {
   onReactivateClick?: (labType: LabType) => void;
   onEditClick?: (labType: LabType) => void;
   onDeleteClick?: (labType: LabType) => void;
+  onEditIndicator?: (indicator: IndicatorRowForLabSpec) => void;
+  onDeleteIndicator?: (indicator: IndicatorRowForLabSpec) => void;
 }
 
 export function GroupedIndicatorsSection({
@@ -24,6 +26,8 @@ export function GroupedIndicatorsSection({
   onReactivateClick,
   onEditClick,
   onDeleteClick,
+  onEditIndicator,
+  onDeleteIndicator,
 }: GroupedIndicatorsSectionProps) {
   const [inactiveExpanded, setInactiveExpanded] = useState(false);
 
@@ -58,6 +62,8 @@ export function GroupedIndicatorsSection({
             items={items}
             onEdit={() => onEditClick?.(labType)}
             onDelete={() => onDeleteClick?.(labType)}
+            onEditIndicator={onEditIndicator}
+            onDeleteIndicator={onDeleteIndicator}
           />
         );
       })}

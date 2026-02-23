@@ -18,6 +18,8 @@ interface ActiveLabTypeCardProps {
   items: IndicatorRowForLabSpec[];
   onEdit?: () => void;
   onDelete?: () => void;
+  onEditIndicator?: (indicator: IndicatorRowForLabSpec) => void;
+  onDeleteIndicator?: (indicator: IndicatorRowForLabSpec) => void;
 }
 
 export function ActiveLabTypeCard({
@@ -26,6 +28,8 @@ export function ActiveLabTypeCard({
   items,
   onEdit,
   onDelete,
+  onEditIndicator,
+  onDeleteIndicator,
 }: ActiveLabTypeCardProps) {
   return (
     <div className="rounded-2xl border border-emerald-300/60 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 overflow-hidden animate-fade-in hover:shadow-2xl hover:shadow-slate-300/50 dark:hover:shadow-slate-900/50 transition-all duration-300">
@@ -103,17 +107,24 @@ export function ActiveLabTypeCard({
               <TableHead className="w-[100px] text-right text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                 Default
               </TableHead>
+              <TableHead className="w-[80px]" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((item, index) => (
-              <IndicatorRow key={item.id} indicator={item} index={index} />
+              <IndicatorRow
+                key={item.id}
+                indicator={item}
+                index={index}
+                onEdit={onEditIndicator}
+                onDelete={onDeleteIndicator}
+              />
             ))}
 
             {items.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="py-5 text-center text-slate-600 dark:text-slate-400"
                 >
                   <FlaskConical className="mx-auto h-10 w-10 mb-3 opacity-20" />

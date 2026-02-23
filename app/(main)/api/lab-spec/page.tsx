@@ -11,6 +11,8 @@ import {
   EditLabTypeDialog,
   DeleteLabTypeDialog,
   ReactivateLabTypeDialog,
+  EditIndicatorDialog,
+  DeleteIndicatorDialog,
 } from "./_components/dialogs";
 import { IndicatorRowForLabSpec, LabType } from "@/types";
 import { api } from "@/lib/api";
@@ -47,6 +49,12 @@ export default function LabPage() {
   const [reactivateLabTypeOpen, setReactivateLabTypeOpen] = useState(false);
   const [selectedLabType, setSelectedLabType] = useState<LabType | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // indicator modals
+  const [editIndicatorOpen, setEditIndicatorOpen] = useState(false);
+  const [deleteIndicatorOpen, setDeleteIndicatorOpen] = useState(false);
+  const [selectedIndicator, setSelectedIndicator] =
+    useState<IndicatorRowForLabSpec | null>(null);
 
   const fetchLabTypes = () => {
     api
@@ -206,6 +214,14 @@ export default function LabPage() {
                   setSelectedLabType(labType);
                   setDeleteLabTypeOpen(true);
                 }}
+                onEditIndicator={(indicator) => {
+                  setSelectedIndicator(indicator);
+                  setEditIndicatorOpen(true);
+                }}
+                onDeleteIndicator={(indicator) => {
+                  setSelectedIndicator(indicator);
+                  setDeleteIndicatorOpen(true);
+                }}
               />
             </div>
 
@@ -242,6 +258,21 @@ export default function LabPage() {
               onOpenChange={setReactivateLabTypeOpen}
               labType={selectedLabType}
               onReactivated={fetchLabTypes}
+            />
+
+            {/* Indicator Dialogs */}
+            <EditIndicatorDialog
+              open={editIndicatorOpen}
+              onOpenChange={setEditIndicatorOpen}
+              indicator={selectedIndicator}
+              onUpdated={fetchIndicators}
+            />
+
+            <DeleteIndicatorDialog
+              open={deleteIndicatorOpen}
+              onOpenChange={setDeleteIndicatorOpen}
+              indicator={selectedIndicator}
+              onDeleted={fetchIndicators}
             />
           </motion.div>
         )}
