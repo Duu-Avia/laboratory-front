@@ -97,6 +97,38 @@ export const api = {
 };
 
 /**
+ * Upload a file via FormData (multipart/form-data)
+ * Does NOT set Content-Type header — browser sets it with boundary automatically.
+ */
+export async function uploadFile<T = unknown>(
+  endpoint: string,
+  formData: FormData
+): Promise<T> {
+  const url = `${env.apiUrl}${endpoint}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+
+  if (response.status === 401) {
+    if (typeof window !== "undefined") {
+      window.location.href = ROUTES.login();
+    }
+    throw new ApiError(401, "Unauthorized");
+  }
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new ApiError(response.status, response.statusText, data);
+  }
+
+  return data as T;
+}
+
+/**
  * Fetch blob (for file downloads like Excel, PDF)
  */
 export async function fetchBlob(endpoint: string): Promise<Blob> {

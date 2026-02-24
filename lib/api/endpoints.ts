@@ -68,6 +68,8 @@ export const ENDPOINTS = {
     LAB_TYPES: (userId: number) => `/users/lab-types/${userId}`,
     PROFILE: "/users/profile",
     PROFILE_PASSWORD: "/users/profile/password",
+    SIGNATURE: "/users/profile/signature",
+    SIGNATURE_BY_ID: (id: number) => `/users/signature/${id}`,
     LIST: "/users",
     CREATE: "/users",
     DETAIL: (id: number) => `/users/${id}`,

@@ -1,1 +1,1 @@
-export { api, ApiError, fetchBlob } from "./client";
+export { api, ApiError, fetchBlob, uploadFile } from "./client";
