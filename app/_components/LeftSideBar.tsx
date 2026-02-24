@@ -13,6 +13,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
+import { ROUTES } from "@/lib/routes";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
@@ -32,23 +33,25 @@ type MenuItem = {
   submenu?: { href: string; label: string }[];
 };
 
+const HOME_PATH = ROUTES.home();
+
 const menu: MenuItem[] = [
-  { href: "/", label: "Сорьц", icon: ClipboardCheck },
-  { href: "/api/archive", label: "Архив", icon: Clock },
+  { href: HOME_PATH, label: "Сорьц", icon: ClipboardCheck },
+  { href: ROUTES.app.archive(), label: "Архив", icon: Clock },
   {
-    href: "/api/approve",
+    href: ROUTES.app.approve(),
     label: "Баталгаажуулах хүсэлт",
     icon: CheckCircle2,
     roles: ELEVATED_ROLES,
   },
-  { href: "/api/employees", label: "Хүмүүс", icon: Users },
+  { href: ROUTES.app.employees(), label: "Хүмүүс", icon: Users },
   {
     label: "Шинжилгээний бүртгэл",
     icon: Pencil,
     roles: ELEVATED_ROLES,
     submenu: [
-      { href: "/api/lab-spec", label: "Лаб төрөл" },
-      { href: "/api/locations", label: "Байршил" },
+      { href: ROUTES.app.labSpec(), label: "Лаб төрөл" },
+      { href: ROUTES.app.locations(), label: "Байршил" },
     ],
   },
 ];
@@ -96,7 +99,7 @@ export default function LeftSidebar() {
             className="h-9 w-9 rounded-xl object-cover shadow-lg"
           />
 
-          <Link href="/" className="block">
+          <Link href={HOME_PATH} className="block">
             <div>
               <div className="text-[15px] font-semibold">Лаборатори</div>
               <div className="text-[11px] text-white/70">
@@ -191,8 +194,8 @@ export default function LeftSidebar() {
 
             // Regular item
             const active = item.href
-              ? item.href === "/"
-                ? pathname === "/"
+              ? item.href === HOME_PATH
+                ? pathname === HOME_PATH
                 : pathname.startsWith(item.href)
               : false;
 
@@ -221,3 +224,4 @@ export default function LeftSidebar() {
     </aside>
   );
 }
+

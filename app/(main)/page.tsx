@@ -21,6 +21,7 @@ import { CreateReportModal } from "../_components/CreateReportModal";
 import { PdfViewModal } from "../_components/PdfViewModal";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
+import { ROUTES } from "@/lib/routes";
 // Utils
 
 const ADMIN_ROLES = ["superadmin"];
@@ -149,7 +150,7 @@ export default function ReportsPage() {
       setPdfReportLabType(report.lab_type ?? null);
       setPdfModalOpen(true);
     } else if (isOwner) {
-      router.push(`/api/reports/${report.id}`);
+      router.push(ROUTES.app.reportDetail(report.id));
     }
   }
 

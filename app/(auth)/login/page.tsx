@@ -12,6 +12,7 @@ import { FlaskConical, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { loginValidation, type LoginForm } from "@/lib/validators";
 import { api, ApiError } from "@/lib/api/client";
 import { ENDPOINTS } from "@/lib/api/endpoints";
+import { ROUTES } from "@/lib/routes";
 const loginBg = "/earth.jpg";
 
 export default function LoginPage() {
@@ -33,7 +34,7 @@ export default function LoginPage() {
 
     try {
       await api.post(ENDPOINTS.AUTH.LOGIN, data, { skipAuthRedirect: true });
-      router.push("/");
+      router.push(ROUTES.home());
     } catch (err) {
       if (err instanceof ApiError) {
         const d = err.data as Record<string, string> | undefined;

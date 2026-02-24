@@ -11,6 +11,7 @@ import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
+import { ROUTES } from "@/lib/routes";
 import {
   CreateLocationDialog,
   DeleteLocationDialog,
@@ -29,7 +30,7 @@ export default function LocationsPage() {
 
   useEffect(() => {
     if (user && !isAuthorized) {
-      router.push("/");
+      router.push(ROUTES.home());
     }
   }, [user, isAuthorized, router]);
 

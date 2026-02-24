@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
+import { ROUTES } from "@/lib/routes";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -204,7 +205,7 @@ export default function ReportDetailPage() {
 
       // Redirect to main page after 2 seconds
       setTimeout(() => {
-        router.push("/");
+        router.push(ROUTES.home());
       }, 2000);
     } catch (err) {
       logError(err, "Save report results");

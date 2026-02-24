@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { api } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Authentication hook — provides logout only.
@@ -18,7 +19,7 @@ export function useAuth() {
     } catch {
       // even if the call fails, redirect to login
     }
-    router.push("/login");
+    router.push(ROUTES.login());
   }, [router]);
 
   return { logout };

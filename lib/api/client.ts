@@ -1,4 +1,5 @@
 import { env } from "@/lib/config/env";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * API Error class for handling API errors
@@ -48,7 +49,7 @@ async function baseFetch<T>(
   // Handle unauthorized - redirect to login unless caller handles it
   if (response.status === 401) {
     if (!skipAuthRedirect && typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.href = ROUTES.login();
     }
     const data = await response.json().catch(() => null);
     throw new ApiError(401, "Unauthorized", data);

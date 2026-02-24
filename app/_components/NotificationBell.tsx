@@ -13,6 +13,7 @@ import { useNotifications } from "@/lib/hooks/useNotifications";
 import { NOTIFICATION_TYPE_LABELS } from "@/lib/constants";
 import type { Notification } from "@/types/notification";
 import { useUser } from "@/lib/hooks/useUser";
+import { ROUTES } from "@/lib/routes";
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -81,7 +82,7 @@ export default function NotificationBell() {
   const handleNavigate = () => {
     setOpen(false);
     if (["senior_engineer", "admin", "superadmin"].includes(userRole?.role ?? "")) {
-      router.push(`/api/approve`);
+      router.push(ROUTES.app.approve());
     } else return;
   };
   return (

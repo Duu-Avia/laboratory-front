@@ -9,6 +9,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import Link from "next/link";
+import { ROUTES } from "@/lib/routes";
 
 export const ReportHeader = ({
   reportId,
@@ -20,7 +21,7 @@ export const ReportHeader = ({
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-4">
         <Link
-          href="/reports"
+          href={ROUTES.home()}
           className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
         >
           Тайлангийн дугаар

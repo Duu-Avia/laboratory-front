@@ -11,6 +11,7 @@ import { ENDPOINTS } from "@/lib/api/endpoints";
 import { logError } from "@/lib/errors";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
+import { ROUTES } from "@/lib/routes";
 
 export default function ArchivePage() {
   const router = useRouter();
@@ -96,7 +97,7 @@ export default function ArchivePage() {
       setPdfReportLabType(report.lab_type ?? null);
       setPdfModalOpen(true);
     } else {
-      router.push(`/reports/${report.id}`);
+      router.push(ROUTES.app.reportDetail(report.id));
     }
   }
   const handleExcelConvert = async () => {
