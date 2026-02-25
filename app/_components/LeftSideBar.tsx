@@ -11,6 +11,7 @@ import {
   Users,
   ChevronDown,
   ChevronUp,
+  CircleHelp,
 } from "lucide-react";
 import { useUser } from "@/lib/hooks/useUser";
 import { ROUTES } from "@/lib/routes";
@@ -61,6 +62,18 @@ export default function LeftSidebar() {
   const { user, loading } = useUser();
   const userRole = user?.role ?? "";
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
+  const [helpEnabled, setHelpEnabled] = useState(true);
+
+  // Sync help toggle state from localStorage
+  useEffect(() => {
+    const enabled = localStorage.getItem("helpEnabled");
+    if (enabled === "false") {
+      setHelpEnabled(false);
+    } else {
+      // default or "true"
+      setHelpEnabled(true);
+    }
+  }, []);
 
   // Auto-open dropdown if current path matches a submenu item
   useEffect(() => {
@@ -216,6 +229,23 @@ export default function LeftSidebar() {
           })
         )}
       </nav>
+
+      {/* Help toggle */}
+      <div className="px-3 pb-2">
+        <button
+          type="button"
+          onClick={() => {
+            const next = !helpEnabled;
+            setHelpEnabled(next);
+            localStorage.setItem("helpEnabled", String(next));
+            window.dispatchEvent(new Event("helpToggled"));
+          }}
+          className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/5 transition"
+        >
+          <CircleHelp className="h-4 w-4" />
+          {helpEnabled ? "Тусламж унтраах" : "Тусламж асаах"}
+        </button>
+      </div>
 
       <div className="mx-4 h-px bg-white" />
 

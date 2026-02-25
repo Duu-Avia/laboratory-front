@@ -1,19 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AlertCircle, X, Mail, Key, Lock, Trash2 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { AlertCircle, X, Mail, Key, Lock, Trash2, Pen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { api } from "@/lib/api";
+import { api, uploadFile, fetchBlob } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { getErrorMessage, logError } from "@/lib/errors";
 import type { Employee, Roles } from "@/types";
@@ -46,12 +35,28 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Signature
+  const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
+  const [signatureUploading, setSignatureUploading] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [confirmAction, setConfirmAction] = useState<"replace" | "delete" | "deactivate" | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     api
       .get<Roles[]>(ENDPOINTS.USERS.ROLES)
       .then(setRoles)
       .catch((err) => logError(err, "Fetch roles"));
   }, []);
+
+  const loadSignature = async (userId: number) => {
+    try {
+      const blob = await fetchBlob(ENDPOINTS.USERS.SIGNATURE_BY_ID(userId));
+      setSignatureUrl(URL.createObjectURL(blob));
+    } catch {
+      setSignatureUrl(null);
+    }
+  };
 
   useEffect(() => {
     if (employee) {
@@ -60,8 +65,70 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
       setEditPassword("");
       setError(null);
       setSuccess(null);
+      setConfirmAction(null);
+      loadSignature(employee.id);
     }
   }, [employee]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !employee) return;
+
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      setError("Зөвхөн PNG, JPG зураг оруулна уу");
+      return;
+    }
+
+    setPendingFile(file);
+    setConfirmAction("replace");
+  };
+
+  const cancelConfirm = () => {
+    setConfirmAction(null);
+    setPendingFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleSignatureUpload = async () => {
+    if (!pendingFile || !employee) return;
+    try {
+      setError(null);
+      setSuccess(null);
+      setSignatureUploading(true);
+      const formData = new FormData();
+      formData.append("signature", pendingFile);
+      await uploadFile(ENDPOINTS.USERS.SIGNATURE_BY_ID(employee.id), formData);
+      setSuccess("Гарын үсэг хадгалагдлаа");
+      await loadSignature(employee.id);
+      setConfirmAction(null);
+    } catch (err) {
+      logError(err, "Upload signature");
+      setError(getErrorMessage(err));
+    } finally {
+      setSignatureUploading(false);
+      setPendingFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSignatureDelete = async () => {
+    if (!employee) return;
+    try {
+      setError(null);
+      setSuccess(null);
+      setSignatureUploading(true);
+      await api.delete(ENDPOINTS.USERS.SIGNATURE_BY_ID(employee.id));
+      setSignatureUrl(null);
+      setSuccess("Гарын үсэг устгагдлаа");
+      setConfirmAction(null);
+    } catch (err) {
+      logError(err, "Delete signature");
+      setError(getErrorMessage(err));
+    } finally {
+      setSignatureUploading(false);
+    }
+  };
 
   const handleUpdateEmail = async () => {
     if (!employee || !editEmail.trim()) return;
@@ -124,16 +191,17 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
   };
 
   const handleDeactivate = async () => {
-    if (!employee) return console.log("songoson employee id algaa");
+    if (!employee) return;
     try {
-      const id = employee.id;
-      await api.put(ENDPOINTS.USERS.DEACTIVATE(id));
+      await api.put(ENDPOINTS.USERS.DEACTIVATE(employee.id));
+      setConfirmAction(null);
       onClose();
       onSaved?.();
     } catch (err) {
       logError(err, "Deactivate user");
     }
   };
+
   return (
     <AnimatePresence>
       {employee && (
@@ -218,7 +286,7 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
                 <div className="relative">
                   <Key className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400 z-10" />
                   <Select
-                    value={editRoleId ? String(editRoleId) : undefined}
+                    value={editRoleId ? String(editRoleId) : ""}
                     onValueChange={(v) => {
                       setEditRoleId(Number(v));
                       setSuccess(null);
@@ -280,45 +348,185 @@ export function EditPanel({ employee, onClose, onSaved }: EditPanelProps) {
 
               <Separator />
 
+              {/* Signature */}
+              <div className="space-y-2">
+                <Label className="text-xs text-slate-600 font-medium flex items-center gap-1">
+                  <Pen className="h-3 w-3 text-slate-400" />
+                  Гарын үсэг
+                </Label>
+
+                {/* Inline confirmation for replace/delete */}
+                {confirmAction === "replace" && (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+                    <p className="text-xs text-amber-800 font-medium">
+                      {signatureUrl ? "Гарын үсэг солих уу?" : "Гарын үсэг хадгалах уу?"}
+                    </p>
+                    <p className="text-[11px] text-amber-600">
+                      {signatureUrl
+                        ? "Одоогийн гарын үсгийг шинээр сонгосон зургаар солих гэж байна."
+                        : "Сонгосон зургийг гарын үсэг болгон хадгалах уу?"}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs flex-1"
+                        onClick={cancelConfirm}
+                        disabled={signatureUploading}
+                      >
+                        Болих
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs flex-1"
+                        onClick={handleSignatureUpload}
+                        disabled={signatureUploading}
+                      >
+                        {signatureUploading ? "Хадгалж байна..." : "Тийм, хадгалах"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {confirmAction === "delete" && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-3 space-y-2">
+                    <p className="text-xs text-red-800 font-medium">
+                      Гарын үсэг устгах уу?
+                    </p>
+                    <p className="text-[11px] text-red-600">
+                      {employee.email} хэрэглэгчийн гарын үсгийг устгахдаа итгэлтэй байна уу?
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs flex-1"
+                        onClick={cancelConfirm}
+                        disabled={signatureUploading}
+                      >
+                        Болих
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="h-7 text-xs flex-1"
+                        onClick={handleSignatureDelete}
+                        disabled={signatureUploading}
+                      >
+                        {signatureUploading ? "Устгаж байна..." : "Тийм, устгах"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Normal signature UI (hidden during confirmation) */}
+                {confirmAction !== "replace" && confirmAction !== "delete" && (
+                  <>
+                    {signatureUrl ? (
+                      <div className="space-y-2">
+                        <div className="border border-slate-200 rounded-lg p-2 bg-slate-50 flex items-center justify-center">
+                          <img
+                            src={signatureUrl}
+                            alt="Гарын үсэг"
+                            className="max-h-12 object-contain"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs flex-1"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={signatureUploading}
+                          >
+                            Солих
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs flex-1 text-red-600 border-red-200 hover:bg-red-50"
+                            onClick={() => setConfirmAction("delete")}
+                            disabled={signatureUploading}
+                          >
+                            Устгах
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs w-full"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={signatureUploading}
+                      >
+                        {signatureUploading ? "..." : "Зураг оруулах"}
+                      </Button>
+                    )}
+                  </>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
+                <p className="text-[11px] text-slate-400">
+                  PNG эсвэл JPG. Цагаан дэвсгэр автоматаар арилна.
+                </p>
+              </div>
+
+              <Separator />
+
               {/* Deactivate */}
               <div className="space-y-2">
                 <Label className="text-xs text-red-500 font-medium">
                   Аюултай бүс
                 </Label>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 text-xs w-full text-red-600 border-red-200 hover:bg-red-50 gap-1.5"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                      {employee.is_active
-                        ? "Идэвхгүй болгох"
-                        : "Аль хэдийн идэвхгүй"}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Ажилтныг идэвхгүй болгох уу?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {employee.email} хэрэглэгчийг идэвхгүй болговол системд
-                        нэвтрэх боломжгүй болно.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Болих</AlertDialogCancel>
-                      <AlertDialogAction
+
+                {confirmAction === "deactivate" ? (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-3 space-y-2">
+                    <p className="text-xs text-red-800 font-medium">
+                      Ажилтныг идэвхгүй болгох уу?
+                    </p>
+                    <p className="text-[11px] text-red-600">
+                      {employee.email} хэрэглэгчийг идэвхгүй болговол системд
+                      нэвтрэх боломжгүй болно.
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs flex-1"
+                        onClick={() => setConfirmAction(null)}
+                      >
+                        Болих
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="h-7 text-xs flex-1"
                         onClick={handleDeactivate}
-                        className="bg-red-600 text-white hover:bg-red-700"
                       >
                         Идэвхгүй болгох
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs w-full text-red-600 border-red-200 hover:bg-red-50 gap-1.5"
+                    onClick={() => setConfirmAction("deactivate")}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    {employee.is_active
+                      ? "Идэвхгүй болгох"
+                      : "Аль хэдийн идэвхгүй"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

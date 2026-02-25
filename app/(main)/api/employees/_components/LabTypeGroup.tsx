@@ -23,7 +23,6 @@ export function LabTypeGroup({
   onEmployeeEdit,
 }: LabTypeGroupProps) {
   const isEmpty = employees.length === 0;
-  console.log(employees, "from lab type group");
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md h-full">
       {/* Card Header */}

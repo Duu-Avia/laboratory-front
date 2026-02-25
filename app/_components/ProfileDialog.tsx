@@ -7,6 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +44,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   // Password change
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
@@ -46,6 +56,13 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const [signatureSuccess, setSignatureSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Signature confirmation dialog
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"upload" | "delete" | null>(null);
+  const [sigPassword, setSigPassword] = useState("");
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+
   useEffect(() => {
     if (!open) return;
     setLoading(true);
@@ -55,7 +72,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     setPasswordSuccess(false);
     setOldPassword("");
     setNewPassword("");
-    setConfirmPassword("");
+    setRepeatPassword("");
     setSignatureError(null);
     setSignatureSuccess(null);
 
@@ -113,7 +130,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       setPasswordError("Шинэ нууц үг оруулна уу");
       return;
     }
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== repeatPassword) {
       setPasswordError("Шинэ нууц үг таарахгүй байна");
       return;
     }
@@ -128,7 +145,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       setPasswordSuccess(true);
       setOldPassword("");
       setNewPassword("");
-      setConfirmPassword("");
+      setRepeatPassword("");
     } catch (err) {
       logError(err, "Change password");
       setPasswordError(getErrorMessage(err));
@@ -137,7 +154,8 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     }
   };
 
-  const handleSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // When user picks a file, validate then open password popup
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -151,39 +169,55 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       return;
     }
 
-    try {
-      setSignatureError(null);
-      setSignatureSuccess(null);
-      setSignatureUploading(true);
-
-      const formData = new FormData();
-      formData.append("signature", file);
-
-      await uploadFile(ENDPOINTS.USERS.SIGNATURE, formData);
-      setSignatureSuccess("Гарын үсэг амжилттай хадгалагдлаа");
-      await loadSignaturePreview();
-    } catch (err) {
-      logError(err, "Upload signature");
-      setSignatureError(getErrorMessage(err));
-    } finally {
-      setSignatureUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    setPendingFile(file);
+    setConfirmAction("upload");
+    setSigPassword("");
+    setConfirmError(null);
+    setConfirmOpen(true);
   };
 
-  const handleSignatureDelete = async () => {
+  // When user clicks delete, open password popup
+  const handleDeleteClick = () => {
+    setConfirmAction("delete");
+    setSigPassword("");
+    setConfirmError(null);
+    setConfirmOpen(true);
+  };
+
+  // Execute after password confirmed
+  const handleConfirmSubmit = async () => {
+    if (!sigPassword.trim()) {
+      setConfirmError("Нууц үг оруулна уу");
+      return;
+    }
+
     try {
       setSignatureError(null);
       setSignatureSuccess(null);
       setSignatureUploading(true);
-      await api.delete(ENDPOINTS.USERS.SIGNATURE);
-      setSignatureUrl(null);
-      setSignatureSuccess("Гарын үсэг амжилттай устгагдлаа");
+
+      if (confirmAction === "upload" && pendingFile) {
+        const formData = new FormData();
+        formData.append("signature", pendingFile);
+        formData.append("password", sigPassword);
+
+        await uploadFile(ENDPOINTS.USERS.SIGNATURE, formData);
+        setSignatureSuccess("Гарын үсэг амжилттай хадгалагдлаа");
+        await loadSignaturePreview();
+      } else if (confirmAction === "delete") {
+        await api.delete(ENDPOINTS.USERS.SIGNATURE, { password: sigPassword });
+        setSignatureUrl(null);
+        setSignatureSuccess("Гарын үсэг амжилттай устгагдлаа");
+      }
+
+      setConfirmOpen(false);
     } catch (err) {
-      logError(err, "Delete signature");
-      setSignatureError(getErrorMessage(err));
+      logError(err, confirmAction === "upload" ? "Upload signature" : "Delete signature");
+      setConfirmError(getErrorMessage(err));
     } finally {
       setSignatureUploading(false);
+      setPendingFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -257,7 +291,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
                       size="sm"
                       variant="outline"
                       className="text-red-600 border-red-200 hover:bg-red-50"
-                      onClick={handleSignatureDelete}
+                      onClick={handleDeleteClick}
                       disabled={signatureUploading}
                     >
                       Устгах
@@ -279,7 +313,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
                 type="file"
                 accept="image/png,image/jpeg"
                 className="hidden"
-                onChange={handleSignatureUpload}
+                onChange={handleFileSelect}
               />
               <p className="text-xs text-muted-foreground">
                 PNG эсвэл JPG, 2MB хүртэл. Цагаан дэвсгэр автоматаар арилна.
@@ -322,9 +356,9 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
               <Input
                 type="password"
                 placeholder="Шинэ нууц үг давтах"
-                value={confirmPassword}
+                value={repeatPassword}
                 onChange={(e) => {
-                  setConfirmPassword(e.target.value);
+                  setRepeatPassword(e.target.value);
                   setPasswordSuccess(false);
                 }}
               />
@@ -349,6 +383,54 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
           </div>
         )}
       </DialogContent>
+
+      {/* Password confirmation for signature actions */}
+      <AlertDialog open={confirmOpen} onOpenChange={(open) => {
+        if (!open) {
+          setConfirmOpen(false);
+          setPendingFile(null);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction === "delete" ? "Гарын үсэг устгах" : "Гарын үсэг хадгалах"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction === "delete"
+                ? "Гарын үсгийг устгахдаа итгэлтэй байна уу? Нууц үгээ оруулна уу."
+                : "Гарын үсгийг хадгалахын тулд нууц үгээ оруулна уу."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input
+            type="password"
+            placeholder="Нууц үг"
+            value={sigPassword}
+            onChange={(e) => setSigPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleConfirmSubmit();
+            }}
+          />
+          {confirmError && (
+            <div className="rounded-lg bg-red-50 border border-red-200 p-2 text-sm text-red-600">
+              {confirmError}
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={signatureUploading}>Болих</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleConfirmSubmit();
+              }}
+              disabled={signatureUploading || !sigPassword.trim()}
+            >
+              {signatureUploading ? "Хадгалж байна..." : "Баталгаажуулах"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

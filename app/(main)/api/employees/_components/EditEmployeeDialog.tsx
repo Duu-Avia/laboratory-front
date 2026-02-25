@@ -407,7 +407,11 @@ export function EditEmployeeDialog({
                     size="sm"
                     variant="outline"
                     className="text-xs text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={handleSignatureDelete}
+                    onClick={() => {
+                      if (window.confirm("Гарын үсгийг устгахдаа итгэлтэй байна уу?")) {
+                        handleSignatureDelete();
+                      }
+                    }}
                     disabled={signatureUploading}
                   >
                     Устгах

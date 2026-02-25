@@ -177,7 +177,7 @@ export function CreateEmployeeDialog({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-700 font-medium">Хочоо хэл</Label>
+              <Label className="text-slate-700 font-medium">Нэр</Label>
               <div className="relative">
                 <UserPen className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 <Input

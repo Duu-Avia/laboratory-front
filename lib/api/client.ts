@@ -92,8 +92,12 @@ export const api = {
       body: body ? JSON.stringify(body) : undefined,
     }),
 
-  delete: <T>(endpoint: string, options?: FetchOptions) =>
-    baseFetch<T>(endpoint, { ...options, method: "DELETE" }),
+  delete: <T>(endpoint: string, body?: unknown, options?: FetchOptions) =>
+    baseFetch<T>(endpoint, {
+      ...options,
+      method: "DELETE",
+      body: body ? JSON.stringify(body) : undefined,
+    }),
 };
 
 /**
