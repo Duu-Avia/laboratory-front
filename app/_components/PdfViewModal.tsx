@@ -238,6 +238,7 @@ export function PdfViewModal({
         onOpenChange={setSignDialogOpen}
         reportId={reportId}
         labTypeId={labTypeId}
+        createdBy={createdBy}
         onSigned={() => {
           onOpenChange(false);
           onApproved?.();

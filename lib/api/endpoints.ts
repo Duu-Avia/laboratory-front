@@ -64,7 +64,8 @@ export const ENDPOINTS = {
 
   // Users
   USERS: {
-    SENIORS: (labTypeId: number) => `/users/seniors?lab_type_id=${labTypeId}`,
+    SENIORS: (labTypeId: number, excludeUserId?: number) =>
+      `/users/seniors?lab_type_id=${labTypeId}${excludeUserId ? `&exclude_user_id=${excludeUserId}` : ""}`,
     LAB_TYPES: (userId: number) => `/users/lab-types/${userId}`,
     PROFILE: "/users/profile",
     PROFILE_PASSWORD: "/users/profile/password",

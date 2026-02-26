@@ -30,6 +30,7 @@ interface SignDialogProps {
   onOpenChange: (open: boolean) => void;
   reportId: number | null;
   labTypeId: number | null;
+  createdBy?: number | null;
   onSigned: () => void;
 }
 
@@ -38,6 +39,7 @@ export function SignDialog({
   onOpenChange,
   reportId,
   labTypeId,
+  createdBy,
   onSigned,
 }: SignDialogProps) {
   const [password, setPassword] = useState("");
@@ -55,13 +57,13 @@ export function SignDialog({
     }
 
     api
-      .get<SeniorEngineer[]>(ENDPOINTS.USERS.SENIORS(labTypeId))
+      .get<SeniorEngineer[]>(ENDPOINTS.USERS.SENIORS(labTypeId, createdBy ?? undefined))
       .then((data) => setSeniors(data))
       .catch((err) => {
         logError(err, "Fetch seniors");
         setSeniors([]);
       });
-  }, [open, labTypeId]);
+  }, [open, labTypeId, createdBy]);
 
   const handleSign = async () => {
     if (!reportId) return;
