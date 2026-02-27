@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Laboratory Management System - Frontend
+
+A full-featured laboratory management web application for managing lab test reports, employees, and approval workflows. Built with **Next.js 16** and **React 19**.
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router, Standalone mode)
+- **Language:** TypeScript 5
+- **Styling:** TailwindCSS 4, shadcn/ui (Radix UI)
+- **Forms:** React Hook Form + Zod validation
+- **Icons:** Lucide React
+- **Animations:** Motion / Framer Motion
+- **Drag & Drop:** @hello-pangea/dnd
+- **PDF Export:** html2pdf.js
+
+## Features
+
+- **Reports Management** — Create, edit, view, approve, sign, reject, and archive lab test reports
+- **Approval Workflow** — Multi-stage pipeline: Draft → Pending → Tested → Signed → Approved
+- **Employee Management** — CRUD operations for users with role & lab type assignment
+- **Lab Specifications** — Manage lab types and their associated indicators
+- **Locations & Samples** — Track sample storage locations
+- **PDF & Excel Export** — Generate and download reports
+- **Real-time Notifications** — Server-sent events for report assignments, approvals, rejections
+- **Activity Logging** — Full audit trail of user actions
+- **Role-Based Access** — `superadmin`, `admin`, `senior_engineer`, `engineer`, `technician`
+
+## Project Structure
+
+```
+app/
+├── (auth)/login/             # Login page
+├── (main)/                   # Authenticated routes
+│   ├── reports/              # Reports dashboard & detail view
+│   ├── approve/              # Report approval queue
+│   ├── archive/              # Archived reports
+│   ├── employees/            # Employee management (admin)
+│   ├── lab-spec/             # Lab type & indicator management (admin)
+│   ├── locations/            # Sample location management (admin)
+│   └── priv-log/             # Activity logs (admin)
+├── _components/              # Shared app-level components
+└── utils/                    # Utility functions
+
+lib/
+├── api/                      # API client, endpoint definitions
+├── config/                   # Environment config
+├── constants/                # App-wide constants
+├── hooks/                    # Custom hooks (useUser, useAuth, useNotifications)
+├── validators/               # Zod schemas
+└── routes.ts                 # Route path definitions
+
+components/ui/                # shadcn/ui components
+types/                        # TypeScript type definitions
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20+
+- Backend API running (default: `http://localhost:8000`)
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_ENV=development
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Install & Run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Install dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Start development server
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+### Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Script             | Description                  |
+| ------------------ | ---------------------------- |
+| `npm run dev`      | Start development server     |
+| `npm run build`    | Build for production         |
+| `npm run start`    | Start production server      |
+| `npm run lint`     | Run ESLint                   |
+| `npm run format`   | Format code with Prettier    |
+| `npm run format:check` | Check formatting         |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment (Docker + K3s)
 
-## Deploy on Vercel
+```bash
+# 1. Build Docker image
+docker build . -f Dockerfile -t laboratory-fe:v0.0.3
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 2. Save image as tar
+docker save -o laboratory_fe_v003.tar laboratory-fe:v0.0.3
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 3. Transfer tar to server (e.g. via FileZilla to /root/Downloads)
+
+# 4. Import image on server
+k3s ctr --namespace k8s.io images import Downloads/laboratory_fe_v003.tar
+
+# 5. Update image version in deployment config
+nano deployment-laboratory.yaml
+# Change the image tag to match the new build version (e.g. laboratory-fe:v0.0.3)
+
+# 6. Apply deployment
+kubectl apply -f deployment-laboratory.yaml
+```
