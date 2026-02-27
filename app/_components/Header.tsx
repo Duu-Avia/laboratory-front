@@ -67,14 +67,14 @@ export function Header({
         <div className="flex-1" />
 
         <Button
-          className="cursor-pointer hover:bg-gray-300 active:bg-gray-400"
+          className="cursor-pointer bg-gray-200 hover:bg-gray-400 active:bg-gray-400"
           variant="secondary"
           onClick={onExportClick}
         >
           Экселрүү хөрвүүлэх
         </Button>
 
-        <Button onClick={onCreateClick}>+ Сорьц шинээр оруулах</Button>
+        <Button className="bg-cyan-800 hover:bg-cyan-500" onClick={onCreateClick}>+ Сорьц шинээр оруулах</Button>
       </div>
 
       <div className="flex justify-between gap-6">
