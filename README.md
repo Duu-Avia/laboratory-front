@@ -23,7 +23,7 @@ A full-featured laboratory management web application for managing lab test repo
 - **PDF & Excel Export** — Generate and download reports
 - **Real-time Notifications** — Server-sent events for report assignments, approvals, rejections
 - **Activity Logging** — Full audit trail of user actions
-- **Role-Based Access** — `superadmin`, `admin`, `senior_engineer`, `engineer`, `technician`
+- **Role-Based Access** — `superadmin`, `senior_engineer/admin`, `engineer`,
 
 ## Project Structure
 
